@@ -1,3 +1,4 @@
+
 /* ── янтарная тема штаба (мягкая версия) ── */
 body{
   background:radial-gradient(ellipse at 50% 0%, #171208 0%, #0d0a05 70%) !important;
@@ -52,12 +53,20 @@ b,.who,.counter,#flag-counter{color:#e8c47a !important}
 .flag-banner{border-color:#e8c47a !important;color:#f0d08a !important;
   background:rgba(232,196,122,.1) !important;box-shadow:0 0 14px rgba(232,196,122,.2)}
 .term-out,.wall .post{border-color:rgba(232,196,122,.25)}
-/* ── сейф и подзаголовки (в той же эстетике) ── */
-.sub-title{font-size:22px;letter-spacing:2px;margin:18px 0 8px;color:#e8c47a;
-  text-shadow:0 0 4px rgba(232,184,74,.3)}
-.safe-box{border:1px dashed rgba(232,196,122,.35);border-radius:6px;padding:16px;
-  background:rgba(0,0,0,.3);margin-bottom:12px}
-/* снег на янтарном фоне */
-.snow-layer span{color:rgba(232,196,122,.4)}
 @media (prefers-reduced-motion: reduce){.rec-dot,.access-denied{animation:none}}
 @media (max-width:600px){.login-box{margin:16px 10px}}
+
+/* ═══ дотяжка новых элементов · та же янтарная эстетика ═══ */
+.safe-box{border:1px dashed rgba(232,196,122,.4);border-radius:6px;
+  padding:16px;background:rgba(0,0,0,.3);margin-bottom:14px}
+.safe-box input{width:100%;margin:8px 0;background:rgba(0,0,0,.4);
+  border:1px solid rgba(232,196,122,.4);color:#f0d08a;font-family:inherit;font-size:18px;
+  padding:7px 12px;border-radius:3px;outline:none}
+.safe-box input:focus{border-color:#e8c47a;box-shadow:0 0 6px rgba(232,196,122,.3)}
+.storage-box{border:1px solid rgba(232,196,122,.25);border-radius:6px;
+  padding:14px;background:rgba(0,0,0,.3);margin-bottom:8px}
+.login-box input{display:block;width:100%;margin:8px 0;background:rgba(0,0,0,.4);
+  border:1px solid rgba(232,196,122,.4);color:#f0d08a;font-family:inherit;font-size:18px;
+  padding:7px 12px;border-radius:3px;outline:none}
+.login-box input:focus{border-color:#e8c47a;box-shadow:0 0 6px rgba(232,196,122,.3)}
+section{margin-bottom:22px}

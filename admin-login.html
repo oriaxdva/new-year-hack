@@ -2,87 +2,76 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>СЛУЖЕБНЫЙ ВХОД · HU::2027</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HU::2027 · Вход в штаб</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="crt.css">
-<!-- пароль от штаба: M4ND4R1N2027 (мандариновый стандарт безопасности) -->
+<link rel="stylesheet" href="admin.css">
 </head>
 <body>
-<div id="snow" class="snow-layer"></div>
-
+<!-- ┌─ СЛУЖЕБНАЯ ЗАПИСЬ · не для дежурных ─────────────
+     логин: santa_operator
+     пароль: SANTA_ROOT_2027
+     кто читает исходники — тот уже почти админ
+     └────────────────────────────────────────────────── -->
+<div class="snow-layer" id="snow"></div>
 <div class="crt-frame">
-  <div class="scanlines"></div><div class="tv-glass"></div>
-
-  <header class="crt-header">
-    <div class="header-top">
-      <div class="logo">ШТАБ · <span class="logo-accent">СЛУЖЕБНЫЙ ВХОД</span></div>
-    </div>
-  </header>
-
-  <div class="garland" id="garland"></div>
-
+  <div class="hazard-tape"></div>
+  <div class="secret-label">ШТАБ BLACK TEAM · ВХОД <span class="rec-dot"></span></div>
   <main class="content">
     <div class="login-box">
-      <h2 class="crt-title">ВХОД В ШТАБ</h2>
-      <p class="crt-text dim">авторизация оператора Black Team</p>
-      <div class="submit-box">
-        <input id="pw" type="password" placeholder="пароль" autocomplete="off">
-        <button id="go" class="btn-primary">ВОЙТИ</button>
-      </div>
-      <div id="msg" class="feedback"></div>
-      <p><a class="dim small" href="index.html">← назад к терминалу</a></p>
+      <div class="crt-title" style="font-size:24px;margin-bottom:10px">ВХОД В ШТАБ</div>
+      <p class="crt-text dim small">доступ строго по регламенту. регламент лежит где-то рядом.</p>
+      <input id="adm-user" placeholder="логин" autocomplete="off">
+      <input id="adm-pass" type="password" placeholder="пароль" autocomplete="off">
+      <button class="btn-primary" id="adm-login">ВОЙТИ</button>
+      <div class="feedback" id="adm-error"></div>
     </div>
+    <div class="tree-row">🍊 🎄 🍊</div>
+    <p class="dim small">обратная ссылка: <a href="index.html" class="amber">на главную</a></p>
   </main>
-
-  <footer class="crt-footer">обратитесь к администратору. или станьте им.</footer>
+  <div class="hazard-tape"></div>
 </div>
-
 <script>
 (function(){
-  var go=function(){
-    var v=(document.getElementById('pw').value||'').trim().toUpperCase();
-    var msg=document.getElementById('msg');
-    if(v==='M4ND4R1N2027'){
-      try{
-        var a=JSON.parse(localStorage.getItem('hu_flags')||'[]');
-        if(a.indexOf('FLAG{ADMIN_PANEL_H4CKED}')===-1){ a.push('FLAG{ADMIN_PANEL_H4CKED}'); localStorage.setItem('hu_flags',JSON.stringify(a)); }
-        localStorage.setItem('backup_pin','DUFKLYH_FRGH_2027');
-      }catch(e){}
-      msg.textContent='✔ доступ разрешён. переходим в штаб...'; msg.style.color='var(--green)';
-      setTimeout(function(){ location.href='admin.html'; },700);
+  function rot3(s){ return s.replace(/[a-z]/gi,function(c){ return String.fromCharCode(c.charCodeAt(0)+3); }); }
+  var PIN=rot3('ARCHIVE_CODE_2027');
+  try{ localStorage.setItem('backup_pin',PIN); }catch(e){}
+  function attempt(){
+    var u=document.getElementById('adm-user').value.trim().toLowerCase();
+    var p=document.getElementById('adm-pass').value.trim().toUpperCase();
+    var err=document.getElementById('adm-error');
+    if(u==='santa_operator' && p==='SANTA_ROOT_2027'){
+      try{ localStorage.setItem('hu_admin_logged','1'); }catch(e){}
+      var a=[]; try{ a=JSON.parse(localStorage.getItem('hu_flags')||'[]'); }catch(err){}
+      if(a.indexOf('FLAG{ADMIN_PANEL_H4CKED}')===-1){
+        a.push('FLAG{ADMIN_PANEL_H4CKED}');
+        try{ localStorage.setItem('hu_flags',JSON.stringify(a)); }catch(err){}
+      }
+      window.location.href='admin.html';
     }else{
-      msg.textContent='✘ неверный код. обратитесь к администратору. или станьте им.';
-      msg.style.color='var(--red)';
+      err.textContent='✘ доступ запрещён. подсказка? она прямо здесь. совсем рядом.';
     }
-  };
-  document.getElementById('go').addEventListener('click',go);
-  document.getElementById('pw').addEventListener('keydown',function(e){ if(e.key==='Enter') go(); });
-})();
-(function snow(){
-  var box=document.getElementById('snow'); if(!box) return;
-  var glyphs=['❄','❅','❆','✦'];
-  for(var i=0;i<40;i++){
-    var s=document.createElement('span');
-    s.textContent=glyphs[Math.floor(Math.random()*glyphs.length)];
-    s.style.left=Math.random()*100+'%';
-    s.style.fontSize=(10+Math.random()*14)+'px';
-    s.style.opacity=(0.25+Math.random()*0.5).toFixed(2);
-    s.style.animationDuration=(9+Math.random()*14)+'s';
-    s.style.animationDelay=(-Math.random()*20)+'s';
-    box.appendChild(s);
   }
-})();
-(function garland(){
-  var g=document.getElementById('garland'); if(!g) return;
-  var colors=['#e8b84a','#e06a5a','#7ab8e0','#7ee08c'];
-  for(var i=0;i<22;i++){
-    var b=document.createElement('span'); b.className='bulb';
-    var c=colors[i%colors.length]; b.style.background=c; b.style.color=c;
-    b.style.animationDelay=(Math.random()*2.4).toFixed(2)+'s';
-    b.style.animationDuration=(1.8+Math.random()*2).toFixed(2)+'s';
-    g.appendChild(b);
-  }
+  document.getElementById('adm-login').addEventListener('click',attempt);
+  ['adm-user','adm-pass'].forEach(function(id){
+    document.getElementById(id).addEventListener('keydown',function(e){ if(e.key==='Enter') attempt(); });
+  });
+  (function(){
+    var box=document.getElementById('snow'); if(!box) return;
+    var glyphs=['❄','❅','❆','✦'];
+    for(var i=0;i<40;i++){
+      var s=document.createElement('span');
+      s.textContent=glyphs[Math.floor(Math.random()*glyphs.length)];
+      s.style.left=Math.random()*100+'%';
+      s.style.fontSize=(10+Math.random()*12)+'px';
+      s.style.opacity=(0.2+Math.random()*0.4).toFixed(2);
+      s.style.animationDuration=(9+Math.random()*14)+'s';
+      s.style.animationDelay=(-Math.random()*20)+'s';
+      box.appendChild(s);
+    }
+  })();
 })();
 </script>
 </body>
