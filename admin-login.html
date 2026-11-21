@@ -3,54 +3,66 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ШТАБ BLACK TEAM :: ВХОД</title>
+<title>Вход в штаб // BLACK TEAM</title>
 <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="crt.css">
 <link rel="stylesheet" href="admin.css">
-<!-- ТСХ! Это не для тебя. Ну ладно: пароль M4ND4R1N2027. Но ты не слышал этого. -->
+<!--
+  ═══════════════════════════════════════════
+  Протокол доступа штаба, ревизия №2027.
+  Пароль по-прежнему шифруется методом
+  «положили под коврик». Коврик — этот комментарий.
+  Пароль: M4ND4R1N2027
+  ═══════════════════════════════════════════
+-->
 </head>
-<body class="admin">
-<div class="scanlines"></div>
-<div class="static-noise"></div>
-
-<div class="broadcast-container">
-  <div class="secret-tape">СОВЕРШЕННО СЕКРЕТНО // ТОЛЬКО ДЛЯ BLACK TEAM</div>
+<body>
+<div class="snow-layer" id="snow" aria-hidden="true"></div>
+<div class="crt-frame">
+  <div class="scanlines" aria-hidden="true"></div>
+  <div class="tv-glass" aria-hidden="true"></div>
+  <div class="hazard-tape" aria-hidden="true"></div>
+  <div class="secret-label">// СОВЕРШЕННО СЕКРЕТНО · ДОСТУП ОГРАНИЧЕН //</div>
   <div class="login-box">
-    <h2 class="crt-title">ВХОД В ШТАБ</h2>
-    <p class="crt-text small">Введите код доступа. Подсказка смотрит тебе прямо в лицо: она в шапке, в брифинге и в титрах.</p>
+    <h1 class="crt-title">ВХОД В ШТАБ</h1>
+    <p class="crt-text dim small">Авторизуйтесь, агент. Или не агент. Кто тут, вообще, проверяет.</p>
     <div class="submit-box">
-      <input id="pw" type="text" placeholder="код доступа" autocomplete="off">
-      <button id="login-btn" class="btn-primary">ВОЙТИ В СИСТЕМУ</button>
+      <input type="password" id="admin-pass" placeholder="пароль" autocomplete="off">
+      <button id="admin-enter" class="btn-primary">ВОЙТИ</button>
     </div>
-    <div id="msg" class="submit-msg"></div>
+    <p id="login-feedback" class="feedback"></p>
+    <p class="dim small">Забыли пароль? Настоящие агенты читают исходники (Ctrl+U).</p>
   </div>
-  <footer class="crt-footer">// HU::2027 · СИСТЕМА ОХРАНЯЕТ ФЛАГИ · И НАДЕЕТСЯ, ЧТО ТЫ НЕ ЗАГЛЯНЕШЬ В ИСХОДНИКИ //</footer>
+  <div class="garland" id="garland" aria-hidden="true"></div>
 </div>
-
 <script>
-(function () {
-  if (localStorage.getItem('hu_admin') === '1') { location.replace('admin.html'); return; }
-  function addFlag(f) {
-    var s = [];
-    try { s = JSON.parse(localStorage.getItem('hu_flags') || '[]') || []; } catch (e) {}
-    if (s.indexOf(f) === -1) { s.push(f); localStorage.setItem('hu_flags', JSON.stringify(s)); }
-  }
-  function tryLogin() {
-    var v = document.getElementById('pw').value.trim().toUpperCase();
-    var msg = document.getElementById('msg');
-    if (v === 'M4ND4R1N2027') {
-      localStorage.setItem('hu_admin', '1');
-      addFlag('FLAG{ADMIN_PANEL_H4CKED}');
-      msg.textContent = 'ДОСТУП РАЗРЕШЁН. ПЕРЕХОД В ШТАБ...';
-      msg.className = 'submit-msg ok';
-      setTimeout(function () { location.href = 'admin.html'; }, 900);
-    } else {
-      msg.textContent = 'ДОСТУП ЗАПРЕЩЁН. Сигнал о вторжении отправлен... почти.';
-      msg.className = 'submit-msg';
+(function(){
+  var box=document.getElementById('snow');
+  if(box){ for(var i=0;i<40;i++){var s=document.createElement('span');s.textContent='❄';
+    s.style.left=Math.random()*100+'%';s.style.fontSize=(8+Math.random()*12)+'px';
+    s.style.opacity=(0.2+Math.random()*0.4).toFixed(2);
+    s.style.animationDuration=(10+Math.random()*12)+'s';
+    s.style.animationDelay=(-Math.random()*20)+'s';box.appendChild(s);} }
+  var g=document.getElementById('garland');
+  if(g){ var cols=['#e8b84a','#e06a5a','#7ee08c','#7ab8e0'];
+    for(var j=0;j<18;j++){var b=document.createElement('span');b.className='bulb';
+      b.style.background=cols[j%4];b.style.color=cols[j%4];
+      b.style.animationDelay=(Math.random()*2.4).toFixed(2)+'s';g.appendChild(b);} }
+  var CORRECT='M4ND4R1N2027';
+  function tryEnter(){
+    var v=document.getElementById('admin-pass').value.trim();
+    var fb=document.getElementById('login-feedback');
+    if(v.toUpperCase()===CORRECT){
+      localStorage.setItem('hu_admin','1');
+      fb.textContent='✔ ДОСТУП РАЗРЕШЁН. ПЕРЕНАПРАВЛЕНИЕ...'; fb.style.color='var(--amber)';
+      setTimeout(function(){location.href='admin.html';},700);
+    }else{
+      fb.textContent='✘ Неверный код. Попробуй ещё — подсказка в исходнике страницы.';
+      fb.style.color='var(--red)';
     }
   }
-  document.getElementById('login-btn').addEventListener('click', tryLogin);
-  document.getElementById('pw').addEventListener('keydown', function (e) { if (e.key === 'Enter') tryLogin(); });
+  document.getElementById('admin-enter').addEventListener('click',tryEnter);
+  document.getElementById('admin-pass').addEventListener('keydown',function(e){if(e.key==='Enter')tryEnter();});
 })();
 </script>
 </body>
