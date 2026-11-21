@@ -4,106 +4,80 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HU::2027 // BLACK TEAM</title>
-<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="crt.css">
+<script src="app.js" defer></script>
 </head>
 <body>
-<!--
-  ═══════════════════════════════════════════
-  Ну что, раз уж ты читаешь исходники...
-  Первый флаг твой: FLAG{HTML_C0MMENT_2027}
-  Осталось 5. Загляни потом в консоль (F12).
-  ═══════════════════════════════════════════
--->
-<div class="snow-layer" id="snow" aria-hidden="true"></div>
-<div class="crt-frame">
-  <div class="scanlines" aria-hidden="true"></div>
-  <div class="tv-glass" aria-hidden="true"></div>
+<div id="snow" aria-hidden="true"></div>
+<div id="garland" aria-hidden="true"></div>
 
-  <header class="crt-header">
-    <div class="header-top">
-      <div class="logo">HU::2027 <span class="logo-accent">// BLACK TEAM</span></div>
-      <div class="header-right">
-        <span id="clock" class="clock">00:00:00</span>
-        <button id="audio-toggle" class="header-btn">AUDIO: OFF</button>
+<header class="crt-header">
+  <div class="logo">HU::2027 // BLACK TEAM</div>
+  <nav class="nav-tabs">
+    <button class="tab-btn active" data-section="briefing">БРИФИНГ</button>
+    <button class="tab-btn" data-section="message">ОБРАЩЕНИЕ</button>
+    <button class="tab-btn" data-section="tasks">ЗАДАНИЯ</button>
+    <button class="tab-btn" data-section="wall">СТЕНА</button>
+    <button class="tab-btn" data-section="terminal">ТЕРМИНАЛ</button>
+  </nav>
+  <div class="header-right">
+    <button id="sound-toggle" title="Звук" aria-label="Переключить звук">♪</button>
+    <span id="clock">00:00:00</span>
+  </div>
+</header>
+
+<main>
+  <section id="section-briefing" class="tab-section">
+    <h1>БРИФИНГ ОПЕРАЦИИ «МАНДАРИН»</h1>
+    <div class="trees">🎄 🎄 🎄</div>
+    <p class="typed">Соединение установлено... расшифровка... прием.</p>
+    <p class="typed">Оперативная сводка: 31 декабря 2027 года серверная отдела «Ху» пережила нестандартный год. Дедлайны, патчи, кофе — все как обычно. Но кое-что пошло не по плану.</p>
+    <p class="typed">Ваше задание: найти <b>8 флагов</b>, спрятанных в системе. Каждый флаг — подтверждение вашей прыти и сообразительности.</p>
+    <p class="typed">Поздравляем, ты <b>Black Team</b> — элита, на которую держится вся оборона этого подразделения.</p>
+    <div class="flag-counter-box">
+      <span id="flag-counter">ФЛАГОВ СОБРАНО: 0/8</span>
+      <div id="final-banner" class="hidden">
+        <h2>🎄 С НОВЫМ ГОДОМ, BLACK TEAM! 🎄</h2>
+        <p>Ты настоящий боец — без тебя этот год был бы просто набором логов.</p>
+        <p class="small">Мандарины из сейфа можно забрать. Ёлку в серверной не выключать: это единственный источник праздничного духа.</p>
       </div>
     </div>
-    <nav class="crt-nav" id="crt-nav">
-      <button data-section="briefing" class="active">БРИФИНГ</button>
-      <button data-section="broadcast">ОБРАЩЕНИЕ</button>
-      <button data-section="tasks">ЗАДАНИЯ</button>
-      <button data-section="wall">СТЕНА</button>
-      <button data-section="terminal">ТЕРМИНАЛ</button>
-    </nav>
-  </header>
+    <div class="hint-box">
+      <span class="hint-label">ПОДСКАЗКА ДНЯ:</span> начните с исходного кода этой страницы. Ctrl+U — ваш лучший друг.
+    </div>
+  </section>
 
-  <div class="garland" id="garland" aria-hidden="true"></div>
+  <section id="section-message" class="tab-section hidden">
+    <h1>ОБРАЩЕНИЕ КОМАНДУ</h1>
+    <div class="typewriter-block" id="typewriter"></div>
+  </section>
 
-  <main class="content">
+  <section id="section-tasks" class="tab-section hidden">
+    <h1>ЗАДАНИЯ ОПЕРАЦИИ</h1>
+    <div id="tasks-list"></div>
+  </section>
 
-    <!-- БРИФИНГ -->
-    <section id="briefing" class="crt-section active">
-      <h2 class="crt-title">БРИФИНГ</h2>
-      <p class="crt-text">Операция <b>«МАНДАРИН &amp; КО»</b> подходит к концу. Год закрыт, система почти пуста — но в ней остались спрятанные флаги. Их <b>6</b>. Твоя задача — найти все и сдать на странице ЗАДАНИЯ.</p>
-      <p class="crt-text dim">Знающие ищут там, где небезопасно: комментарии, админки, заметки чужих пользователей, стены сообщений и даже консоль браузера.</p>
-      <p class="crt-text dim">P.S. Если найдёшь то, что не должен был находить — поздравляем, ты Black Team.</p>
-      <div class="tree-row" aria-hidden="true">🌲 ✦ ❄ 🌲 ✦ ❄ 🌲</div>
-    </section>
+  <section id="section-wall" class="tab-section hidden">
+    <h1>СТЕНА СООБЩЕНИЙ</h1>
+    <p class="wall-intro">Кто-то оставляет здесь послания. Кажется, вы не одни.</p>
+    <div id="wall-posts"></div>
+  </section>
 
-    <!-- ОБРАЩЕНИЕ -->
-    <section id="broadcast" class="crt-section">
-      <h2 class="crt-title">ОБРАЩЕНИЕ</h2>
-      <div class="transmission-status amber">• ПРЯМОЙ ЭФИР КАНАЛ 27 · ШТАБ BLACK TEAM · ПРЕЗИДЕНТ ХАКЕРОВ</div>
-      <div class="broadcast-screen">
-        <div id="broadcast-text" class="broadcast-text"></div>
-        <div id="broadcast-flag" class="flag-banner hidden"></div>
-      </div>
-      <div class="btn-row">
-        <button id="start-broadcast" class="btn-primary">СТАРТ ТРАНСЛЯЦИИ</button>
-        <button id="stop-broadcast" class="btn-ghost hidden">СТОП</button>
-      </div>
-      <p class="dim small">Если трансляция не запускается — резервный канал всегда в строю.</p>
-    </section>
+  <section id="section-terminal" class="tab-section hidden">
+    <h1>ТЕРМИНАЛ</h1>
+    <div id="terminal-out"></div>
+    <div class="terminal-input-row">
+      <span class="prompt">black@hu:~$</span>
+      <input id="terminal-in" type="text" autocomplete="off" placeholder="help">
+    </div>
+  </section>
+</main>
 
-    <!-- ЗАДАНИЯ -->
-    <section id="tasks" class="crt-section">
-      <h2 class="crt-title">ЗАДАНИЯ</h2>
-      <p class="counter">Сдано флагов: <span id="flag-counter" class="amber">0</span> / 6</p>
-      <div class="submit-box">
-        <input type="text" id="flag-input" placeholder="FLAG{...}" autocomplete="off">
-        <button id="flag-submit" class="btn-primary">СДАТЬ</button>
-      </div>
-      <p id="flag-feedback" class="feedback"></p>
-      <ul class="flag-list" id="flag-list"></ul>
-    </section>
+<footer>
+  <div class="trees small-trees">🎄 🌟 ❄ 🎅 🌟 🎄</div>
+  <p>HU::2027 // BLACK TEAM — логи закрыты, год сдан. С наступающим!</p>
+</footer>
 
-    <!-- СТЕНА -->
-    <section id="wall" class="crt-section">
-      <h2 class="crt-title">СТЕНА СООБЩЕНИЙ</h2>
-      <div id="wall-posts" class="wall"></div>
-      <div class="submit-box">
-        <input type="text" id="wall-input" placeholder="твой ник: сообщение" autocomplete="off">
-        <button id="wall-post" class="btn-primary">ОТПРАВИТЬ</button>
-      </div>
-    </section>
-
-    <!-- ТЕРМИНАЛ -->
-    <section id="terminal" class="crt-section">
-      <h2 class="crt-title">ТЕРМИНАЛ</h2>
-      <div id="term-out" class="term-out"></div>
-      <div class="submit-box">
-        <span class="term-prompt">black@hu:~$</span>
-        <input type="text" id="term-in" autocomplete="off">
-      </div>
-    </section>
-
-  </main>
-
-  <footer class="crt-footer">
-    <span class="tree-row" aria-hidden="true">🌲 🎄 🌲 ✦ ❄ ✦ 🌲 🎅 ❄ 🌲 🎄 🌲</span>
-    <p class="dim">HU::2027 · Black Team · логи закрыты, год сдан</p>
-  </footer>
-</div>
-<script src="app.js"></script>
+<div id="confetti-layer" aria-hidden="true"></div>
 </body>
 </html>

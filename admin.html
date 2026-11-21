@@ -3,127 +3,154 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ШТАБ // АДМИН-ПАНЕЛЬ</title>
-<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="crt.css">
+<title>ШТАБ // HU::2027</title>
 <link rel="stylesheet" href="admin.css">
-<!--
-  ═══════════════════════════════════════════
-  Внутренняя документация штаба (не для чужих).
-
-  1) Заметки нумеруются по id. Служебные заметки
-     тоже нумеруются по id. Даже если их «нет» в списке.
-
-  2) Хранилище флагов открывается по роли.
-     Роль сервер берёт из localStorage ключа hu_role.
-     Сервер доверяет браузеру. Сервер наивен.
-  ═══════════════════════════════════════════
--->
 </head>
 <body>
-<div class="snow-layer" id="snow" aria-hidden="true"></div>
-<div class="crt-frame">
-  <div class="scanlines" aria-hidden="true"></div>
-  <div class="tv-glass" aria-hidden="true"></div>
-  <div class="hazard-tape" aria-hidden="true"></div>
-  <div class="secret-label">// ШТАБ BLACK TEAM · АДМИН-ПАНЕЛЬ · ЗАПИСЬ ВЕДЕТСЯ <span class="rec-dot"></span> //</div>
+<div id="snow" aria-hidden="true"></div>
+<div id="garland" aria-hidden="true"></div>
+<!--
+  СЛУЖЕБНОЕ: в заметках 7 штук, но список показывает только 1 и 2.
+  Заметка id=3 — служебная. Флаг: FLAG{1DOR_N0T3S}
+  Роль пользователя лежит в localStorage (hu_role). По умолчанию guest.
+  Хранилище флагов открыто только для admin. Подсказка: сервер верит браузеру.
+-->
+<div class="amber-panel">
+  <h1>ШТАБ BLACK TEAM</h1>
+  <p class="dim">Сессия: <span id="whoami">role=guest</span></p>
 
-  <nav class="crt-nav admin-nav" id="admin-nav">
-    <button data-atab="notes" class="active">ЗАМЕТКИ</button>
-    <button data-atab="vault">ХРАНИЛИЩЕ ФЛАГОВ</button>
-    <button id="logout" class="btn-ghost small" style="margin-left:auto">ВЫЙТИ</button>
-  </nav>
+  <h2>ЗАМЕТКИ</h2>
+  <div id="notes-list"></div>
+  <div id="note-view" class="hidden"></div>
 
-  <main class="content">
+  <h2>ХРАНИЛИЩЕ ФЛАГОВ</h2>
+  <div id="vault-denied" class="denied">
+    ДОСТУП ЗАПРЕЩЁН<br>
+    <span class="small">role=guest. Обратитесь к администратору. Или станьте им.</span>
+  </div>
+  <div id="vault-open" class="hidden">
+    <p>ДОСТУП РАЗРЕШЁН. Хранилище открыто:</p>
+    <div class="vault-flag">FLAG{R0LE_SW4P_2027}</div>
+    <p class="small">Флаг за смену роли сдан автоматически.</p>
+  </div>
 
-    <section id="notes" class="crt-section active">
-      <h2 class="crt-title">ЗАМЕТКИ СОТРУДНИКОВ</h2>
-      <p class="crt-text dim small">Фильтр заметок по id: <input id="note-id" type="number" min="1" placeholder="id" style="width:80px"> <button id="note-open" class="btn-ghost small">ОТКРЫТЬ</button></p>
-      <div id="notes-list" class="notes"></div>
-      <div id="note-secret" class="hidden"></div>
-    </section>
+  <h2>РЕЗЕРВНЫЙ КОД</h2>
+  <div class="form-row">
+    <label for="code">КОД АРХИВА:</label>
+    <input id="code" type="text" autocomplete="off">
+  </div>
+  <button id="code-btn">РАЗБЛОКИРОВАТЬ</button>
+  <div id="code-msg"></div>
 
-    <section id="vault" class="crt-section">
-      <h2 class="crt-title">ХРАНИЛИЩЕ ФЛАГОВ</h2>
-      <div id="vault-denied" class="access-denied">
-        <p>⛔ ДОСТУП ЗАПРЕЩЁН</p>
-        <p class="small">Ваша роль: <b id="role-now">guest</b>. Нужна роль admin.</p>
-        <p class="small dim">Сервер верит тому, что написано в вашем localStorage. Сервер наивен. Обратитесь к администратору. Или станьте им.</p>
-      </div>
-      <div id="vault-open" class="hidden"></div>
-    </section>
-
-  </main>
+  <p><a href="index.html">← вернуться на главную</a></p>
 </div>
 <script>
 (function(){
-  if(localStorage.getItem('hu_admin')!=='1'){ location.href='admin-login.html'; return; }
-  function submitFlag(f){
-    var arr=[]; try{arr=JSON.parse(localStorage.getItem('hu_flags')||'[]');}catch(e){}
-    if(arr.indexOf(f)===-1){arr.push(f);localStorage.setItem('hu_flags',JSON.stringify(arr));}
+'use strict';
+/* Флаг за вход сдаем здесь */
+function submitFlagHere(name){
+  var K='hu_flags_v3';
+  var FLAGS=['FLAG{W3LC0ME_2027}','FLAG{C0NS0LE_D1VER}','FLAG{NEW_YEAR_ADDR3SS}','FLAG{ADMIN_PANEL_H4CKED}','FLAG{1DOR_N0T3S}','FLAG{R0LE_SW4P_2027}','FLAG{TERMIN4L_CHE4T_2027}','FLAG{S4F3_N0T_L0CK3D}'];
+  var f=FLAGS.filter(function(x){return x===name})[0];
+  if(!f)return;
+  var arr=[];
+  try{arr=JSON.parse(localStorage.getItem(K)||'[]')}catch(e){}
+  var id=FLAGS.indexOf(name)+1;
+  if(arr.indexOf(id)===-1){arr.push(id);localStorage.setItem(K,JSON.stringify(arr))}
+}
+try{
+  if(localStorage.getItem('hu_logged')==='1'){submitFlagHere('FLAG{ADMIN_PANEL_H4CKED}')}
+}catch(e){}
+
+/* Снег и гирлянда */
+var BULB=['#e06a5a','#e8b84a','#c9d98a','#6fb7d9'];
+(function(){
+  var snow=document.getElementById('snow');
+  var chars=['❄','❅','❆'];
+  for(var i=0;i<24;i++){
+    var f=document.createElement('span');
+    f.className='snowflake';f.textContent=chars[i%3];
+    f.style.left=(Math.random()*100)+'%';
+    f.style.fontSize=(8+Math.random()*12)+'px';
+    f.style.animationDuration=(9+Math.random()*12)+'s';
+    f.style.animationDelay=(-Math.random()*15)+'s';
+    snow.appendChild(f);
   }
-  /* снегопад */
-  var box=document.getElementById('snow');
-  if(box){ for(var i=0;i<40;i++){var s=document.createElement('span');s.textContent='❄';
-    s.style.left=Math.random()*100+'%';s.style.fontSize=(8+Math.random()*12)+'px';
-    s.style.opacity=(0.2+Math.random()*0.4).toFixed(2);
-    s.style.animationDuration=(10+Math.random()*12)+'s';
-    s.style.animationDelay=(-Math.random()*20)+'s';box.appendChild(s);} }
-  /* вкладки */
-  document.getElementById('admin-nav').addEventListener('click',function(e){
-    var b=e.target.closest('button[data-atab]'); if(!b) return;
-    document.querySelectorAll('#admin-nav button[data-atab]').forEach(function(x){x.classList.remove('active');});
-    document.querySelectorAll('.crt-section').forEach(function(s){s.classList.remove('active');});
-    b.classList.add('active');
-    document.getElementById(b.dataset.atab).classList.add('active');
-  });
-  document.getElementById('logout').addEventListener('click',function(){
-    localStorage.removeItem('hu_admin'); location.href='admin-login.html';
-  });
-  /* заметки */
-  var NOTES=[
-    {id:1,who:'sysadmin',txt:'Не забудьте выключить ёлку в серверной. Опять пожарная сигнализация сойдёт с ума.'},
-    {id:2,who:'jr.helper',txt:'А где лежит список флагов? Мне сказали «на странице задания», но там одни вопросики.'}
-  ];
-  var list=document.getElementById('notes-list');
-  NOTES.forEach(function(n){
-    var d=document.createElement('div'); d.className='note';
-    d.innerHTML='<span class="who">'+n.who+' · id='+n.id+'</span><div class="txt"></div>';
-    d.querySelector('.txt').textContent=n.txt;
-    list.appendChild(d);
-  });
-  var SECRET={id:3,who:'root',txt:'Служебная заметка (id=3). Кто-то сливал заметки через подмену id. Я оставляю здесь кое-что важное, чтобы никто не забыл: FLAG{IDOR_N0TES_2027}. И мандарины в сейфе.'};
-  function openNote(id){
-    var holder=document.getElementById('note-secret');
-    id=parseInt(id,10);
-    var n=NOTES.find(function(x){return x.id===id;});
-    if(!n && id===3) n=SECRET;
-    if(!n){ holder.className='note flagged'; holder.textContent='заметка не найдена (или у неё слишком любопытный id).'; holder.classList.remove('hidden'); return; }
-    if(n===SECRET){
-      holder.className='note flagged';
-      holder.innerHTML='<span class="who">'+n.who+' · id='+n.id+'</span><div class="txt"></div><div class="flag-banner">★ '+n.txt.match(/FLAG\{[^}]+\}/)[0]+' ★</div>';
-      holder.querySelector('.txt').textContent=n.txt;
-      holder.classList.remove('hidden');
-      submitFlag('FLAG{IDOR_N0TES_2027}');
-    }else{
-      holder.className='note';
-      holder.innerHTML='<span class="who">'+n.who+' · id='+n.id+'</span><div class="txt"></div>';
-      holder.querySelector('.txt').textContent=n.txt;
-      holder.classList.remove('hidden');
+  var g=document.getElementById('garland');
+  for(var j=0;j<18;j++){
+    var b=document.createElement('span');
+    b.className='bulb';
+    b.style.left=(100/18*j+2.7)+'%';
+    b.style.top=(6+Math.sin(j/3)*8)+'px';
+    b.style.background=BULB[j%4];b.style.color=BULB[j%4];
+    b.style.setProperty('--dur',(2.2+Math.random()*2.5).toFixed(2)+'s');
+    b.style.animationDelay=(-Math.random()*4)+'s';
+    g.appendChild(b);
+  }
+})();
+
+/* Роль */
+var role='guest';
+try{role=localStorage.getItem('hu_role')||'guest'}catch(e){}
+document.getElementById('whoami').textContent='role='+role;
+
+/* Заметки (IDOR) */
+var NOTES={
+  1:{title:'Журнал дежурств',body:'31.12.2027. Всё спокойно. Кофе кончился. Опять.'},
+  2:{title:'Инвентарь',body:'Гирлянды — 4 шт. Мандарины — 2 ящика. Терпение — на исходе.'},
+  3:{title:'СЛУЖЕБНАЯ ЗАПИСЬ',body:'Ключ доступа к архиву: ARCHIVE_CODE_2027. Флаг этой заметки: FLAG{1DOR_N0T3S}. Не показывать в общем списке. (Кто это читает — молодец.)'}
+};
+var list=document.getElementById('notes-list');
+[1,2].forEach(function(id){
+  var b=document.createElement('button');
+  b.className='note-btn';b.textContent='Заметка #'+id+' — '+NOTES[id].title;
+  b.addEventListener('click',function(){showNote(id)});
+  list.appendChild(b);
+});
+var hintBtn=document.createElement('button');
+hintBtn.className='note-btn dim';
+hintBtn.textContent='Всего заметок: 7. Показаны не все.';
+list.appendChild(hintBtn);
+
+function showNote(id){
+  var v=document.getElementById('note-view');
+  v.classList.remove('hidden');
+  if(NOTES[id]){
+    v.innerHTML='<h3>'+NOTES[id].title+'</h3><p>'+NOTES[id].body+'</p>';
+    if(id===3){
+      submitFlagHere('FLAG{1DOR_N0T3S}');
+      v.innerHTML+='<div class="vault-flag">FLAG{1DOR_N0T3S} — сдан</div>';
     }
+  }else{
+    v.innerHTML='<h3>Заметка #'+id+'</h3><p class="err">Запись не найдена или недоступна.</p>';
   }
-  document.getElementById('note-open').addEventListener('click',function(){openNote(document.getElementById('note-id').value);});
-  /* хранилище */
-  var role=localStorage.getItem('hu_role')||'guest';
-  document.getElementById('role-now').textContent=role;
-  if(role==='admin'){
-    document.getElementById('vault-denied').classList.add('hidden');
-    var v=document.getElementById('vault-open');
-    v.className='flag-banner';
-    v.innerHTML='★ FLAG{R0LE_SW4P_2027} — роль подменена, хранилище открыто ★';
-    v.classList.remove('hidden');
-    submitFlag('FLAG{R0LE_SW4P_2027}');
+}
+/* Проверка URL на ?note= (IDOR) */
+(function(){
+  var m=location.search.match(/[?&]note=(\d+)/);
+  if(m)showNote(parseInt(m[1],10));
+})();
+
+/* Хранилище */
+function renderVault(){
+  var ok=(localStorage.getItem('hu_role')==='admin');
+  document.getElementById('vault-denied').classList.toggle('hidden',ok);
+  document.getElementById('vault-open').classList.toggle('hidden',!ok);
+  if(ok)submitFlagHere('FLAG{R0LE_SW4P_2027}');
+}
+renderVault();
+
+/* Резервный код */
+document.getElementById('code-btn').addEventListener('click',function(){
+  var v=document.getElementById('code').value.trim();
+  var msg=document.getElementById('code-msg');
+  if(v==='ARCHIVE_CODE_2027'){
+    submitFlagHere('FLAG{S4F3_N0T_L0CK3D}');
+    msg.innerHTML='<div class="vault-flag">Сейф открыт: FLAG{S4F3_N0T_L0CK3D} — сдан</div><p class="small">Внутри — мандарины. Как и обещали.</p>';
+  }else{
+    msg.innerHTML='<div class="err">Код неверный. Сейф не запирается, но и без кода не открывается. Парадокс.</div>';
   }
+});
 })();
 </script>
 </body>
