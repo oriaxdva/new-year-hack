@@ -1,53 +1,66 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>HU::2027 · вход в штаб</title>
+<title>Вход в штаб · HU::2027</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="crt.css">
 <link rel="stylesheet" href="admin.css">
+<!-- пароль от штаба: hackmas2027 (не говорите смене Б) -->
 </head>
 <body>
 <div class="snow-layer" id="snow"></div>
 <div class="crt-frame">
-  <div class="scanlines"></div>
-  <div class="tv-glass"></div>
+  <div class="scanlines"></div><div class="tv-glass"></div>
   <div class="hazard-tape"></div>
-  <div class="secret-label">ШТАБ BLACK TEAM · СОВЕРШЕННО СЕКРЕТНО <span class="rec-dot"></span></div>
-  <main class="content">
-    <div class="crt-title">ВХОД В СИСТЕМУ</div>
+  <div class="secret-label">ШТАБ BLACK TEAM · ДОПУСК ПО ПАРОЛЮ</div>
+  <div class="content">
     <div class="login-box">
-      <p class="crt-text dim">только для санты и очень настойчивых</p>
-      <input id="admin-pass" type="password" placeholder="пароль">
-      <div class="btn-row"><button class="btn-primary" id="admin-go">ВОЙТИ В СИСТЕМУ</button></div>
-      <div id="login-msg" class="feedback"></div>
+      <div class="logo" style="text-align:center;margin-bottom:10px">HU::<span class="logo-accent">ШТАБ</span></div>
+      <p class="crt-text dim" style="text-align:center;margin-bottom:16px">служебный вход. посторонним — мандарины и выход.</p>
+      <div class="submit-box">
+        <input id="admin-pass" type="password" placeholder="пароль штаба" autocomplete="off">
+        <button id="admin-enter" class="btn-primary">ВОЙТИ</button>
+      </div>
+      <div class="feedback" id="admin-err"></div>
+      <div id="admin-success" class="hidden">
+        <div class="flag-banner">✔ FLAG{ADMIN_PANEL_H4CKED} — штаб открыт</div>
+        <div class="btn-row"><a class="btn-primary" href="admin.html" style="text-decoration:none;text-align:center">ПЕРЕЙТИ В ШТАБ</a></div>
+      </div>
     </div>
-  </main>
-  <footer class="crt-footer">🍊 серверная 2027 · мандариновый стандарт безопасности</footer>
+  </div>
+  <footer class="crt-footer">
+    <div class="tree-row">🎄 🎄 🎄</div>
+    <div class="dim small">доступ logging включён. смена Б в курсе, что ты читаешь исходники</div>
+  </footer>
 </div>
-<!-- пароль для входа: M4ND4R1N2027. тсс. -->
 <script>
 (function(){
-  try{localStorage.setItem('backup_pin','DUFKLYHbFRGHb535:');}catch(e){}
-  var inp=document.getElementById('admin-pass');
-  function go(){
-    var v=(inp.value||'').trim().toUpperCase();
-    var msg=document.getElementById('login-msg');
-    if(v==='M4ND4R1N2027'){
-      var arr=[];try{arr=JSON.parse(localStorage.getItem('hu_flags')||'[]');}catch(e){}
-      if(arr.indexOf('FLAG{ADMIN_PANEL_H4CKED}')===-1)arr.push('FLAG{ADMIN_PANEL_H4CKED}');
-      try{localStorage.setItem('hu_flags',JSON.stringify(arr));}catch(e){}
-      msg.textContent='✔ доступ разрешён. переходим в штаб...';
-      setTimeout(function(){location.href='admin.html';},900);
+  function fail(msg){
+    var e=document.getElementById('admin-err');
+    e.textContent=msg; e.style.color='#e06a5a';
+  }
+  function tryPass(){
+    var v=(document.getElementById('admin-pass').value||'').trim().toLowerCase();
+    if(v==='hackmas2027'){
+      document.getElementById('admin-err').textContent='';
+      try{ localStorage.setItem('hu_admin_session','1'); }catch(e){}
+      document.getElementById('admin-success').classList.remove('hidden');
+      var arr=[];
+      try{ arr=JSON.parse(localStorage.getItem('hu_flags')||'[]'); }catch(e){}
+      if(arr.indexOf('FLAG{ADMIN_PANEL_H4CKED}')===-1){ arr.push('FLAG{ADMIN_PANEL_H4CKED}'); }
+      try{ localStorage.setItem('hu_flags',JSON.stringify(arr)); }catch(e){}
+    }else if(v){
+      fail('✘ неверный пароль. подсказки нет — есть исходники');
     }else{
-      msg.textContent='✘ неверно. обратитесь к администратору. или станьте им.';
-      inp.value='';
+      fail('✘ пустой пароль — это не тактика, это надежда');
     }
   }
-  document.getElementById('admin-go').addEventListener('click',go);
-  inp.addEventListener('keydown',function(e){if(e.key==='Enter')go();});
-  inp.focus();
+  document.getElementById('admin-enter').addEventListener('click',tryPass);
+  document.getElementById('admin-pass').addEventListener('keydown',function(e){ if(e.key==='Enter') tryPass(); });
 })();
 </script>
 </body>

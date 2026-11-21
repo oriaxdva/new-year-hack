@@ -1,46 +1,49 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>HU::2027 · штаб</title>
+<title>Штаб · HU::2027</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="crt.css">
 <link rel="stylesheet" href="admin.css">
+<script>
+/* ── страж штаба: без сессии страницы не существует ── */
+(function(){
+  var ok=false;
+  try{ ok=localStorage.getItem('hu_admin_session')==='1'; }catch(e){}
+  if(!ok){ location.replace('admin-login.html'); }
+})();
+</script>
 </head>
 <body>
 <div class="snow-layer" id="snow"></div>
 <div class="crt-frame">
-  <div class="scanlines"></div>
-  <div class="tv-glass"></div>
+  <div class="scanlines"></div><div class="tv-glass"></div>
   <div class="hazard-tape"></div>
-  <div class="secret-label">ШТАБ BLACK TEAM · СОВЕРШЕННО СЕКРЕТНО <span class="rec-dot"></span></div>
-  <main class="content">
-    <div class="crt-title">ШТАБ</div>
-    <nav class="crt-nav" id="admin-nav">
-      <button data-sec="notes" class="active">ЗАМЕТКИ</button>
-      <button data-sec="storage">ХРАНИЛИЩЕ</button>
-      <button data-sec="safe">СЕЙФ</button>
-    </nav>
-    <section class="crt-section active" id="sec-notes">
-      <p class="crt-text dim small">служебные заметки. нумерация с единицы.</p>
+  <div class="secret-label">ШТАБ BLACK TEAM · ЗАКРЫТЫЙ КОНТУР <span class="rec-dot"></span></div>
+  <div class="content">
+    <section id="notes-sec">
+      <h2 class="crt-title">ЗАПИСКИ</h2>
+      <p class="crt-text dim small">служебные записки дежурных смен. читать можно. не все.</p>
       <div id="notes-box"></div>
-      <p class="dim small">подсказка: admin.html?note=3</p>
+      <p class="crt-text dim small" id="notes-hint">если записка не открылась — возможно, у неё просто другой номер. где-то.</p>
     </section>
-    <section class="crt-section" id="sec-storage">
-      <div id="storage-content"></div>
+    <section id="storage-sec" style="margin-top:26px">
+      <h2 class="crt-title">ХРАНИЛИЩЕ</h2>
+      <div id="storage-panel"></div>
     </section>
-    <section class="crt-section" id="sec-safe">
-      <p class="crt-text dim">резервный код доступа. найти его — отдельная задача.</p>
-      <div class="safe-box">
-        <input id="safe-code" placeholder="введите код">
-        <div class="btn-row"><button class="btn-primary" id="safe-go">ОТКРЫТЬ</button></div>
-        <div id="safe-msg" class="feedback"></div>
-        <div id="safe-banner" class="flag-banner hidden"></div>
-      </div>
-    </section>
-  </main>
-  <footer class="crt-footer">🍊 штаб · 2027</footer>
+  </div>
+  <div class="btn-row" style="padding:0 22px 6px">
+    <button id="admin-logout" class="btn-ghost">ВЫЙТИ ИЗ ШТАБА</button>
+    <a class="btn-ghost" href="index.html" style="text-decoration:none;text-align:center">НА ГЛАВНУЮ</a>
+  </div>
+  <footer class="crt-footer">
+    <div class="tree-row">🎄 🎄 🎄</div>
+    <div class="dim small">штаб BLACK TEAM · всё, что здесь происходит, остаётся в этом браузере</div>
+  </footer>
 </div>
 <script src="admin-app.js"></script>
 </body>
