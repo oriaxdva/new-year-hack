@@ -3,82 +3,88 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HU::2027 — перехват новогоднего канала</title>
+<title>HU::2027 — закрытый новогодний канал</title>
 <link rel="stylesheet" href="crt.css">
-<!--
-  HU::2027 // внутренняя телеграмма штаба
-  FLAG{WELCOME_2027}
-  привет, связной. раз ты читаешь исходники — ты уже нашёл первый флаг.
-  дальше смотри в консоль, в эфир и в дверь внизу страницы.
--->
+<!-- ================================================== -->
+<!--  ФЛАГ №1: FLAG{WELCOME_2027}                        -->
+<!--  привет, любознательный. начинать стоило отсюда     -->
+<!-- ================================================== -->
 </head>
-<body class="locked">
+<body>
+<div id="confetti"></div>
 
 <div id="access-screen">
   <div class="access-box">
-    <div class="access-title">HU::2027</div>
-    <div class="access-sub">канал перехвачен. доступ — по коду</div>
-    <input id="access-input" type="password" placeholder="КОД ДОСТУПА" autocomplete="off">
+    <div class="access-sig">HU::2027</div>
+    <div class="access-sub">ЗАКРЫТЫЙ КАНАЛ &mdash; ДОСТУП ТОЛЬКО ПО КОДУ</div>
+    <input id="access-input" type="password" placeholder="ВВЕДИ КОД ДОСТУПА" autocomplete="off">
     <button id="access-btn" type="button">ВОЙТИ</button>
-    <div id="access-error" role="alert"></div>
+    <div id="access-error"></div>
   </div>
 </div>
 
-<header id="topbar">
-  <span class="logo">HU::2027</span>
-  <span id="flags-counter">флаги: 0/6</span>
-</header>
+<div class="panel">
+  <header class="panel-head">
+    <div class="sig">HU::2027</div>
+    <div class="sig-sub">// частный канал хакерского кружка &laquo;Снежинка&raquo; &mdash; эфир к Новому году</div>
+    <nav class="nav">
+      <a href="#brief">БРИФИНГ</a>
+      <a href="#tasks">ЗАДАНИЯ</a>
+      <a href="#live">ПРЯМОЙ ЭФИР</a>
+      <a href="#wall">СТЕНА</a>
+      <a href="#term">ТЕРМИНАЛ</a>
+    </nav>
+  </header>
 
-<main id="main">
-  <section id="briefing">
-    <h2>БРИФИНГ</h2>
-    <p>Новогодняя трансляция 2027 года кем-то перехвачена. Штаб собрал шесть следов —
-       каждый спрятан на этом канале или рядом с ним. Твоя задача: собрать все шесть,
-       прежде чем бой прогремит под бой курантов.</p>
-    <p class="dim">Сдача флагов — только через поле на странице ЗАДАНИЯ. Терминал сдачи не принимает.</p>
+  <section id="brief" class="sec">
+    <h2>[ БРИФИНГ ]</h2>
+    <p>Скоро Новый год, и кружок &laquo;Снежинка&raquo; выходит в открытый эфир. Наш канал взломали накануне праздника &mdash; и мы почти рады: кто-то из вас уже откопал первый секрет.</p>
+    <p>По каналу разбросаны флаги вида <span class="flagfmt">FLAG{...}</span>. Каждый найденный &mdash; плюс один шаг к празднику. Код доступа к каналу знает ведущий. Или знает тот, кто читает исходники.</p>
+    <p class="dim">// если читаешь это &mdash; ты уже на верном пути</p>
   </section>
 
-  <section id="tasks">
-    <h2>ЗАДАНИЯ</h2>
-    <ol id="tasks-list"></ol>
-    <div class="flag-form">
-      <input id="flag-input" placeholder="FLAG{...}" autocomplete="off">
-      <button id="flag-submit" type="button">СДАТЬ ФЛАГ</button>
+  <section id="tasks" class="sec">
+    <h2>[ ЗАДАНИЯ ]</h2>
+    <div class="counter-line">СДАНО ФЛАГОВ: <span id="flags-counter">0/6</span></div>
+    <div id="tasks-list"></div>
+    <div class="submit-line">
+      <input id="flag-input" type="text" placeholder="ВВЕДИ ФЛАГ СЮДА" autocomplete="off">
+      <button id="flag-submit" type="button">СДАТЬ</button>
     </div>
-    <div id="flag-msg" role="status"></div>
+    <div id="flag-msg"></div>
   </section>
 
-  <section id="broadcast">
-    <h2>ПРЯМОЙ ЭФИР</h2>
+  <section id="live" class="sec">
+    <h2>[ ПРЯМОЙ ЭФИР ]</h2>
     <div id="broadcast-feed"></div>
   </section>
 
-  <section id="wall">
-    <h2>СТЕНА</h2>
+  <section id="wall" class="sec">
+    <h2>[ СТЕНА ]</h2>
     <div id="wall-posts"></div>
   </section>
 
-  <section id="terminal">
-    <h2>ТЕРМИНАЛ</h2>
-    <div id="term-output"></div>
-    <input id="term-input" placeholder="команда..." autocomplete="off">
+  <section id="term" class="sec">
+    <h2>[ ТЕРМИНАЛ ]</h2>
+    <div id="term-output" class="term-out"></div>
+    <div class="term-line"><span class="prompt">hu@2027:~$</span>
+      <input id="term-input" type="text" autocomplete="off" placeholder="help">
+    </div>
   </section>
-</main>
 
-<footer id="footer">
-  <span>HU::2027 · канал освещает штаб зимней операции</span>
-  <a id="admin-door" href="admin.html">служебный вход</a>
-</footer>
+  <footer class="panel-foot">
+    <span class="dim">// HU::2027 &mdash; смотри в оба. Санта видит всё.</span>
+  </footer>
+</div>
 
 <div id="finale" hidden>
   <div class="finale-box">
-    <h2>КАНАЛ ВЗЛОМАН. ПОЛНОСТЬЮ</h2>
-    <p>Шесть из шести. Штаб снимает шляпу (и надевает её обратно — холодно).</p>
-    <p id="finale-secret"></p>
+    <div class="finale-title">★ ВСЕ ФЛАГИ СОБРАНЫ ★</div>
+    <div class="finale-text">Канал очищен, эфир стабилен, мандарины на столе.<br>Хакерский кружок &laquo;Снежинка&raquo; благодарит тебя лично.</div>
+    <div class="finale-code">С ДНЁМ ХАКЕРА, С НОВЫМ 2027-М!</div>
     <button id="finale-close" type="button">ЗАКРЫТЬ</button>
   </div>
 </div>
-<div id="confetti"></div>
 
 <script src="app.js"></script>
 </body>

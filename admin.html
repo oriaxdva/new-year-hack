@@ -3,43 +3,60 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ШТАБ — панель</title>
-<link rel="stylesheet" href="admin.css">
+<title>HU::ADMIN — штаб</title>
+<!-- СТРАЖ: без сессии страница не отрисовывается и уходит на вход -->
 <script>
-/* страж: без сессии страница даже не отрисовывается */
-(function(){ if(!localStorage.getItem('hu_admin_session')){ location.replace('admin-login.html'); } })();
+  if (!localStorage.getItem('hu_admin_session')) {
+    document.documentElement.style.visibility = 'hidden';
+    location.replace('admin-login.html');
+  }
 </script>
-<style>html{visibility:hidden}</style>
+<link rel="stylesheet" href="admin.css">
 </head>
 <body>
-<header id="admin-topbar">
-  <span class="logo">ШТАБ :: 2027</span>
-  <button id="logout" type="button">ВЫЙТИ</button>
-</header>
-<main>
-  <section id="notes">
-    <h2>СЛУЖЕБНЫЕ ЗАМЕТКИ</h2>
-    <ol id="notes-list">
-      <li><a href="admin.html?note=1">заметка 1: план сани</a></li>
-      <li><a href="admin.html?note=2">заметка 2: реестр подарков</a></li>
-      <li><a href="admin.html?note=3">заметка 3: [удалено модератором]</a></li>
-    </ol>
-  </section>
-  <section id="roles">
-    <h2>УПРАВЛЕНИЕ РОЛЯМИ</h2>
-    <p>ваша роль: <span id="role-now">guest</span></p>
-    <input id="role-input" placeholder="новая роль" autocomplete="off">
-    <button id="role-apply" type="button">ПРИМЕНИТЬ</button>
-    <div id="role-msg" role="status"></div>
-  </section>
-</main>
-<div id="note-modal" hidden>
-  <div class="note-box">
-    <h3 id="note-title"></h3>
-    <p id="note-body"></p>
-    <button id="note-close" type="button">ЗАКРЫТЬ</button>
-  </div>
+<div class="snow" aria-hidden="true"></div>
+<div class="garland" aria-hidden="true">
+  <span>❄</span><span>🎄</span><span>❄</span><span>🍊</span><span>❄</span><span>🎄</span><span>❄</span>
 </div>
+
+<div class="panel">
+  <header class="panel-head">
+    <div class="sig">HU::ADMIN</div>
+    <div class="sig-sub">// служебная панель кружка «Снежинка»</div>
+    <nav class="nav">
+      <a href="#notes">ЗАПИСКИ</a>
+      <a href="#ops">ОПЕРАЦИИ</a>
+      <a href="#" id="logout-link">ВЫЙТИ</a>
+      <a href="index.html">← НА КАНАЛ</a>
+    </nav>
+  </header>
+
+  <section id="notes" class="sec">
+    <h2>[ ЗАПИСКИ ]</h2>
+    <div class="dim">// записки нумеруются подряд. все как один</div>
+    <div class="note-tabs">
+      <button class="note-tab" data-note="1" type="button">записка #1</button>
+      <button class="note-tab" data-note="2" type="button">записка #2</button>
+    </div>
+    <div id="note-view" class="note-view">выбери записку выше</div>
+  </section>
+
+  <section id="ops" class="sec">
+    <h2>[ ОПЕРАЦИИ ]</h2>
+    <div class="dim">// панель проверки роли. доверяем браузеру — он же свой</div>
+    <div id="role-view" class="role-view"></div>
+    <div class="submit-line">
+      <input id="cmd-input" type="text" placeholder="ВВЕДИ КОМАНДУ" autocomplete="off">
+      <button id="cmd-btn" type="button">ВЫПОЛНИТЬ</button>
+    </div>
+    <div id="cmd-msg"></div>
+  </section>
+
+  <footer class="panel-foot">
+    <span class="dim">// штаб не запирается. но и не рекламируется</span>
+  </footer>
+</div>
+
 <script src="admin-app.js"></script>
 </body>
 </html>

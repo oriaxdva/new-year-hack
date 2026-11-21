@@ -3,47 +3,65 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ШТАБ — вход</title>
+<title>HU::2027 — вход в штаб</title>
 <link rel="stylesheet" href="admin.css">
 <!--
-  служебная памятка дежурного штаба
-  пароль входа: hackmas2027
-  не потеряй. снова.
+  ============================================================
+  ФЛАГ №4 доступен тем, кто читает исходники:
+  пароль от штаба — hackmas2027
+  ============================================================
 -->
 </head>
 <body>
-<div class="login-box">
-  <div class="login-title">ШТАБ :: ВХОД</div>
-  <input id="admin-pass" type="password" placeholder="ПАРОЛЬ" autocomplete="off">
-  <button id="admin-enter" type="button">ВОЙТИ</button>
-  <div id="admin-login-msg" role="alert"></div>
-  <div id="admin-flag-box" hidden>
-    <div class="flag-line">FLAG{ADMIN_PANEL_H4CKED}</div>
-    <p>доступ получен. дверь в штаб открыта</p>
-    <a class="enter-btn" href="admin.html">ПЕРЕЙТИ В ШТАБ</a>
-  </div>
-  <a class="back-link" href="index.html">&larr; назад на канал</a>
+<div class="snow" aria-hidden="true"></div>
+<div class="garland" aria-hidden="true">
+  <span>❄</span><span>🎄</span><span>❄</span><span>🍊</span><span>❄</span><span>🎄</span><span>❄</span>
 </div>
+
+<div class="login-box">
+  <div class="sig">HU::ADMIN</div>
+  <div class="sig-sub">// штаб кружка «Снежинка». вход только для своих</div>
+  <input id="pw-input" type="password" placeholder="ПАРОЛЬ ШТАБА" autocomplete="off">
+  <button id="pw-btn" type="button">ВОЙТИ</button>
+  <div id="pw-error"></div>
+  <div id="pw-ok" hidden>
+    <div class="ok-line">✔ ДОСТУП РАЗРЕШЁН</div>
+    <div class="flag-line">FLAG{ADMIN_PANEL_H4CKED}</div>
+    <div class="dim">// флаг запиши на странице ЗАДАНИЯ главного канала</div>
+    <a class="go-btn" href="admin.html">ПЕРЕЙТИ В ШТАБ →</a>
+  </div>
+  <a class="back-link" href="index.html">← вернуться на канал</a>
+</div>
+
 <script>
-'use strict';
-(function(){
-  var PASS = 'hackmas2027';
-  var $ = function(id){ return document.getElementById(id); };
-  function ls(k,v){ if(arguments.length>1){try{localStorage.setItem(k,v);}catch(e){}} try{return localStorage.getItem(k);}catch(e){return null;} }
-  function enter(){
-    var v = ($('admin-pass').value||'').trim();
-    var msg = $('admin-login-msg');
-    if (v === PASS){
-      ls('hu_admin_session','1');
-      ls('hu_backup_pin','DUFKLYHbFRGHb5350'); /* ROT-3 от ARCHIVE_CODE_2027 */
-      msg.textContent = '';
-      $('admin-flag-box').hidden = false;
+(function () {
+  var CODE = 'hackmas2027';
+  var input = document.getElementById('pw-input');
+  var btn = document.getElementById('pw-btn');
+  var err = document.getElementById('pw-error');
+  var ok = document.getElementById('pw-ok');
+
+  function tryLogin() {
+    if ((input.value || '').trim().toLowerCase() === CODE) {
+      try {
+        localStorage.setItem('hu_admin_session', 'granted');
+      } catch (e) {}
+      err.textContent = '';
+      ok.hidden = false;
+      input.disabled = true;
+      btn.disabled = true;
     } else {
-      msg.textContent = '\u2718 неверный пароль. дежурный хмурится';
+      err.textContent = '✘ пароль не принят. подсказки — на странице входа (в исходниках)';
+      input.value = '';
+      input.focus();
     }
   }
-  $('admin-enter').addEventListener('click', enter);
-  $('admin-pass').addEventListener('keydown', function(e){ if(e.key==='Enter') enter(); });
+
+  btn.addEventListener('click', tryLogin);
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { e.preventDefault(); tryLogin(); }
+  });
+  input.focus();
 })();
 </script>
 </body>
