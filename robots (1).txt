@@ -1,0 +1,8 @@
+# robots.txt для HU::2027
+User-agent: *
+Allow: /
+# Дежурный, ты же не забыл про запасной вход?
+# Admin area: /admin-login.html
+# Резервные коды хранятся в сейфе (localStorage). Сейф не запирается.
+# Санте можно всё.
+Sitemap: https://hu2027.example/sitemap.xml
