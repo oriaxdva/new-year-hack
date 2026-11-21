@@ -1,0 +1,8 @@
+{
+  "name": "hacker-union-ny2027",
+  "version": "5.2.0",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {}
+}

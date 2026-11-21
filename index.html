@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HACKER UNION — Новый год 2027</title>
+<link rel="stylesheet" href="/crt.css">
+</head>
+<body>
+<!-- maintenance log 2026-12-31: deployment ok. key rotate ok. key=FLAG{HTML_C0MMENT_2027}. do not remove -->
+<div id="crt-overlay"></div>
+<div id="scanlines"></div>
+<div id="noise"></div>
+
+<!-- Вход -->
+<div id="entry-overlay">
+  <div class="entry-box">
+    <div class="glitch" data-text="HACKER UNION">HACKER UNION</div>
+    <p class="entry-sub">// доступ только для своих //</p>
+    <p class="entry-hint">Ввод кода активации. Подсказка смотрит тебе прямо в лицо: он в шапке, в брифинге и в титрах.</p>
+    <input id="entry-code" type="text" placeholder="КОД_АКТИВАЦИИ" autocomplete="off">
+    <button id="entry-btn" class="btn-primary">ВОЙТИ В СИСТЕМУ</button>
+    <div id="entry-error" class="error-msg hidden"></div>
+  </div>
+</div>
+
+<header id="header">
+  <div class="logo glitch" data-text="HU::2027">HU::2027</div>
+  <nav>
+    <button data-screen="briefing">БРИФИНГ</button>
+    <button data-screen="broadcast">ОБРАЩЕНИЕ</button>
+    <button data-screen="tasks">ЗАДАНИЯ</button>
+    <button data-screen="wall">СТЕНА</button>
+    <button data-screen="terminal">ТЕРМИНАЛ</button>
+  </nav>
+  <div class="header-right">
+    <span id="clock">00:00:00</span>
+    <button id="audio-btn" title="Звук">AUDIO: OFF</button>
+  </div>
+</header>
+
+<main>
+  <!-- Брифинг -->
+  <section id="screen-briefing" class="screen">
+    <h2 class="glitch" data-text="БРИФИНГ">БРИФИНГ</h2>
+    <div class="panel">
+      <p>Операция <b>«МАНДАРИН &amp; КО»</b> подходит к концу. Год закрыт, система почти пуста — но в ней остались спрятанные флаги. Их <b>4</b>. Твоя задача — найти все и сдать на странице ЗАДАНИЯ.</p>
+      <p>Знающие ищут там, где небезопасно: комментарии, админки, заметки чужих пользователей, стены сообщений и даже консоль браузера.</p>
+      <p class="hint">P.S. Если найдёшь то, что не должен был находить — поздравляем, ты Red Team.</p>
+    </div>
+  </section>
+
+  <!-- Обращение -->
+  <section id="screen-broadcast" class="screen hidden">
+    <h2 class="glitch" data-text="ОБРАЩЕНИЕ">ОБРАЩЕНИЕ</h2>
+    <div class="broadcast-container">
+      <div class="crt-frame">
+        <div class="crt-scanlines"></div>
+        <div class="crt-glass"></div>
+        <div class="video-area">
+          <video id="local-video" src="/president.mp4" loop playsinline muted></video>
+          <div id="text-broadcast" class="text-broadcast hidden">
+            <div class="static-noise"></div>
+            <div class="broadcast-text">
+              <span class="line live">● ПРЯМОЙ ЭФИР</span>
+              <span class="line small">КАНАЛ 27 · ШТАБ RED TEAM · ПРЕЗИДЕНТ ХАКЕРОВ</span>
+              <div class="message-box">
+                <span id="typed-message" class="typed"></span><span class="cursor">▌</span>
+              </div>
+            </div>
+          </div>
+          <div id="no-video-fallback" class="fallback-msg hidden">ПРЕРЫВАЕМ СИГНАЛ... ПЕРЕХОДИМ НА РЕЗЕРВНЫЙ КАНАЛ</div>
+        </div>
+      </div>
+      <button id="play-broadcast-btn" class="btn-primary">СТАРТ ТРАНСЛЯЦИИ</button>
+      <p class="hint">Если трансляция не запускается — резервный канал всегда в строю.</p>
+    </div>
+  </section>
+
+  <!-- Задания -->
+  <section id="screen-tasks" class="screen hidden">
+    <h2 class="glitch" data-text="ЗАДАНИЯ">ЗАДАНИЯ</h2>
+    <div class="progress-wrap"><div id="progress-bar"></div></div>
+    <p id="progress-text">0 / 4</p>
+    <div id="tasks-list"></div>
+  </section>
+
+  <!-- Стена -->
+  <section id="screen-wall" class="screen hidden">
+    <h2 class="glitch" data-text="СТЕНА СООБЩЕНИЙ">СТЕНА СООБЩЕНИЙ</h2>
+    <div class="panel">
+      <input id="wall-input" type="text" maxlength="200" placeholder="Напиши что-нибудь команде...">
+      <button id="wall-btn" class="btn-primary">ОТПРАВИТЬ</button>
+      <div id="wall-msg" class="error-msg hidden"></div>
+      <div id="wall-feed"></div>
+    </div>
+  </section>
+
+  <!-- Терминал -->
+  <section id="screen-terminal" class="screen hidden">
+    <h2 class="glitch" data-text="ТЕРМИНАЛ">ТЕРМИНАЛ</h2>
+    <div class="terminal">
+      <div id="term-out"></div>
+      <div class="term-input-line"><span class="term-prompt">root@hu:~$</span><input id="term-input" autocomplete="off"></div>
+    </div>
+  </section>
+</main>
+
+<footer id="statusbar">
+  <span>HU::2027 // МАНДАРИН &amp; КО</span>
+  <span id="audio-ind">◆ глухой сигнал</span>
+</footer>
+
+<script src="/app.js"></script>
+</body>
+</html>

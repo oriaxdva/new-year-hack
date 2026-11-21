@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>ВХОД — ADMIN</title>
+<link rel="stylesheet" href="/crt.css">
+</head>
+<body>
+<div id="scanlines"></div>
+<main style="max-width:400px;margin:100px auto;text-align:center">
+  <h2 class="glitch" data-text="ADMIN ACCESS">ADMIN ACCESS</h2>
+  <!-- TODO: убрать пароль из коммента перед релизом. Пароль: HAPPY2027ADMIN -->
+  <div class="panel">
+    <input id="pw" type="password" placeholder="пароль администратора" style="width:100%;padding:8px;background:#020402;border:1px solid #1a7a3a;color:#33ff66;font-family:inherit">
+    <button id="go" class="btn-primary" style="margin-top:10px">ВОЙТИ</button>
+    <p id="err" style="color:#ff2a6a;margin-top:8px"></p>
+  </div>
+</main>
+<script>
+document.getElementById('go').onclick = async () => {
+  const r = await fetch('/api/admin/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password: document.getElementById('pw').value })
+  });
+  if (r.ok) location.reload();
+  else document.getElementById('err').textContent = 'неверный пароль';
+};
+</script>
+</body>
+</html>

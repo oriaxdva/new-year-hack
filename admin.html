@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>ADMIN — HACKER UNION</title>
+<link rel="stylesheet" href="/crt.css">
+</head>
+<body>
+<div id="scanlines"></div>
+<main style="max-width:700px;margin:60px auto;padding:0 20px">
+  <h2 class="glitch" data-text="ADMIN PANEL">ADMIN PANEL</h2>
+  <div class="panel">
+    <h3>Заметки сотрудников (IDOR: попробуй поменять id)</h3>
+    <div id="notes">Загрузка...</div>
+  </div>
+  <div class="panel">
+    <h3>Управление</h3>
+    <p>Сессии активны, флаги не подделать. Красиво, но в новой версии заметки доступны всем, у кого есть cookie. Гм.</p>
+  </div>
+</main>
+<script>
+(async () => {
+  const d = await fetch('/api/admin/notes').then(r => r.json()).catch(() => ({ notes: [] }));
+  document.getElementById('notes').innerHTML =
+    (d.notes || [{ author: '?', text: d.error || 'нет данных' }]).map(n =>
+      '<p><b>' + n.author + ':</b> ' + n.text + '</p>').join('');
+})();
+</script>
+</body>
+</html>
