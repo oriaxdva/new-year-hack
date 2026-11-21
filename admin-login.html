@@ -2,30 +2,53 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>ВХОД — ADMIN</title>
-<link rel="stylesheet" href="/crt.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HU :: ВХОД В ШТАБ</title>
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="crt.css">
+<link rel="stylesheet" href="admin.css">
 </head>
 <body>
-<div id="scanlines"></div>
-<main style="max-width:400px;margin:100px auto;text-align:center">
-  <h2 class="glitch" data-text="ADMIN ACCESS">ADMIN ACCESS</h2>
-  <!-- TODO: убрать пароль из коммента перед релизом. Пароль: HAPPY2027ADMIN -->
-  <div class="panel">
-    <input id="pw" type="password" placeholder="пароль администратора" style="width:100%;padding:8px;background:#020402;border:1px solid #1a7a3a;color:#33ff66;font-family:inherit">
-    <button id="go" class="btn-primary" style="margin-top:10px">ВОЙТИ</button>
-    <p id="err" style="color:#ff2a6a;margin-top:8px"></p>
+<!--
+  СЛУЖЕБНАЯ ЗАПИСЬ (для участников хакатона):
+  пароль от штаба: M4ND4R1N2027
+  P.S. Пароли в комментариях — плохая идея. Но сервер-то какой доверчивый...
+-->
+<div class="broadcast-container">
+  <div class="crt-frame">
+    <div class="tv-glass"></div>
+    <div class="scanlines"></div>
+    <div class="static-noise"></div>
+    <div class="secret-tape">СОВЕРШЕННО СЕКРЕТНО · ШТАБ RED TEAM</div>
+    <h1 class="crt-title amber-title">ВХОД В ШТАБ</h1>
+    <p class="crt-text small">Только для сотрудников. Посторонним вход воспрещён. Особенно посторонним, которые это читают.</p>
+    <div class="auth-box">
+      <label for="login">ЛОГИН</label>
+      <input type="text" id="login" value="admin" autocomplete="off">
+      <label for="password">ПАРОЛЬ</label>
+      <input type="password" id="password" autocomplete="off">
+      <button class="btn-primary" id="login-btn">ВОЙТИ</button>
+      <p class="crt-text small" id="login-msg"></p>
+    </div>
   </div>
-</main>
+</div>
 <script>
-document.getElementById('go').onclick = async () => {
-  const r = await fetch('/api/admin/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ password: document.getElementById('pw').value })
-  });
-  if (r.ok) location.reload();
-  else document.getElementById('err').textContent = 'неверный пароль';
-};
+(function(){
+  var btn = document.getElementById('login-btn');
+  var pass = document.getElementById('password');
+  var msg = document.getElementById('login-msg');
+  function tryLogin(){
+    if (pass.value === 'M4ND4R1N2027'){
+      localStorage.setItem('hu_role', 'guest'); // «сервер» выдаёт роль прямо в браузер
+      location.href = 'admin.html';
+    } else {
+      msg.textContent = 'ОТКАЗАНО. НЕВЕРНЫЙ ПАРОЛЬ.';
+      msg.style.color = '#ff3b30';
+    }
+  }
+  btn.addEventListener('click', tryLogin);
+  pass.addEventListener('keydown', function(e){ if(e.key === 'Enter') tryLogin(); });
+})();
 </script>
 </body>
 </html>

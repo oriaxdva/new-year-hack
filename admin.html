@@ -2,28 +2,110 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>ADMIN — HACKER UNION</title>
-<link rel="stylesheet" href="/crt.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HU :: ШТАБ RED TEAM</title>
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="crt.css">
+<link rel="stylesheet" href="admin.css">
 </head>
 <body>
-<div id="scanlines"></div>
-<main style="max-width:700px;margin:60px auto;padding:0 20px">
-  <h2 class="glitch" data-text="ADMIN PANEL">ADMIN PANEL</h2>
-  <div class="panel">
-    <h3>Заметки сотрудников (IDOR: попробуй поменять id)</h3>
-    <div id="notes">Загрузка...</div>
+<!--
+  СЛУЖЕБНАЯ ЗАПИСЬ:
+  1) Роль пользователя хранится в localStorage под ключом hu_role.
+     Сервер «доверяет» этому значению. Возможно, не стоило.
+  2) Заметка id=3 — служебная. Проверку «кто открывает» никто не делал.
+  3) Хранилище флагов открывается роли admin.
+-->
+<div class="broadcast-container">
+  <div class="crt-frame">
+    <div class="tv-glass"></div>
+    <div class="scanlines"></div>
+    <div class="static-noise"></div>
+
+    <header class="status-bar">
+      <span class="status-item amber"><span class="rec-dot"></span>REC</span>
+      <span class="status-item">ШТАБ RED TEAM</span>
+      <span class="status-item" id="who">РОЛЬ: ...</span>
+    </header>
+
+    <h1 class="crt-title amber-title">ШТАБ RED TEAM</h1>
+
+    <section class="content-block">
+      <h2 class="crt-title">ЗАМЕТКИ</h2>
+      <div id="notes"></div>
+    </section>
+
+    <hr class="crt-line">
+
+    <section class="content-block">
+      <h2 class="crt-title">ХРАНИЛИЩЕ ФЛАГОВ</h2>
+      <div id="vault-denied" class="access-denied">
+        ДОСТУП ЗАПРЕЩЁН: ТРЕБУЕТСЯ РОЛЬ admin.<br>
+        <span class="small">Подсказка: сервер верит тому, что написано в твоём localStorage.</span>
+      </div>
+      <div id="vault-open" class="hidden">
+        <p class="crt-text">Секретное хранилище открыто. Внутри был всего один флаг — забирай:</p>
+        <div class="flag-banner">FLAG{R0LE_SW4P_2027}</div>
+      </div>
+    </section>
+
+    <p class="crt-text small"><a class="crt-link" href="index.html">← НА ГЛАВНУЮ</a></p>
   </div>
-  <div class="panel">
-    <h3>Управление</h3>
-    <p>Сессии активны, флаги не подделать. Красиво, но в новой версии заметки доступны всем, у кого есть cookie. Гм.</p>
-  </div>
-</main>
+</div>
 <script>
-(async () => {
-  const d = await fetch('/api/admin/notes').then(r => r.json()).catch(() => ({ notes: [] }));
-  document.getElementById('notes').innerHTML =
-    (d.notes || [{ author: '?', text: d.error || 'нет данных' }]).map(n =>
-      '<p><b>' + n.author + ':</b> ' + n.text + '</p>').join('');
+(function(){
+  'use strict';
+
+  // Кто мы? «Сервер» читает роль прямо из localStorage — верит ей безоговорочно.
+  var role = localStorage.getItem('hu_role') || 'guest';
+  document.getElementById('who').textContent = 'РОЛЬ: ' + role.toUpperCase();
+
+  // ---------- ЗАМЕТКИ (IDOR: проверку владельца никто не делал) ----------
+  var NOTES = [
+    { id: 1, author: 'admin',     text: 'План на новый год: 1) закрыть квартал 2) обновить пароли 3) НЕ КЛАСТЬ ПАРОЛИ В КОММЕНТАРИИ. Переписать это объявление на стене.' },
+    { id: 2, author: 'n0ctis',    text: 'Напоминание команде: бэкапы каждый вечер. Кто снова положил прод — чистит снежный двор весь январь.' },
+    { id: 3, author: 'root',      text: 'СЛУЖЕБНОЕ. ФЛАГ: FLAG{IDOR_N0TES_2027}. Внимание: кто-то сливал заметки через подмену id. Починить к январю. Или не чинить.', secret: true }
+  ];
+
+  var notesEl = document.getElementById('notes');
+  function renderNote(n){
+    var div = document.createElement('div');
+    div.className = 'note' + (n.secret ? ' flagged' : '');
+    var head = document.createElement('div');
+    head.className = 'note-head';
+    head.textContent = 'ЗАМЕТКА #' + n.id + ' · ' + n.author;
+    var body = document.createElement('div');
+    body.className = 'note-body';
+    body.textContent = n.text;
+    div.appendChild(head); div.appendChild(body);
+    notesEl.appendChild(div);
+  }
+  // «Сервер» отдаёт любую заметку по запрошенному id — хоть чужую
+  NOTES.forEach(renderNote);
+  // ..а также ту, которую попросили в адресе страницы: ?note=3
+  var requested = parseInt(new URLSearchParams(location.search).get('note'), 10);
+  if (requested){
+    var found = NOTES.find(function(n){ return n.id === requested; });
+    if (found) renderNote(found);
+  }
+
+  // ---------- ХРАНИЛИЩЕ ----------
+  var denied = document.getElementById('vault-denied');
+  var open = document.getElementById('vault-open');
+  if (role === 'admin'){
+    denied.classList.add('hidden');
+    open.classList.remove('hidden');
+    submitFlagExternal('FLAG{R0LE_SW4P_2027}');
+  }
+
+  // сдача флага в общий зачёт (тот же localStorage, что и на главной)
+  function submitFlagExternal(flag){
+    var FLAGS_TOTAL = 6;
+    var found;
+    try { found = JSON.parse(localStorage.getItem('hu_flags') || '[]'); } catch(e){ found = []; }
+    var f = flag.toUpperCase();
+    if (found.indexOf(f) === -1){ found.push(f); localStorage.setItem('hu_flags', JSON.stringify(found)); }
+  }
 })();
 </script>
 </body>

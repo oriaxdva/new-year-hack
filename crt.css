@@ -1,303 +1,98 @@
-/* ============================================================
-   CRT-СТИЛЬ: «Прямой эфир Президента Хакеров»
-   Новогодняя версия для хакатона 2027
-   ============================================================ */
-
-/* ---------- Токены темы ---------- */
-:root {
-  --crt-bg: #030503;              /* почти чёрный, чуть зелёный */
-  --crt-green: #33ff66;           /* основной фосфор */
-  --crt-green-dim: #1a8f3c;       /* приглушённый зелёный */
-  --crt-amber: #ffb347;           /* редкий янтарный акцент */
-  --crt-gray: #7a8a7d;            /* второстепенный текст */
-  --crt-black: #000000;
-  --glow-sm: 0 0 4px rgba(51, 255, 102, 0.55);
-  --glow-md: 0 0 10px rgba(51, 255, 102, 0.40);
-  --glow-lg: 0 0 26px rgba(51, 255, 102, 0.25);
-  --font-crt: 'VT323', 'Courier New', Courier, monospace;
+:root{
+  --green:#0f0;
+  --green-dim:#0a0;
+  --amber:#ffb000;
+  --red:#ff3b30;
+  --bg:#050505;
+  --panel:#000;
 }
-
-/* ---------- Сброс и база ---------- */
-* { box-sizing: border-box; }
-
-html, body {
-  margin: 0;
-  padding: 0;
-  background: var(--crt-bg);
-  color: var(--crt-green);
-  font-family: var(--font-crt);
-  min-height: 100vh;
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);
+  color:var(--green);
+  font-family:'VT323','Courier New',monospace;
+  font-size:20px;
+  min-height:100vh;
+  overflow-x:hidden;
+  text-shadow:0 0 6px rgba(0,255,0,.55);
 }
-
-body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 24px 16px;
-  overflow-x: hidden;
-  text-rendering: optimizeLegibility;
-  animation: crt-flicker 4s infinite steps(60);
+/* CRT-рамка */
+.broadcast-container{min-height:100vh;padding:16px;display:flex;justify-content:center}
+.crt-frame{
+  width:100%;max-width:980px;background:var(--panel);
+  border:3px solid var(--green);border-radius:10px;
+  box-shadow:0 0 24px rgba(0,255,0,.35), inset 0 0 60px rgba(0,255,0,.06);
+  padding:20px;position:relative;overflow:hidden;
 }
-
-/* Лёгкое фоновое свечение по краям экрана */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 1;
-  background:
-    radial-gradient(ellipse at 50% 45%, rgba(51,255,102,0.05) 0%, transparent 60%),
-    radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.75) 100%);
+/* стекло, сканлайны, шум */
+.tv-glass,.scanlines,.static-noise{pointer-events:none;position:fixed;inset:0;z-index:5}
+.tv-glass{background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.55) 100%)}
+.scanlines{background:repeating-linear-gradient(0deg,rgba(0,0,0,.22) 0 1px,transparent 1px 3px)}
+.static-noise{opacity:.05;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");animation:noiseShift .35s steps(3) infinite}
+@keyframes noiseShift{0%{transform:translate(0,0)}50%{transform:translate(-30px,10px)}100%{transform:translate(20px,-15px)}}
+@keyframes flicker{0%,100%{opacity:.97}50%{opacity:1}}
+.crt-frame{animation:flicker .18s infinite}
+/* шапка */
+.status-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;border-bottom:1px solid var(--green);padding-bottom:8px;margin-bottom:14px}
+.status-item{color:var(--amber);text-shadow:0 0 6px rgba(255,176,0,.5);font-size:16px}
+.status-item.green{color:var(--green)}
+.btn-audio{background:none;border:1px solid var(--amber);color:var(--amber);font-family:inherit;font-size:16px;cursor:pointer;padding:2px 8px}
+.btn-audio:hover{background:var(--amber);color:#000;text-shadow:none}
+/* текст */
+.crt-title{font-size:32px;margin:6px 0 12px;letter-spacing:3px;color:var(--green)}
+.crt-text{line-height:1.5;margin:8px 0}
+.crt-text.small{font-size:16px;color:#7fdc7f}
+.content-block{margin:18px 0}
+.broadcast-meta{font-size:16px;margin:4px 0}
+hr.crt-line{border:0;border-top:1px dashed var(--green-dim);margin:20px 0}
+/* печать */
+.message-box{min-height:140px;border:1px solid var(--green-dim);padding:12px;background:rgba(0,20,0,.35)}
+.broadcast-text{white-space:pre-wrap;line-height:1.55;margin:0}
+.cursor{display:inline-block;width:.6em;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.flag-banner{
+  margin-top:12px;padding:10px 14px;border:2px solid var(--amber);
+  color:var(--amber);text-shadow:0 0 8px rgba(255,176,0,.7);
+  animation:amberFlash .8s steps(2) infinite;
 }
-
-/* ---------- Мерцание (как у ЭЛТ) ---------- */
-@keyframes crt-flicker {
-  0%, 100% { opacity: 1; }
-  3%  { opacity: 0.97; }
-  6%  { opacity: 1; }
-  54% { opacity: 0.985; }
-  55% { opacity: 0.94; }
-  56% { opacity: 1; }
-  87% { opacity: 0.97; }
-  88% { opacity: 1; }
+@keyframes amberFlash{0%,100%{opacity:1}50%{opacity:.55}}
+/* кнопки */
+.controls{display:flex;gap:12px;margin-top:12px}
+.btn-primary,.btn-action{
+  background:var(--panel);color:var(--green);border:2px solid var(--green);
+  font-family:inherit;font-size:20px;padding:10px 22px;cursor:pointer;
+  letter-spacing:2px;text-transform:uppercase;text-shadow:inherit;transition:.2s;
 }
-
-/* ---------- Контейнер эфира ---------- */
-.broadcast-container {
-  position: relative;
-  width: 100%;
-  max-width: 880px;
-  margin: 32px auto;
-  z-index: 2;
+.btn-primary:hover,.btn-action:hover{background:var(--green);color:#000;text-shadow:none;box-shadow:0 0 16px rgba(0,255,0,.8)}
+.btn-primary:active,.btn-action:active{transform:scale(.96)}
+/* ввод */
+.input-group{display:flex;gap:10px;margin:10px 0;flex-wrap:wrap}
+input[type=text]{
+  background:#000;border:1px solid var(--green);color:var(--green);
+  font-family:inherit;font-size:18px;padding:8px 10px;min-width:220px;flex:1;
+  caret-color:var(--green);outline:none;
 }
-
-/* Рамка старого телевизора */
-.crt-frame {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  border: 10px solid #101410;
-  outline: 2px solid rgba(51,255,102,0.25);
-  border-radius: 14px;
-  background: var(--crt-black);
-  overflow: hidden;
-  box-shadow:
-    inset 0 0 60px rgba(0,0,0,0.9),
-    var(--glow-lg),
-    0 18px 60px rgba(0,0,0,0.8);
+input[type=text]:focus{box-shadow:0 0 10px rgba(0,255,0,.5)}
+/* стена */
+.wall{display:flex;flex-direction:column;gap:10px}
+.wall-post{border:1px dashed var(--green-dim);padding:10px 12px;background:rgba(0,20,0,.25);line-height:1.4}
+.nick{color:var(--amber);font-weight:bold;margin-right:8px}
+.amber{color:var(--amber);text-shadow:0 0 6px rgba(255,176,0,.5)}
+.hidden{display:none!important}
+.crt-footer{margin-top:24px;border-top:1px solid var(--green-dim);padding-top:10px;font-size:14px;color:#5fbf5f;text-align:center}
+/* метель */
+.snow-layer{position:fixed;inset:0;pointer-events:none;z-index:4;overflow:hidden}
+.flake{position:absolute;top:-2%;color:var(--green);opacity:.7;animation:fall linear infinite;text-shadow:0 0 6px rgba(0,255,0,.6)}
+.flake.amber{color:var(--amber);text-shadow:0 0 6px rgba(255,176,0,.6)}
+@keyframes fall{to{transform:translateY(105vh) rotate(360deg)}}
+/* доступность */
+@media (prefers-reduced-motion:reduce){
+  .crt-frame,.static-noise,.flake,.cursor,.flag-banner{animation:none}
+  .flake{display:none}
 }
-
-/* Сканлайны — полосы старого монитора */
-.scanlines {
-  position: absolute;
-  inset: 0;
-  z-index: 12;
-  pointer-events: none;
-  background-image: repeating-linear-gradient(
-    to bottom,
-    rgba(255,255,255,0.045) 0px,
-    rgba(255,255,255,0.045) 1px,
-    transparent 1px,
-    transparent 4px
-  );
-  mix-blend-mode: overlay;
-}
-
-/* Полупрозрачное «стекло» и виньетка */
-.tv-glass {
-  position: absolute;
-  inset: 0;
-  z-index: 11;
-  pointer-events: none;
-  background:
-    radial-gradient(circle at 50% 50%, rgba(20,60,25,0.18) 0%, rgba(0,0,0,0.55) 100%);
-  box-shadow: inset 0 0 120px rgba(0,0,0,0.85);
-}
-
-/* Бегущая яркая линия сверху вниз (лёгкая) */
-.tv-glass::after {
-  content: "";
-  position: absolute;
-  left: 0; right: 0;
-  height: 90px;
-  background: linear-gradient(to bottom,
-    transparent 0%,
-    rgba(51,255,102,0.05) 50%,
-    transparent 100%);
-  animation: glass-sweep 7s linear infinite;
-}
-
-@keyframes glass-sweep {
-  0%   { top: -15%; }
-  100% { top: 110%; }
-}
-
-/* ---------- Область видео/эфира ---------- */
-.video-area {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  z-index: 2;
-}
-
-.video-area video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* ---------- Текстовый эфир ---------- */
-.text-broadcast {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background:
-    radial-gradient(ellipse at center, rgba(4,16,6,0.92) 0%, rgba(0,0,0,0.96) 100%);
-  padding: 24px;
-  z-index: 3;
-}
-
-.broadcast-text {
-  width: 100%;
-  max-width: 720px;
-  max-height: 100%;
-  overflow: hidden;
-}
-
-.line {
-  display: block;
-  margin: 6px 0;
-  letter-spacing: 1.5px;
-  font-size: clamp(18px, 2.6vw, 26px);
-  text-shadow: var(--glow-sm);
-}
-
-.line.small {
-  font-size: clamp(12px, 1.6vw, 15px);
-  color: var(--crt-gray);
-  text-shadow: none;
-  letter-spacing: 3px;
-}
-
-.message-box {
-  margin-top: 18px;
-  border-top: 1px solid rgba(51,255,102,0.35);
-  padding-top: 14px;
-}
-
-.typed {
-  font-size: clamp(15px, 2vw, 20px);
-  line-height: 1.55;
-  color: var(--crt-green);
-  text-shadow: var(--glow-sm);
-  white-space: pre-wrap;
-}
-
-.cursor {
-  display: inline-block;
-  width: 0.6em;
-  background: var(--crt-green);
-  color: transparent;
-  text-shadow: var(--glow-md);
-  animation: cursor-blink 1s steps(2) infinite;
-}
-
-@keyframes cursor-blink {
-  0%, 49%  { opacity: 1; }
-  50%, 100% { opacity: 0; }
-}
-
-/* ---------- Шум (статики) ---------- */
-.static-noise {
-  position: absolute;
-  inset: 0;
-  z-index: 4;
-  pointer-events: none;
-  opacity: 0.16;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  animation: noise-shift 0.35s steps(3) infinite;
-}
-
-@keyframes noise-shift {
-  0%   { transform: translate(0, 0); }
-  33%  { transform: translate(-3px, 2px); }
-  66%  { transform: translate(2px, -2px); }
-  100% { transform: translate(0, 0); }
-}
-
-/* ---------- Заголовки-служебные строки ---------- */
-.broadcast-title,
-.line.urgent {
-  color: var(--crt-amber);
-  text-shadow: 0 0 6px rgba(255,179,71,0.6);
-  animation: amber-pulse 2.2s ease-in-out infinite;
-}
-
-@keyframes amber-pulse {
-  0%, 100% { opacity: 0.85; }
-  50%      { opacity: 1; }
-}
-
-/* ---------- Фолбэк-сообщение ---------- */
-.fallback-msg {
-  position: absolute;
-  top: 10px;
-  right: 14px;
-  z-index: 8;
-  font-size: 12px;
-  letter-spacing: 1px;
-  color: var(--crt-gray);
-  background: rgba(0,0,0,0.55);
-  border: 1px solid rgba(51,255,102,0.2);
-  padding: 4px 10px;
-  border-radius: 4px;
-}
-
-/* ---------- Кнопка «СТАРТ ТРАНСЛЯЦИИ» ---------- */
-.btn-primary {
-  display: block;
-  margin: 26px auto 0;
-  padding: 14px 34px;
-  font-family: var(--font-crt);
-  font-size: clamp(18px, 2.4vw, 24px);
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--crt-green);
-  background: rgba(0, 20, 6, 0.85);
-  border: 2px solid var(--crt-green-dim);
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.25s ease;
-  text-shadow: var(--glow-sm);
-  box-shadow: inset 0 0 12px rgba(51,255,102,0.08);
-}
-
-.btn-primary:hover {
-  background: var(--crt-green);
-  color: var(--crt-black);
-  text-shadow: none;
-  border-color: var(--crt-green);
-  box-shadow: 0 0 22px rgba(51,255,102,0.55), inset 0 0 20px rgba(51,255,102,0.25);
-}
-
-.btn-primary:active {
-  transform: scale(0.96);
-}
-
-/* ---------- Скрытие ---------- */
-.hidden {
-  display: none !important;
-}
-
-/* ---------- Уважение к настройкам пользователя ---------- */
-@media (prefers-reduced-motion: reduce) {
-  body, .cursor, .static-noise, .tv-glass::after, .line.urgent {
-    animation: none !important;
-  }
+@media (max-width:600px){
+  body{font-size:17px}
+  .crt-title{font-size:24px}
+  .btn-primary,.btn-action{font-size:16px;padding:8px 14px}
 }
