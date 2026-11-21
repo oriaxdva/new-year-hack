@@ -1,88 +1,118 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HU::2027 — закрытый новогодний канал</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HU::2027 · Black Team</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="crt.css">
-<!-- ================================================== -->
-<!--  ФЛАГ №1: FLAG{WELCOME_2027}                        -->
-<!--  привет, любознательный. начинать стоило отсюда     -->
-<!-- ================================================== -->
+<!-- FLAG{HTML_C0MMENT_2027} — флаг №1 спрятан прямо тут. исходники — честный путь. -->
 </head>
 <body>
-<div id="confetti"></div>
 
+<!-- экран доступа: весь экран, за ним ничего не видно -->
 <div id="access-screen">
-  <div class="access-box">
-    <div class="access-sig">HU::2027</div>
-    <div class="access-sub">ЗАКРЫТЫЙ КАНАЛ &mdash; ДОСТУП ТОЛЬКО ПО КОДУ</div>
-    <input id="access-input" type="password" placeholder="ВВЕДИ КОД ДОСТУПА" autocomplete="off">
-    <button id="access-btn" type="button">ВОЙТИ</button>
-    <div id="access-error"></div>
+  <div class="access-wrap">
+    <div class="sign">HU::2027</div>
+    <div class="access-panel">
+      <div class="access-title">ДОСТУП ЗАКРЫТ</div>
+      <p class="access-sub">закрытый канал Black Team. введите код доступа</p>
+      <input id="access-input" type="password" placeholder="КОД ДОСТУПА" autocomplete="off">
+      <button id="access-submit" class="btn-primary">ВОЙТИ</button>
+      <div id="access-err" class="access-err"></div>
+      <p class="dim small">код у ведущего. и, возможно, у санта-клауса</p>
+    </div>
   </div>
 </div>
 
-<div class="panel">
-  <header class="panel-head">
-    <div class="sig">HU::2027</div>
-    <div class="sig-sub">// частный канал хакерского кружка &laquo;Снежинка&raquo; &mdash; эфир к Новому году</div>
-    <nav class="nav">
-      <a href="#brief">БРИФИНГ</a>
-      <a href="#tasks">ЗАДАНИЯ</a>
-      <a href="#live">ПРЯМОЙ ЭФИР</a>
-      <a href="#wall">СТЕНА</a>
-      <a href="#term">ТЕРМИНАЛ</a>
+<div class="snow-layer" id="snow"></div>
+
+<div class="crt-frame">
+  <div class="scanlines"></div>
+  <div class="tv-glass"></div>
+  <header class="crt-header">
+    <div class="header-top">
+      <div class="logo">HU::<span class="logo-accent">2027</span></div>
+      <div class="header-right">
+        <span class="clock" id="clock">00:00:00</span>
+        <button class="header-btn" id="audio-toggle">AUDIO: OFF</button>
+      </div>
+    </div>
+    <nav class="crt-nav" id="crt-nav">
+      <button data-section="missions" class="active">ЗАДАНИЯ</button>
+      <button data-section="broadcast">ЭФИР</button>
+      <button data-section="wall">СТЕНА</button>
+      <button data-section="terminal">ТЕРМИНАЛ</button>
     </nav>
   </header>
+  <div class="garland" id="garland"></div>
 
-  <section id="brief" class="sec">
-    <h2>[ БРИФИНГ ]</h2>
-    <p>Скоро Новый год, и кружок &laquo;Снежинка&raquo; выходит в открытый эфир. Наш канал взломали накануне праздника &mdash; и мы почти рады: кто-то из вас уже откопал первый секрет.</p>
-    <p>По каналу разбросаны флаги вида <span class="flagfmt">FLAG{...}</span>. Каждый найденный &mdash; плюс один шаг к празднику. Код доступа к каналу знает ведущий. Или знает тот, кто читает исходники.</p>
-    <p class="dim">// если читаешь это &mdash; ты уже на верном пути</p>
-  </section>
+  <main class="content">
 
-  <section id="tasks" class="sec">
-    <h2>[ ЗАДАНИЯ ]</h2>
-    <div class="counter-line">СДАНО ФЛАГОВ: <span id="flags-counter">0/6</span></div>
-    <div id="tasks-list"></div>
-    <div class="submit-line">
-      <input id="flag-input" type="text" placeholder="ВВЕДИ ФЛАГ СЮДА" autocomplete="off">
-      <button id="flag-submit" type="button">СДАТЬ</button>
-    </div>
-    <div id="flag-msg"></div>
-  </section>
+    <section class="crt-section active" id="missions">
+      <h2 class="crt-title">БРИФИНГ</h2>
+      <p class="crt-text">Ты — свежий агент Black Team. Досье короткое: прошлый год ты уронил прод и оставил после себя сорок писем «уведомление о недоставке» от Санты.</p>
+      <p class="crt-text">Задача на праздник: собрать <b>7 флагов</b>. Один лежит прямо в исходниках этой страницы. Остальные разбросаны по каналу: консоль, эфир, штаб, места без замков. Один из них — просто вопрос. Никто не скажет, откуда он.</p>
+      <p class="crt-text">Флаг выглядит как <span class="amber">FLAG{...}</span>. Сдавать — только здесь, в поле ниже. Терминал и стена флаги не принимают: там сидят другие люди.</p>
+      <p class="crt-text dim small">Подсказки — на стене, в robots.txt и там, где их меньше всего ждёшь. Соберёшь все семь — канал уйдёт в эфир, а год официально считается вскрытым.</p>
+      <div class="tree-row">🎄 🎁 🎄</div>
+      <div class="counter">ФЛАГОВ СОБРАНО: <span id="flag-counter" class="amber">0</span>/7</div>
+      <div class="submit-box">
+        <input id="flag-input" placeholder="FLAG{...}" autocomplete="off">
+        <button id="flag-submit" class="btn-primary">СДАТЬ</button>
+      </div>
+      <div id="flag-feedback" class="feedback"></div>
+      <ul class="flag-list" id="flag-list"></ul>
+    </section>
 
-  <section id="live" class="sec">
-    <h2>[ ПРЯМОЙ ЭФИР ]</h2>
-    <div id="broadcast-feed"></div>
-  </section>
+    <section class="crt-section" id="broadcast">
+      <h2 class="crt-title">ЭФИР</h2>
+      <div class="transmission-status"><span class="rec-dot"></span> ТРАНСЛЯЦИЯ ЗАБЛОКИРОВАНА · ОЖИДАНИЕ РАСШИФРОВКИ</div>
+      <div class="broadcast-screen" id="broadcast-screen">
+        <div class="broadcast-text" id="broadcast-text"></div>
+      </div>
+      <div class="btn-row">
+        <button id="start-broadcast" class="btn-primary">РАСШИФРОВАТЬ ЭФИР</button>
+        <button id="stop-broadcast" class="btn-ghost hidden">СТОП</button>
+      </div>
+      <div id="broadcast-flag" class="flag-banner hidden"></div>
+    </section>
 
-  <section id="wall" class="sec">
-    <h2>[ СТЕНА ]</h2>
-    <div id="wall-posts"></div>
-  </section>
+    <section class="crt-section" id="wall">
+      <h2 class="crt-title">СТЕНА</h2>
+      <p class="dim small">переговоры команды. читать можно. верить — на свой страх.</p>
+      <div class="wall" id="wall-posts"></div>
+      <div class="submit-box">
+        <input id="wall-input" placeholder="ник: сообщение" autocomplete="off">
+        <button id="wall-post" class="btn-primary">ОТПРАВИТЬ</button>
+      </div>
+    </section>
 
-  <section id="term" class="sec">
-    <h2>[ ТЕРМИНАЛ ]</h2>
-    <div id="term-output" class="term-out"></div>
-    <div class="term-line"><span class="prompt">hu@2027:~$</span>
-      <input id="term-input" type="text" autocomplete="off" placeholder="help">
-    </div>
-  </section>
+    <section class="crt-section" id="terminal">
+      <h2 class="crt-title">ТЕРМИНАЛ</h2>
+      <div class="term-out" id="term-out"></div>
+      <div class="submit-box">
+        <input id="term-in" placeholder="black@hu:~$" autocomplete="off">
+      </div>
+    </section>
 
-  <footer class="panel-foot">
-    <span class="dim">// HU::2027 &mdash; смотри в оба. Санта видит всё.</span>
+  </main>
+
+  <footer class="crt-footer">
+    <div class="tree-row">🎄 🎄 🎄</div>
+    <p class="dim small">HU::2027 · Black Team · закрытый канал · не для Санты</p>
   </footer>
 </div>
 
-<div id="finale" hidden>
+<!-- финал -->
+<div id="finale" class="hidden">
   <div class="finale-box">
-    <div class="finale-title">★ ВСЕ ФЛАГИ СОБРАНЫ ★</div>
-    <div class="finale-text">Канал очищен, эфир стабилен, мандарины на столе.<br>Хакерский кружок &laquo;Снежинка&raquo; благодарит тебя лично.</div>
-    <div class="finale-code">С ДНЁМ ХАКЕРА, С НОВЫМ 2027-М!</div>
-    <button id="finale-close" type="button">ЗАКРЫТЬ</button>
+    <div class="sign-small">HU::2027</div>
+    <h2 class="finale-title">С НОВЫМ ГОДОМ, BLACK TEAM!</h2>
+    <p class="finale-text">Ты хороший боец. Без вас этот год был бы просто набором логов.</p>
+    <p class="dim small">все семь флагов на месте. канал чист. год вскрыт.</p>
+    <button id="finale-close" class="btn-primary">ЗАКРЫТЬ</button>
   </div>
 </div>
 

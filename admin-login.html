@@ -1,68 +1,41 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HU::2027 — вход в штаб</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HU::2027 · Вход в штаб</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="admin.css">
-<!--
-  ============================================================
-  ФЛАГ №4 доступен тем, кто читает исходники:
-  пароль от штаба — hackmas2027
-  ============================================================
--->
+<!-- пароль штаба: hackmas2027 — админы не понимают, что исходники тоже читают -->
 </head>
 <body>
-<div class="snow" aria-hidden="true"></div>
-<div class="garland" aria-hidden="true">
-  <span>❄</span><span>🎄</span><span>❄</span><span>🍊</span><span>❄</span><span>🎄</span><span>❄</span>
+<div class="snow-layer" id="snow"></div>
+<div class="crt-frame">
+  <div class="scanlines"></div>
+  <div class="tv-glass"></div>
+  <header class="crt-header">
+    <div class="logo">HU::<span class="logo-accent">2027</span> · ШТАБ</div>
+    <div class="garland" id="garland"></div>
+  </header>
+  <main class="content">
+    <div class="login-box">
+      <div class="crt-title">ВХОД В ШТАБ</div>
+      <p class="crt-text dim small">только для членов Black Team. посторонним — от ворот поворот</p>
+      <div class="submit-box">
+        <input id="pw" type="password" placeholder="ПАРОЛЬ ШТАБА" autocomplete="off">
+        <button id="enter" class="btn-primary">ВОЙТИ</button>
+      </div>
+      <div id="pw-err" class="feedback"></div>
+      <div id="ok-banner" class="flag-banner hidden">★ FLAG{ADMIN_PANEL_H4CKED} — штаб выдал ключ с первого раза ★</div>
+      <a id="goto" class="btn-ghost hidden" href="admin.html">ПЕРЕЙТИ В ШТАБ →</a>
+    </div>
+  </main>
+  <footer class="crt-footer">
+    <div class="tree-row">🎄 🎄 🎄</div>
+    <p class="dim small">HU::2027 · Black Team · штаб</p>
+  </footer>
 </div>
-
-<div class="login-box">
-  <div class="sig">HU::ADMIN</div>
-  <div class="sig-sub">// штаб кружка «Снежинка». вход только для своих</div>
-  <input id="pw-input" type="password" placeholder="ПАРОЛЬ ШТАБА" autocomplete="off">
-  <button id="pw-btn" type="button">ВОЙТИ</button>
-  <div id="pw-error"></div>
-  <div id="pw-ok" hidden>
-    <div class="ok-line">✔ ДОСТУП РАЗРЕШЁН</div>
-    <div class="flag-line">FLAG{ADMIN_PANEL_H4CKED}</div>
-    <div class="dim">// флаг запиши на странице ЗАДАНИЯ главного канала</div>
-    <a class="go-btn" href="admin.html">ПЕРЕЙТИ В ШТАБ →</a>
-  </div>
-  <a class="back-link" href="index.html">← вернуться на канал</a>
-</div>
-
-<script>
-(function () {
-  var CODE = 'hackmas2027';
-  var input = document.getElementById('pw-input');
-  var btn = document.getElementById('pw-btn');
-  var err = document.getElementById('pw-error');
-  var ok = document.getElementById('pw-ok');
-
-  function tryLogin() {
-    if ((input.value || '').trim().toLowerCase() === CODE) {
-      try {
-        localStorage.setItem('hu_admin_session', 'granted');
-      } catch (e) {}
-      err.textContent = '';
-      ok.hidden = false;
-      input.disabled = true;
-      btn.disabled = true;
-    } else {
-      err.textContent = '✘ пароль не принят. подсказки — на странице входа (в исходниках)';
-      input.value = '';
-      input.focus();
-    }
-  }
-
-  btn.addEventListener('click', tryLogin);
-  input.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter') { e.preventDefault(); tryLogin(); }
-  });
-  input.focus();
-})();
-</script>
+<script src="admin-app.js"></script>
 </body>
 </html>

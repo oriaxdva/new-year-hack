@@ -1,62 +1,62 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HU::ADMIN — штаб</title>
-<!-- СТРАЖ: без сессии страница не отрисовывается и уходит на вход -->
-<script>
-  if (!localStorage.getItem('hu_admin_session')) {
-    document.documentElement.style.visibility = 'hidden';
-    location.replace('admin-login.html');
-  }
-</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HU::2027 · Штаб</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="admin.css">
+<script>
+/* страж штаба: без сессии страницу даже не видно */
+(function(){
+  try{
+    if(localStorage.getItem('hu_admin_session')!=='1'){
+      document.documentElement.style.visibility='hidden';
+      location.replace('admin-login.html');
+    }
+  }catch(e){ location.replace('admin-login.html'); }
+})();
+</script>
 </head>
 <body>
-<div class="snow" aria-hidden="true"></div>
-<div class="garland" aria-hidden="true">
-  <span>❄</span><span>🎄</span><span>❄</span><span>🍊</span><span>❄</span><span>🎄</span><span>❄</span>
-</div>
-
-<div class="panel">
-  <header class="panel-head">
-    <div class="sig">HU::ADMIN</div>
-    <div class="sig-sub">// служебная панель кружка «Снежинка»</div>
-    <nav class="nav">
-      <a href="#notes">ЗАПИСКИ</a>
-      <a href="#ops">ОПЕРАЦИИ</a>
-      <a href="#" id="logout-link">ВЫЙТИ</a>
-      <a href="index.html">← НА КАНАЛ</a>
+<div class="crt-frame">
+  <div class="scanlines"></div>
+  <div class="tv-glass"></div>
+  <header class="crt-header">
+    <div class="header-top">
+      <div class="logo">HU::<span class="logo-accent">2027</span> · ШТАБ</div>
+      <div class="header-right">
+        <span class="clock" id="clock">00:00:00</span>
+        <button class="header-btn" id="logout">ВЫЙТИ</button>
+      </div>
+    </div>
+    <nav class="crt-nav" id="crt-nav">
+      <button data-section="notes" class="active">ЗАМЕТКИ</button>
+      <button data-section="storage">ХРАНИЛИЩЕ</button>
     </nav>
   </header>
-
-  <section id="notes" class="sec">
-    <h2>[ ЗАПИСКИ ]</h2>
-    <div class="dim">// записки нумеруются подряд. все как один</div>
-    <div class="note-tabs">
-      <button class="note-tab" data-note="1" type="button">записка #1</button>
-      <button class="note-tab" data-note="2" type="button">записка #2</button>
-    </div>
-    <div id="note-view" class="note-view">выбери записку выше</div>
-  </section>
-
-  <section id="ops" class="sec">
-    <h2>[ ОПЕРАЦИИ ]</h2>
-    <div class="dim">// панель проверки роли. доверяем браузеру — он же свой</div>
-    <div id="role-view" class="role-view"></div>
-    <div class="submit-line">
-      <input id="cmd-input" type="text" placeholder="ВВЕДИ КОМАНДУ" autocomplete="off">
-      <button id="cmd-btn" type="button">ВЫПОЛНИТЬ</button>
-    </div>
-    <div id="cmd-msg"></div>
-  </section>
-
-  <footer class="panel-foot">
-    <span class="dim">// штаб не запирается. но и не рекламируется</span>
+  <div class="hazard-tape"></div>
+  <div class="secret-label">ВНУТРЕННЯЯ ПЕРЕПИСКА · УРОВЕНЬ ДОПУСКА: САНТА</div>
+  <main class="content">
+    <section class="crt-section active" id="notes">
+      <h2 class="crt-title">ЗАМЕТКИ ШТАБА</h2>
+      <p class="dim small">личные записки команды. читается всё, что положено. и то, что не положено.</p>
+      <div id="notes-box"></div>
+      <p class="dim small">открыть конкретную записку: <span class="amber">admin.html?note=N</span></p>
+    </section>
+    <section class="crt-section" id="storage">
+      <h2 class="crt-title">ХРАНИЛИЩЕ ДОСТУПА</h2>
+      <p class="crt-text">штаб решает, кто админ, сверяя запись на твоей стороне. так задумано. так и работает.</p>
+      <button id="check-role" class="btn-primary">ПРОВЕРИТЬ МОЙ ДОПУСК</button>
+      <div id="role-result"></div>
+    </section>
+  </main>
+  <footer class="crt-footer">
+    <div class="tree-row">🎄 🎄 🎄</div>
+    <p class="dim small">HU::2027 · Black Team · штаб</p>
   </footer>
 </div>
-
 <script src="admin-app.js"></script>
 </body>
 </html>
