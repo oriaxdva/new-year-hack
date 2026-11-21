@@ -3,51 +3,54 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HU :: ВХОД В ШТАБ</title>
+<title>ШТАБ BLACK TEAM :: ВХОД</title>
 <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="crt.css">
 <link rel="stylesheet" href="admin.css">
+<!-- ТСХ! Это не для тебя. Ну ладно: пароль M4ND4R1N2027. Но ты не слышал этого. -->
 </head>
-<body>
-<!--
-  СЛУЖЕБНАЯ ЗАПИСЬ (для участников хакатона):
-  пароль от штаба: M4ND4R1N2027
-  P.S. Пароли в комментариях — плохая идея. Но сервер-то какой доверчивый...
--->
+<body class="admin">
+<div class="scanlines"></div>
+<div class="static-noise"></div>
+
 <div class="broadcast-container">
-  <div class="crt-frame">
-    <div class="tv-glass"></div>
-    <div class="scanlines"></div>
-    <div class="static-noise"></div>
-    <div class="secret-tape">СОВЕРШЕННО СЕКРЕТНО · ШТАБ RED TEAM</div>
-    <h1 class="crt-title amber-title">ВХОД В ШТАБ</h1>
-    <p class="crt-text small">Только для сотрудников. Посторонним вход воспрещён. Особенно посторонним, которые это читают.</p>
-    <div class="auth-box">
-      <label for="login">ЛОГИН</label>
-      <input type="text" id="login" value="admin" autocomplete="off">
-      <label for="password">ПАРОЛЬ</label>
-      <input type="password" id="password" autocomplete="off">
-      <button class="btn-primary" id="login-btn">ВОЙТИ</button>
-      <p class="crt-text small" id="login-msg"></p>
+  <div class="secret-tape">СОВЕРШЕННО СЕКРЕТНО // ТОЛЬКО ДЛЯ BLACK TEAM</div>
+  <div class="login-box">
+    <h2 class="crt-title">ВХОД В ШТАБ</h2>
+    <p class="crt-text small">Введите код доступа. Подсказка смотрит тебе прямо в лицо: она в шапке, в брифинге и в титрах.</p>
+    <div class="submit-box">
+      <input id="pw" type="text" placeholder="код доступа" autocomplete="off">
+      <button id="login-btn" class="btn-primary">ВОЙТИ В СИСТЕМУ</button>
     </div>
+    <div id="msg" class="submit-msg"></div>
   </div>
+  <footer class="crt-footer">// HU::2027 · СИСТЕМА ОХРАНЯЕТ ФЛАГИ · И НАДЕЕТСЯ, ЧТО ТЫ НЕ ЗАГЛЯНЕШЬ В ИСХОДНИКИ //</footer>
 </div>
+
 <script>
-(function(){
-  var btn = document.getElementById('login-btn');
-  var pass = document.getElementById('password');
-  var msg = document.getElementById('login-msg');
-  function tryLogin(){
-    if (pass.value === 'M4ND4R1N2027'){
-      localStorage.setItem('hu_role', 'guest'); // «сервер» выдаёт роль прямо в браузер
-      location.href = 'admin.html';
+(function () {
+  if (localStorage.getItem('hu_admin') === '1') { location.replace('admin.html'); return; }
+  function addFlag(f) {
+    var s = [];
+    try { s = JSON.parse(localStorage.getItem('hu_flags') || '[]') || []; } catch (e) {}
+    if (s.indexOf(f) === -1) { s.push(f); localStorage.setItem('hu_flags', JSON.stringify(s)); }
+  }
+  function tryLogin() {
+    var v = document.getElementById('pw').value.trim().toUpperCase();
+    var msg = document.getElementById('msg');
+    if (v === 'M4ND4R1N2027') {
+      localStorage.setItem('hu_admin', '1');
+      addFlag('FLAG{ADMIN_PANEL_H4CKED}');
+      msg.textContent = 'ДОСТУП РАЗРЕШЁН. ПЕРЕХОД В ШТАБ...';
+      msg.className = 'submit-msg ok';
+      setTimeout(function () { location.href = 'admin.html'; }, 900);
     } else {
-      msg.textContent = 'ОТКАЗАНО. НЕВЕРНЫЙ ПАРОЛЬ.';
-      msg.style.color = '#ff3b30';
+      msg.textContent = 'ДОСТУП ЗАПРЕЩЁН. Сигнал о вторжении отправлен... почти.';
+      msg.className = 'submit-msg';
     }
   }
-  btn.addEventListener('click', tryLogin);
-  pass.addEventListener('keydown', function(e){ if(e.key === 'Enter') tryLogin(); });
+  document.getElementById('login-btn').addEventListener('click', tryLogin);
+  document.getElementById('pw').addEventListener('keydown', function (e) { if (e.key === 'Enter') tryLogin(); });
 })();
 </script>
 </body>

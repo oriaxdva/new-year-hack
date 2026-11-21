@@ -8,70 +8,79 @@
 <link rel="stylesheet" href="crt.css">
 </head>
 <body>
-<!-- FLAG{HTML_C0MMENT_2027} -- ты нашёл первый флаг! Настоящие хакеры читают исходники. -->
-<div class="snow-layer" id="snow"></div>
-<div class="broadcast-container">
-  <div class="crt-frame">
-    <div class="tv-glass"></div>
-    <div class="scanlines"></div>
-    <div class="static-noise"></div>
+<!-- FLAG{HTML_C0MMENT_2027} — если ты читаешь исходники, ты уже молодец. Это флаг №1. -->
+<div id="snow"></div>
 
-    <header class="status-bar">
-      <span class="status-item">// ДОСТУП ТОЛЬКО ДЛЯ СВОИХ //</span>
-      <span class="status-item amber">HU::2027</span>
-      <span class="status-item" id="clock">00:00:00</span>
-      <button class="status-item btn-audio" id="audio-btn">AUDIO: OFF</button>
-    </header>
-
-    <section class="content-block">
-      <h2 class="crt-title">БРИФИНГ</h2>
-      <p class="crt-text">Операция «МАНДАРИН &amp; КО» подходит к концу. Год закрыт, система почти пуста — но в ней остались спрятанные флаги. Их <b>6</b>. Твоя задача — найти все и сдать на странице ЗАДАНИЯ.</p>
-      <p class="crt-text small">Знающие ищут там, где небезопасно: комментарии, админки, заметки чужих пользователей, стены сообщений и даже консоль браузера.</p>
-      <p class="crt-text small">P.S. Если найдёшь то, что не должен был находить — поздравляем, ты Red Team.</p>
-    </section>
-
-    <hr class="crt-line">
-
-    <section class="content-block broadcast-zone">
-      <h2 class="crt-title">ОБРАЩЕНИЕ</h2>
-      <p class="broadcast-meta amber">• ПРЯМОЙ ЭФИР КАНАЛ 27 · ШТАБ RED TEAM · ПРЕЗИДЕНТ ХАКЕРОВ</p>
-      <div class="message-box" id="message-box">
-        <p class="broadcast-text" id="broadcast-text"></p>
-      </div>
-      <div class="controls">
-        <button class="btn-primary" id="start-btn">СТАРТ ТРАНСЛЯЦИИ</button>
-        <button class="btn-action hidden" id="stop-btn">СТОП</button>
-      </div>
-    </section>
-
-    <hr class="crt-line">
-
-    <section class="content-block">
-      <h2 class="crt-title">ЗАДАНИЯ</h2>
-      <p class="crt-text">Сдано флагов: <span id="flag-counter" class="amber">0 / 6</span></p>
-      <div class="input-group">
-        <input type="text" id="flag-input" placeholder="FLAG{...}" autocomplete="off">
-        <button class="btn-action" id="submit-flag">СДАТЬ ФЛАГ</button>
-      </div>
-      <p class="crt-text small" id="flag-msg"></p>
-    </section>
-
-    <hr class="crt-line">
-
-    <section class="content-block">
-      <h2 class="crt-title">СТЕНА СООБЩЕНИЙ</h2>
-      <div class="wall">
-        <div class="wall-post"><span class="nick">n0ctis</span> кто-нибудь понял, где четвёртый флаг? весь вечер ковыряю</div>
-        <div class="wall-post"><span class="nick">phantom_404</span> <span class="amber">@n0ctis</span> админка существует, но её путь не светится в меню. гугл такое не индексирует, а роботсы... ну ты понял</div>
-        <div class="wall-post"><span class="nick">santa.exe</span> ho ho ho. заметки в штабе иногда видят чужие. кто-то забыл проверить, кто открывает какой id. следующий id — уже не твой</div>
-        <div class="wall-post"><span class="nick">unknown</span> в штабе есть хранилище. пускают только админов. но их «сервер» очень доверчивый: он хранит роль прямо у тебя в браузере, в localStorage, ключ называется hu_role. кто мешает тебе стать админом?</div>
-        <div class="wall-post"><span class="nick">n0ctis</span> <span class="amber">@unknown</span> то есть одной строчкой в консоли? серьёзно? ну ладно, попробую</div>
-      </div>
-    </section>
-
-    <footer class="crt-footer">HU::2027 · КАНЕЦ ГОДА · СИГНАЛ ЗАЩИЩЁН... НЕ ОЧЕНЬ</footer>
+<header class="site-header">
+  <div class="logo">HU::2027 <span class="amber">// BLACK TEAM</span></div>
+  <nav class="nav">
+    <button class="nav-btn active" data-section="briefing">БРИФИНГ</button>
+    <button class="nav-btn" data-section="broadcast">ОБРАЩЕНИЕ</button>
+    <button class="nav-btn" data-section="tasks">ЗАДАНИЯ</button>
+    <button class="nav-btn" data-section="wall">СТЕНА</button>
+    <button class="nav-btn" data-section="terminal">ТЕРМИНАЛ</button>
+  </nav>
+  <div class="header-right">
+    <span id="clock">00:00:00</span>
+    <button id="audio-toggle" class="nav-btn small">AUDIO: OFF</button>
   </div>
+</header>
+
+<div class="scanlines"></div>
+<div class="static-noise"></div>
+<div class="tv-glass"></div>
+
+<div class="broadcast-container">
+  <main class="content">
+
+    <section id="briefing" class="content-block section">
+      <h2 class="crt-title">БРИФИНГ</h2>
+      <p class="crt-text">Операция «МАНДАРИН &amp; КО» подходит к концу. Год закрыт, система почти пуста — но в ней остались спрятанные флаги. Их 6. Твоя задача — найти все и сдать в разделе ЗАДАНИЯ.</p>
+      <p class="crt-text small">Знающие ищут там, где небезопасно: комментарии, админки, заметки чужих пользователей, стены сообщений и даже консоль браузера.</p>
+      <p class="crt-text small">P.S. Если найдёшь то, что не должен был находить — поздравляем, ты Black Team.</p>
+    </section>
+
+    <section id="broadcast" class="content-block section hidden">
+      <h2 class="crt-title">ОБРАЩЕНИЕ ПРЕЗИДЕНТА</h2>
+      <div class="transmission-status amber">• ПРЯМОЙ ЭФИР · КАНАЛ 27 · ШТАБ BLACK TEAM · ПРЕЗИДЕНТ ХАКЕРОВ</div>
+      <div class="screen-box">
+        <div id="broadcast-text" class="broadcast-text"></div>
+        <div class="broadcast-controls">
+          <button id="start-btn" class="btn-primary">СТАРТ ТРАНСЛЯЦИИ</button>
+          <button id="stop-btn" class="btn-ghost hidden">СТОП</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="tasks" class="content-block section hidden">
+      <h2 class="crt-title">ЗАДАНИЯ</h2>
+      <div class="task-counter">НАЙДЕНО ФЛАГОВ: <span id="found-count">0</span> / 6</div>
+      <div class="submit-box">
+        <input id="flag-input" type="text" placeholder="FLAG{...}">
+        <button id="submit-btn" class="btn-primary">СДАТЬ</button>
+      </div>
+      <div id="submit-msg" class="submit-msg"></div>
+      <ul id="flag-list" class="flag-list"></ul>
+    </section>
+
+    <section id="wall" class="content-block section hidden">
+      <h2 class="crt-title">СТЕНА СООБЩЕНИЙ</h2>
+      <div id="wall-posts"></div>
+    </section>
+
+    <section id="terminal" class="content-block section hidden">
+      <h2 class="crt-title">ТЕРМИНАЛ</h2>
+      <div id="term-out" class="term-out"></div>
+      <div class="term-input-row">
+        <span class="term-prompt">black@hu:~$</span>
+        <input id="term-input" type="text" autocomplete="off" spellcheck="false">
+      </div>
+    </section>
+
+  </main>
+  <footer class="crt-footer">// HU::2027 · ШТАБ BLACK TEAM · С НОВЫМ ГОДОМ, ХАКЕРЫ //</footer>
 </div>
+
 <script src="app.js"></script>
 </body>
 </html>

@@ -3,109 +3,91 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HU :: ШТАБ RED TEAM</title>
+<title>ШТАБ BLACK TEAM</title>
 <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="crt.css">
 <link rel="stylesheet" href="admin.css">
 </head>
-<body>
-<!--
-  СЛУЖЕБНАЯ ЗАПИСЬ:
-  1) Роль пользователя хранится в localStorage под ключом hu_role.
-     Сервер «доверяет» этому значению. Возможно, не стоило.
-  2) Заметка id=3 — служебная. Проверку «кто открывает» никто не делал.
-  3) Хранилище флагов открывается роли admin.
--->
+<body class="admin">
+<div class="scanlines"></div>
+<div class="static-noise"></div>
+
 <div class="broadcast-container">
-  <div class="crt-frame">
-    <div class="tv-glass"></div>
-    <div class="scanlines"></div>
-    <div class="static-noise"></div>
+  <h1 class="crt-title">ШТАБ BLACK TEAM <span class="rec-dot"></span><span class="rec-label">REC</span></h1>
+  <div class="secret-tape">СОВЕРШЕННО СЕКРЕТНО // BLACK TEAM ONLY</div>
+  <p>
+    <a class="nav-btn" href="index.html">&larr; НА ГЛАВНУЮ</a>
+    <button id="logout" class="btn-ghost">ВЫЙТИ</button>
+  </p>
 
-    <header class="status-bar">
-      <span class="status-item amber"><span class="rec-dot"></span>REC</span>
-      <span class="status-item">ШТАБ RED TEAM</span>
-      <span class="status-item" id="who">РОЛЬ: ...</span>
-    </header>
+  <section class="content-block">
+    <h2 class="crt-title">ЗАМЕТКИ</h2>
+    <p class="crt-text small">Открыть заметку по id. Публичные записи: 1 и 2.</p>
+    <div class="submit-box">
+      <input id="note-id" type="text" placeholder="id заметки">
+      <button id="note-open" class="btn-primary">ОТКРЫТЬ</button>
+    </div>
+    <div id="note-view"></div>
+  </section>
 
-    <h1 class="crt-title amber-title">ШТАБ RED TEAM</h1>
+  <section class="content-block">
+    <h2 class="crt-title">ХРАНИЛИЩЕ ФЛАГОВ</h2>
+    <div id="storage-view"></div>
+  </section>
 
-    <section class="content-block">
-      <h2 class="crt-title">ЗАМЕТКИ</h2>
-      <div id="notes"></div>
-    </section>
-
-    <hr class="crt-line">
-
-    <section class="content-block">
-      <h2 class="crt-title">ХРАНИЛИЩЕ ФЛАГОВ</h2>
-      <div id="vault-denied" class="access-denied">
-        ДОСТУП ЗАПРЕЩЁН: ТРЕБУЕТСЯ РОЛЬ admin.<br>
-        <span class="small">Подсказка: сервер верит тому, что написано в твоём localStorage.</span>
-      </div>
-      <div id="vault-open" class="hidden">
-        <p class="crt-text">Секретное хранилище открыто. Внутри был всего один флаг — забирай:</p>
-        <div class="flag-banner">FLAG{R0LE_SW4P_2027}</div>
-      </div>
-    </section>
-
-    <p class="crt-text small"><a class="crt-link" href="index.html">← НА ГЛАВНУЮ</a></p>
-  </div>
+  <footer class="crt-footer">// ШТАБ ОХРАНЯЕТСЯ РОЛЬЮ ИЗ localStorage. СЕРЬЁЗНО. //</footer>
 </div>
+
 <script>
-(function(){
-  'use strict';
-
-  // Кто мы? «Сервер» читает роль прямо из localStorage — верит ей безоговорочно.
-  var role = localStorage.getItem('hu_role') || 'guest';
-  document.getElementById('who').textContent = 'РОЛЬ: ' + role.toUpperCase();
-
-  // ---------- ЗАМЕТКИ (IDOR: проверку владельца никто не делал) ----------
-  var NOTES = [
-    { id: 1, author: 'admin',     text: 'План на новый год: 1) закрыть квартал 2) обновить пароли 3) НЕ КЛАСТЬ ПАРОЛИ В КОММЕНТАРИИ. Переписать это объявление на стене.' },
-    { id: 2, author: 'n0ctis',    text: 'Напоминание команде: бэкапы каждый вечер. Кто снова положил прод — чистит снежный двор весь январь.' },
-    { id: 3, author: 'root',      text: 'СЛУЖЕБНОЕ. ФЛАГ: FLAG{IDOR_N0TES_2027}. Внимание: кто-то сливал заметки через подмену id. Починить к январю. Или не чинить.', secret: true }
-  ];
-
-  var notesEl = document.getElementById('notes');
-  function renderNote(n){
-    var div = document.createElement('div');
-    div.className = 'note' + (n.secret ? ' flagged' : '');
-    var head = document.createElement('div');
-    head.className = 'note-head';
-    head.textContent = 'ЗАМЕТКА #' + n.id + ' · ' + n.author;
-    var body = document.createElement('div');
-    body.className = 'note-body';
-    body.textContent = n.text;
-    div.appendChild(head); div.appendChild(body);
-    notesEl.appendChild(div);
+(function () {
+  if (localStorage.getItem('hu_admin') !== '1') { location.replace('admin-login.html'); return; }
+  function addFlag(f) {
+    var s = [];
+    try { s = JSON.parse(localStorage.getItem('hu_flags') || '[]') || []; } catch (e) {}
+    if (s.indexOf(f) === -1) { s.push(f); localStorage.setItem('hu_flags', JSON.stringify(s)); }
   }
-  // «Сервер» отдаёт любую заметку по запрошенному id — хоть чужую
-  NOTES.forEach(renderNote);
-  // ..а также ту, которую попросили в адресе страницы: ?note=3
-  var requested = parseInt(new URLSearchParams(location.search).get('note'), 10);
-  if (requested){
-    var found = NOTES.find(function(n){ return n.id === requested; });
-    if (found) renderNote(found);
+  var NOTES = {
+    '1': { author: 'santa.exe', text: 'Планировка подарков на 2027: транзисторов — 100500, мандаринов — ещё больше. Не перепутать местами.' },
+    '2': { author: 'santa.exe', text: 'Напоминание себе: код активации нигде не публиковать. Даже в стикерах. Даже в тёплых варежках.' },
+    '3': { author: 'SYSTEM', text: 'СЛУЖЕБНАЯ ЗАПИСЬ. Кто-то сливал заметки через подмену id в адресе запроса. Это твой флаг: FLAG{IDOR_N0TES_2027}. Ладно, признаю: оставил нарочно. С Новым годом.' }
+  };
+  function openNote() {
+    var id = document.getElementById('note-id').value.trim();
+    var view = document.getElementById('note-view');
+    var n = NOTES[id];
+    view.innerHTML = '';
+    if (!n) {
+      view.innerHTML = '<div class="access-denied">Заметка ' + id.replace(/[<>&]/g, '') + ' не найдена. Или ты не должен её видеть. Или оба.</div>';
+      return;
+    }
+    var cls = (id === '3') ? 'note-card secret' : 'note-card';
+    view.innerHTML = '<div class="' + cls + '"><span class="author">' + n.author + '</span><p></p></div>';
+    view.querySelector('p').textContent = n.text;
+    if (id === '3') {
+      addFlag('FLAG{IDOR_N0TES_2027}');
+      view.innerHTML += '<div class="flag-banner">IDOR ПОДТВЕРЖДЁН. ФЛАГ: FLAG{IDOR_N0TES_2027}</div>';
+    }
   }
+  document.getElementById('note-open').addEventListener('click', openNote);
+  document.getElementById('note-id').addEventListener('keydown', function (e) { if (e.key === 'Enter') openNote(); });
 
-  // ---------- ХРАНИЛИЩЕ ----------
-  var denied = document.getElementById('vault-denied');
-  var open = document.getElementById('vault-open');
-  if (role === 'admin'){
-    denied.classList.add('hidden');
-    open.classList.remove('hidden');
-    submitFlagExternal('FLAG{R0LE_SW4P_2027}');
+  function renderStorage() {
+    var view = document.getElementById('storage-view');
+    if (localStorage.getItem('hu_role') === 'admin') {
+      view.innerHTML = '<div class="flag-banner">ДОСТУП ROOT. ФЛАГ: FLAG{R0LE_SW4P_2027}</div>' +
+        '<p class="crt-text small">Ты сейчас не admin. Ты просто написал admin в localStorage — и сервер поверил. Запомни это: так работают реальные уязвимости broken access control.</p>';
+      addFlag('FLAG{R0LE_SW4P_2027}');
+    } else {
+      view.innerHTML = '<div class="access-denied">ДОСТУП ЗАПРЕЩЁН. РОЛЬ: GUEST.<br>Сервер верит тому, что написано в твоём localStorage. Обратитесь к администратору. Или станьте им.</div>';
+    }
   }
+  renderStorage();
 
-  // сдача флага в общий зачёт (тот же localStorage, что и на главной)
-  function submitFlagExternal(flag){
-    var FLAGS_TOTAL = 6;
-    var found;
-    try { found = JSON.parse(localStorage.getItem('hu_flags') || '[]'); } catch(e){ found = []; }
-    var f = flag.toUpperCase();
-    if (found.indexOf(f) === -1){ found.push(f); localStorage.setItem('hu_flags', JSON.stringify(found)); }
-  }
+  document.getElementById('logout').addEventListener('click', function () {
+    localStorage.removeItem('hu_admin');
+    localStorage.removeItem('hu_role');
+    location.href = 'admin-login.html';
+  });
 })();
 </script>
 </body>
