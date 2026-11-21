@@ -1,78 +1,111 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BLACK TEAM :: Новогодняя серверная 2027</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HU::2027 · Black Team</title>
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="crt.css">
+<!-- FLAG{HTML_C0MMENT_2027} — флаг №1 лежит здесь, как и положено: в самом уютном месте исходника -->
 </head>
 <body>
-<!-- ...шум ветра в серверной... -->
-<!-- Флаг №1: FLAG{HTML_COMMENT_2027} — привет, исследователь исходников! -->
-<div id="snow"></div>
-<div class="garland" id="garland"></div>
+<div id="snow" class="snow-layer"></div>
 
-<header>
-  <div class="logo">BLACK TEAM<span>::2027</span></div>
-  <nav id="nav">
-    <button data-sec="brief" class="active">БРИФИНГ</button>
-    <button data-sec="speech">ОБРАЩЕНИЕ</button>
-    <button data-sec="tasks">ЗАДАНИЯ</button>
-    <button data-sec="wall">СТЕНА</button>
-    <button data-sec="term">ТЕРМИНАЛ</button>
-  </nav>
-  <div class="counter" id="counter">0/8</div>
-</header>
-
-<main class="panel">
-  <section id="brief" class="sec active">
-    <h2>🎄 БРИФИНГ</h2>
-    <p>Серверная Black Team подготовилась к Новому году. Но где-то потерялись <b>8 флагов</b>.</p>
-    <p>Ищи в исходниках, консоли, эфире, запасных входах и чужих заметках.</p>
-    <p class="hint">Сдать флаг можно только в разделе «ЗАДАНИЯ».</p>
-  </section>
-
-  <section id="speech" class="sec">
-    <h2>📡 ОБРАЩЕНИЕ</h2>
-    <pre id="speech-text"></pre>
-  </section>
-
-  <section id="tasks" class="sec">
-    <h2>🎯 ЗАДАНИЯ</h2>
-    <div id="task-list"></div>
-    <div class="submit-row">
-      <input id="flag-input" placeholder="FLAG{...}" autocomplete="off">
-      <button id="flag-btn">СДАТЬ</button>
-    </div>
-    <div id="flag-msg"></div>
-  </section>
-
-  <section id="wall" class="sec">
-    <h2>🧱 СТЕНА</h2>
-    <div id="wall-posts"></div>
-    <p class="wall-note">Иногда на стене всплывают живые сообщения. Просто кто-то рядом.</p>
-  </section>
-
-  <section id="term" class="sec">
-    <h2>💻 ТЕРМИНАЛ</h2>
-    <div id="term-out"></div>
-    <div class="submit-row">
-      <input id="term-in" placeholder="команда... (help)" autocomplete="off">
-      <button id="term-btn">&gt;</button>
-    </div>
-  </section>
-</main>
-
-<footer>🎄 Серверная 2027 — работает в штатном режиме</footer>
-
-<div id="finale" class="hidden">
-  <div class="finale-box">
-    <h2>С НОВЫМ ГОДОМ, BLACK TEAM!</h2>
-    <p>ТЫ ХОРОШИЙ БОЕЦ. БЕЗ ВАС ЭТОТ ГОД БЫЛ БЫ ПРОСТО НАБОРОМ ЛОГОВ.</p>
-    <button id="finale-close">ЗАКРЫТЬ</button>
+<!-- окно входа: код активации выдаёт ведущий. он же — санта -->
+<div id="gate" class="overlay">
+  <div class="overlay-box">
+    <div class="overlay-title">ТЕРМИНАЛ HU::2027</div>
+    <p class="crt-text dim">соединение установлено · требуется код активации</p>
+    <input id="gate-input" autocomplete="off" placeholder="КОД">
+    <div id="gate-msg" class="feedback"></div>
+    <button id="gate-enter" class="btn-primary">ВОЙТИ</button>
+    <p class="dim small" style="margin-top:10px">подсказка: с наступающим — по-английски, слитно</p>
   </div>
 </div>
-<div id="confetti"></div>
+
+<div class="crt-frame">
+  <div class="scanlines"></div><div class="tv-glass"></div>
+
+  <header class="crt-header">
+    <div class="header-top">
+      <div class="logo">HU::<span class="logo-accent">2027</span> · BLACK TEAM</div>
+      <div class="header-right">
+        <span class="clock" id="clock">--:--:--</span>
+        <button class="header-btn" id="audio-toggle">AUDIO: OFF</button>
+      </div>
+    </div>
+    <nav class="crt-nav" id="crt-nav">
+      <button data-section="sec-brief" class="active">БРИФИНГ</button>
+      <button data-section="sec-broadcast">ОБРАЩЕНИЕ</button>
+      <button data-section="sec-flags">ЗАДАНИЯ</button>
+      <button data-section="sec-wall">СТЕНА</button>
+      <button data-section="sec-term">ТЕРМИНАЛ</button>
+    </nav>
+  </header>
+
+  <div class="garland" id="garland"></div>
+
+  <main class="content">
+
+    <section id="sec-brief" class="crt-section active">
+      <h2 class="crt-title">БРИФИНГ</h2>
+      <p class="crt-text">Сеть HU::2027 под твоим контролем. 8 флагов спрятаны в терминалах, штабе и самом исходнике этого сайта.</p>
+      <p class="crt-text dim">Найди все — увидишь финал. Мандарины в сейфе целы, проверено.</p>
+      <div class="tree-row">🎄 ❄ 🎄 ❄ 🎄</div>
+      <p class="counter small">сдано флагов: <b id="flag-counter">0</b>/8</p>
+    </section>
+
+    <section id="sec-broadcast" class="crt-section">
+      <h2 class="crt-title">ОБРАЩЕНИЕ</h2>
+      <div class="transmission-status">ЭФИР · ШИФРОВАНИЕ: ПАРТИЙНОЕ <span class="rec-dot"></span></div>
+      <div class="broadcast-screen"><div id="broadcast-text" class="broadcast-text"></div></div>
+      <div class="btn-row">
+        <button id="start-broadcast" class="btn-primary">НАЧАТЬ ЭФИР</button>
+        <button id="stop-broadcast" class="btn-ghost hidden">СТОП</button>
+      </div>
+      <div id="broadcast-flag" class="flag-banner hidden"></div>
+    </section>
+
+    <section id="sec-flags" class="crt-section">
+      <h2 class="crt-title">ЗАДАНИЯ</h2>
+      <p class="counter">сдано: <b id="flag-counter2">0</b>/8</p>
+      <div class="submit-box">
+        <input id="flag-input" placeholder="FLAG{...}" autocomplete="off">
+        <button id="flag-submit" class="btn-primary">СДАТЬ</button>
+      </div>
+      <div id="flag-feedback" class="feedback"></div>
+      <ul id="flag-list" class="flag-list"></ul>
+    </section>
+
+    <section id="sec-wall" class="crt-section">
+      <h2 class="crt-title">СТЕНА</h2>
+      <div id="wall-posts" class="wall"></div>
+      <div class="submit-box">
+        <input id="wall-input" placeholder="ник: сообщение">
+        <button id="wall-post" class="btn-primary">ОТПРАВИТЬ</button>
+      </div>
+    </section>
+
+    <section id="sec-term" class="crt-section">
+      <h2 class="crt-title">ТЕРМИНАЛ</h2>
+      <div id="term-out" class="term-out"></div>
+      <div class="submit-box"><input id="term-in" placeholder="команда · enter для выполнения" autocomplete="off"></div>
+    </section>
+
+  </main>
+
+  <footer class="crt-footer">🎄 серверная 2027 · работает в штатном режиме · с наступающим 🎄</footer>
+</div>
+
+<!-- финал: появляется только при 8/8 реальных флагов -->
+<div id="finale" class="overlay hidden">
+  <div class="overlay-box">
+    <div class="overlay-title">🎄 С НОВЫМ ГОДОМ, BLACK TEAM!</div>
+    <p class="crt-text">Ты хороший боец. Без вас этот год был бы просто набором логов.</p>
+    <p class="dim small">8/8 флагов · сервера целы · мандарины на месте</p>
+    <button id="finale-close" class="btn-primary" style="margin-top:14px">ЗАКРЫТЬ</button>
+  </div>
+</div>
 
 <script src="app.js"></script>
 </body>

@@ -1,124 +1,140 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ШТАБ :: ПАНЕЛЬ</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ШТАБ · HU::2027</title>
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="crt.css">
 <link rel="stylesheet" href="admin.css">
 </head>
 <body>
-<div id="snow"></div>
-<div class="garland" id="garland"></div>
+<div id="snow" class="snow-layer"></div>
 
-<main class="panel">
-  <h2>ПАНЕЛЬ ШТАБА</h2>
-  <p class="ticker">СОВЕРШЕННО СЕКРЕТНО · КОПИРОВАТЬ ЗАПРЕЩЕНО · ПОПРОБУЙ ВСЁ-ТАКИ</p>
+<div class="crt-frame">
+  <div class="scanlines"></div><div class="tv-glass"></div>
 
-  <h3>ЗАМЕТКИ</h3>
-  <div id="note-view" class="box"></div>
-  <div class="nav-notes">
-    <button onclick="showNote(1)">id=1</button>
-    <button onclick="showNote(2)">id=2</button>
-    <button onclick="showNote(3)">id=3</button>
-    <button onclick="showNote(4)">id=4</button>
-  </div>
+  <div class="hazard-tape"></div>
+  <div class="secret-label">СОВЕРШЕННО СЕКРЕТНО · ШТАБ BLACK TEAM <span class="rec-dot"></span></div>
 
-  <h3>ХРАНИЛИЩЕ</h3>
-  <div class="box">
-    <div id="store-view">проверка доступа...</div>
-    <button onclick="checkStore()">ПРОВЕРИТЬ ДОСТУП</button>
-  </div>
-
-  <h3>СЕЙФ</h3>
-  <div class="box">
-    <div class="submit-row">
-      <input id="safe-input" placeholder="резервный код..." autocomplete="off">
-      <button onclick="openSafe()">ОТКРЫТЬ</button>
+  <header class="crt-header">
+    <div class="header-top">
+      <div class="logo">ШТАБ · <span class="logo-accent">ПАНЕЛЬ УПРАВЛЕНИЯ</span></div>
     </div>
-    <div id="safe-msg"></div>
-  </div>
+  </header>
 
-  <p class="back"><a href="index.html">&lt; назад в серверную</a></p>
-</main>
+  <div class="garland" id="garland"></div>
+
+  <main class="content">
+    <h2 class="crt-title">ШТАБ</h2>
+    <p class="crt-text dim">привет, оператор. тут хранятся заметки, хранилище и один очень уютный сейф.</p>
+
+    <h3 class="sub-title">ЗАМЕТКИ</h3>
+    <div class="note"><span class="who">директор festive ops · #1</span><div class="txt">все патчи отложены после праздников. так решил директор. он же и завёл это правило.</div></div>
+    <div class="note"><span class="who">инженер, смена Б · #2</span><div class="txt">кто-то снова оставил пароль в исходнике страницы входа. классика жанра.</div></div>
+    <div class="note flagged" id="note-flagged" style="display:none">
+      <span class="who">сисадмин · #3 · доступ: админ</span>
+      <div class="txt">служебная записка #3: если вы это читаете — вы просили заметку, которой вам не выдавали. браузер запомнил. вы запомнили. все довольны. FLAG{IDOR_N0TES_2027}</div>
+    </div>
+    <div id="idor-banner" class="flag-banner hidden"></div>
+    <p class="dim small">нумерация заметок начинается с 1. но иногда бывают и другие номера.</p>
+
+    <h3 class="sub-title">ХРАНИЛИЩЕ</h3>
+    <div id="storage-denied" class="access-denied">
+      <p>ОТКАЗ В ДОСТУПЕ</p>
+      <p class="small">требуемая роль: admin · ваша роль: guest</p>
+      <p class="small dim">роль хранится в вашем браузере. сервер не спросит — он доверчивый.</p>
+    </div>
+    <div id="storage-ok" class="flag-banner hidden"></div>
+
+    <h3 class="sub-title">СЕЙФ</h3>
+    <div class="safe-box">
+      <p class="crt-text dim">сейф с мандаринами. введите резервный код:</p>
+      <div class="submit-box">
+        <input id="safe-in" placeholder="РЕЗЕРВНЫЙ КОД" autocomplete="off">
+        <button id="safe-go" class="btn-primary">ОТКРЫТЬ</button>
+      </div>
+      <div id="safe-msg" class="feedback"></div>
+      <div id="safe-banner" class="flag-banner hidden"></div>
+    </div>
+
+    <p style="margin-top:18px"><a class="dim small" href="index.html">← назад к терминалу</a></p>
+  </main>
+
+  <footer class="crt-footer">🎄 штаб работает в штатном режиме · с наступающим 🎄</footer>
+</div>
 
 <script>
-"use strict";
-function addFlag(code){
-  var f = [];
-  try { f = JSON.parse(localStorage.getItem("hu_flags")) || []; } catch(e){}
-  if(f.indexOf(code) === -1){
-    f.push(code);
-    localStorage.setItem("hu_flags", JSON.stringify(f));
-    console.log("[BLACK TEAM] Флаг принят: " + code);
-  }
-}
-
-// заметки: id=3 — служебная, доступна любому, кто умеет менять параметр
-var NOTES = {
-  1: ["n0ctis", "Планы на 27-е: обновить гирлянду, проверить бэкапы, не забыть мандарины."],
-  2: ["phantom_404", "Кто-то снова зашёл под guest. Роли же лежат у вас в браузере, ребята."],
-  3: ["SYSTEM", "СЛУЖЕБНАЯ ЗАПИСКА // Флаг №5: FLAG{IDOR_NOTE_3_2027} // Удалить не успели: «позже» длиной в год."],
-  4: ["black_ops_7", "Хранилище: доступ по роли. Роль меняется там же, где и всё остальное."]
-};
-function showNote(n){
-  var box = document.getElementById("note-view");
-  var note = NOTES[n];
-  if(!note){
-    box.innerHTML = "<span class=who>SYSTEM:</span> Заметка не найдена. Даже Санта не знает, куда она делась.";
-    return;
-  }
-  box.innerHTML = "<span class=who>" + note[0] + ":</span> " + note[1];
-  if(n === 3) addFlag("FLAG{IDOR_NOTE_3_2027}");
-}
-showNote(1);
-
-// хранилище: пустит только admin
-function checkStore(){
-  var v = document.getElementById("store-view");
-  var role = localStorage.getItem("hu_role") || "guest";
-  if(role === "admin"){
-    v.innerHTML = "доступ: <b>admin</b>. Здравствуй, начальник.<br>Флаг: <b>FLAG{STORAGE_ROLE_2027}</b>";
-    addFlag("FLAG{STORAGE_ROLE_2027}");
-  } else {
-    v.innerHTML = "доступ: <b>" + role + "</b>. Обратитесь к администратору. Или станьте им.";
-  }
-}
-checkStore();
-
-// сейф: резервный код из localStorage, закодирован ROT+3
-function openSafe(){
-  var v = (document.getElementById("safe-input").value || "").trim();
-  var msg = document.getElementById("safe-msg");
-  if(v === "ARCHIVE_CODE_2027"){
-    msg.textContent = "Сейф открыт. Флаг: FLAG{ARCHIVE_CODE_2027}";
-    addFlag("FLAG{ARCHIVE_CODE_2027}");
-  } else {
-    msg.textContent = "Не подходит. Подсказка: код уже у тебя в браузере, просто сдвинут.";
-  }
-}
-
-// снег и гирлянда
 (function(){
-  var box = document.getElementById("snow");
-  for(var i = 0; i < 30; i++){
-    var s = document.createElement("span");
-    s.className = "flake"; s.textContent = "\u2744";
-    s.style.left = (Math.random()*100) + "%";
-    s.style.animationDuration = (8 + Math.random()*10) + "s";
-    s.style.animationDelay = (-Math.random()*15) + "s";
-    s.style.fontSize = (10 + Math.random()*14) + "px";
-    box.appendChild(s);
+  function saveFlag(f){
+    try{
+      var a=JSON.parse(localStorage.getItem('hu_flags')||'[]');
+      if(a.indexOf(f)===-1){ a.push(f); localStorage.setItem('hu_flags',JSON.stringify(a)); }
+    }catch(e){}
   }
-  var g = document.getElementById("garland");
-  var cols = ["#ffd76e", "#ffb347", "#ffe8a3"];
-  for(var j = 0; j < 22; j++){
-    var b = document.createElement("i");
-    b.className = "bulb";
-    b.style.background = cols[j % 3];
-    b.style.color = cols[j % 3];
-    b.style.animationDelay = (j * 0.18) + "s";
-    g.appendChild(b);
+  /* IDOR */
+  var note=null;
+  try{ note=new URLSearchParams(location.search).get('note'); }catch(e){ note=null; }
+  if(note==='3'){
+    document.getElementById('note-flagged').style.display='block';
+    var b=document.getElementById('idor-banner');
+    b.textContent='★ FLAG{IDOR_N0TES_2027} — заметка, которую вам не выдавали ★';
+    b.classList.remove('hidden');
+    saveFlag('FLAG{IDOR_N0TES_2027}');
   }
+  /* роль в localStorage */
+  var role=null;
+  try{ role=localStorage.getItem('hu_role'); }catch(e){}
+  if(role==='admin'){
+    document.getElementById('storage-denied').classList.add('hidden');
+    var ok=document.getElementById('storage-ok');
+    ok.textContent='★ FLAG{R0LE_SW4P_2027} — сервер поверил вашему браузеру ★';
+    ok.classList.remove('hidden');
+    saveFlag('FLAG{R0LE_SW4P_2027}');
+  }
+  /* сейф */
+  function openSafe(){
+    var v=(document.getElementById('safe-in').value||'').trim().toUpperCase();
+    var msg=document.getElementById('safe-msg');
+    if(v==='ARCHIVE_CODE_2027'){
+      var b2=document.getElementById('safe-banner');
+      b2.textContent='★ FLAG{ARCHIVE_CODE_2027} — сейф открыт, мандарины целы ★';
+      b2.classList.remove('hidden');
+      msg.textContent='';
+      saveFlag('FLAG{ARCHIVE_CODE_2027}');
+    }else{
+      msg.textContent='✘ сейф даже не дрогнул.';
+      msg.style.color='#e08a7a';
+    }
+  }
+  document.getElementById('safe-go').addEventListener('click',openSafe);
+  document.getElementById('safe-in').addEventListener('keydown',function(e){ if(e.key==='Enter') openSafe(); });
+  /* снег на янтарном фоне */
+  (function(){
+    var box=document.getElementById('snow'); if(!box) return;
+    var glyphs=['❄','❅','❆'];
+    for(var i=0;i<40;i++){
+      var s=document.createElement('span');
+      s.textContent=glyphs[i%3];
+      s.style.left=Math.random()*100+'%';
+      s.style.fontSize=(10+Math.random()*12)+'px';
+      s.style.opacity=(0.2+Math.random()*0.4).toFixed(2);
+      s.style.animationDuration=(9+Math.random()*14)+'s';
+      s.style.animationDelay=(-Math.random()*20)+'s';
+      box.appendChild(s);
+    }
+  })();
+  (function(){
+    var g=document.getElementById('garland'); if(!g) return;
+    var colors=['#e8c47a','#e06a5a','#7ab8e0','#7ee08c'];
+    for(var i=0;i<22;i++){
+      var b3=document.createElement('span'); b3.className='bulb';
+      var c=colors[i%4]; b3.style.background=c; b3.style.color=c;
+      b3.style.animationDelay=(Math.random()*2.4).toFixed(2)+'s';
+      b3.style.animationDuration=(1.8+Math.random()*2).toFixed(2)+'s';
+      g.appendChild(b3);
+    }
+  })();
 })();
 </script>
 </body>
