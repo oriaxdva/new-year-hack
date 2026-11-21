@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HU::2027 — Штаб Black Team</title>
+<link rel="stylesheet" href="crt.css">
+</head>
+<body>
+<!-- ЗАДАНИЕ №1. Тот, кто читает исходники, уже победил.
+     ФЛАГ №1: FLAG{HTML_C0MMENT_2027} -->
+
+<div class="snow-layer" id="snowLayer" aria-hidden="true"></div>
+<div class="garland" id="garland" aria-hidden="true"></div>
+
+<header class="topbar">
+  <div class="brand">HU::2027 <span class="dim">// BLACK TEAM</span></div>
+  <nav class="nav" id="nav">
+    <button data-sec="briefing" class="active">БРИФИНГ</button>
+    <button data-sec="speech">ОБРАЩЕНИЕ</button>
+    <button data-sec="tasks">ЗАДАНИЯ</button>
+    <button data-sec="wall">СТЕНА</button>
+    <button data-sec="term">ТЕРМИНАЛ</button>
+  </nav>
+  <div class="top-right">
+    <span id="clock" class="clock">--:--:--</span>
+    <button id="soundBtn" class="mini-btn" title="звук">🔈</button>
+  </div>
+</header>
+
+<main class="panel">
+
+  <!-- БРИФИНГ -->
+  <section id="sec-briefing" class="sec active">
+    <h1 class="glow-soft">🟢 СТАТУС: ЖИВ. ГОД СДАН</h1>
+    <p>🎄 Брифинг для бойцов <b>Black Team</b>. Серверная переведена в праздничный режим: гирлянды горят, снег идёт даже в дата-центре, мандарины — в сейфе.</p>
+    <p>В этом году инфраструктуру не роняли (почти), инциденты гасили сообща, а логи читали как детектив. По нашей традиции флаги спрятаны по всей площадке — теперь их восемь. Найди все — получишь официальное поздравление.</p>
+    <p class="dim">Подсказки — на стене и в эфире. С Новым годом!</p>
+  </section>
+
+  <!-- ОБРАЩЕНИЕ -->
+  <section id="sec-speech" class="sec">
+    <h2>📡 Обращение к команде</h2>
+    <div class="screen">
+      <pre id="broadcast" class="broadcast"></pre>
+      <div id="bc-flag" class="flag-card hidden"></div>
+    </div>
+    <button id="bc-replay" class="btn">▶ ПОВТОРИТЬ ЭФИР</button>
+  </section>
+
+  <!-- ЗАДАНИЯ -->
+  <section id="sec-tasks" class="sec">
+    <h2>🎯 Задания</h2>
+    <div id="counter" class="counter">Сдано флагов: 0/8</div>
+    <div id="final-banner" class="final hidden">
+      <div class="final-title">🎉 С НОВЫМ ГОДОМ, BLACK TEAM!</div>
+      <div class="final-text">Ты хороший боец. Без вас этот год был бы просто набором логов.</div>
+    </div>
+    <ul class="tasks">
+      <li>❄️ Где-то в этой странице спрятан дар от разработчика. Исходники — наше всё.</li>
+      <li>❄️ Консоль браузера слышит больше, чем показывает экран.</li>
+      <li>❄️ Досмотреть новогоднее обращение до конца — уже подвиг. И флаг.</li>
+      <li>❄️ У штаба есть запасной вход. Роботы знают дорогу.</li>
+      <li>❄️ В админке лежат записки. Не все из них — для твоих глаз.</li>
+      <li>❄️ Сервер верит тому, что ему говорят. Даже если говорят из браузера.</li>
+      <li>❄️ Иногда проще попросить громче, чем ломать дверь.</li>
+      <li>❄️ Резервные коды не сгорают. Даже если спрятаны в сейфе без замка.</li>
+    </ul>
+    <p class="dim">Флаги формата FLAG{...}. Сдавать в терминале: <code>submit FLAG{...}</code></p>
+  </section>
+
+  <!-- СТЕНА -->
+  <section id="sec-wall" class="sec">
+    <h2>🧱 Стена сообщений</h2>
+    <div id="wall" class="wall"></div>
+    <p class="dim">Иногда на стене мелькают живые сообщения — просто болтовня команды. Сиди, смотри.</p>
+  </section>
+
+  <!-- ТЕРМИНАЛ -->
+  <section id="sec-term" class="sec">
+    <h2>🖥️ Терминал</h2>
+    <div class="screen">
+      <div id="term-out" class="term-out"></div>
+      <div class="term-line"><span class="dim">black@hu:~$</span>
+        <input id="term-in" autocomplete="off" spellcheck="false" placeholder="help">
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="trees">🎄 ✨ 🎄 ❄️ 🎄 ✨ 🎄 ⛄ 🎄 ✨ 🎄</div>
+  <div class="dim">HU::2027 · логи закрыты, год сдан · серверная работает в штатном режиме</div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

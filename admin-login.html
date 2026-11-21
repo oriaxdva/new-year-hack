@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HU::2027 — Вход в штаб</title>
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<!-- Служебная заметка дежурного:
+     пароль: M4ND4R1N2027 (мандарин, год, никакой криптографии) -->
+
+<div class="snow-layer" id="snowLayer" aria-hidden="true"></div>
+<div class="garland amber" id="garland" aria-hidden="true"></div>
+
+<main class="panel">
+  <div class="ribbon">СОВЕРШЕННО СЕКРЕТНО · КОПИРОВАТЬ ЗАПРЕЩЕНО · ПОПРОБУЙ ВСЁ-ТАКИ</div>
+  <h1>🔐 Вход в штаб</h1>
+  <p class="dim">Доступ только для агентов Black Team. Гости видят эту надпись и нервничают.</p>
+  <div id="err" class="err hidden">Неверный пароль. Даже дед Мороз не угадал бы с первой попытки.</div>
+  <div class="screen">
+    <div class="form-line">
+      <label for="pw">ПАРОЛЬ:</label>
+      <input id="pw" type="password" autocomplete="off">
+    </div>
+    <button id="go" class="btn">ВОЙТИ В СИСТЕМУ</button>
+  </div>
+  <p class="dim">© Дед Мороз &amp; Co. Санте можно всё.</p>
+</main>
+
+<script>
+(function(){
+  // Резервный код лежит в localStorage под ключом backup_pin, закодирован ROT+3.
+  // Сейф не запирается.
+  localStorage.setItem('backup_pin', 'DUFKLYH_FRGH_5350');
+
+  const input = document.getElementById('pw');
+  const err = document.getElementById('err');
+  function submit(){
+    if(input.value === 'M4ND4R1N2027'){
+      const f = JSON.parse(localStorage.getItem('hu_flags')||'[]');
+      if(!f.includes(4)){ f.push(4); localStorage.setItem('hu_flags', JSON.stringify(f)); }
+      localStorage.setItem('hu_role', 'guest');
+      sessionStorage.setItem('hu_admin', '1');
+      location.href = 'admin.html';
+    } else {
+      err.classList.remove('hidden');
+      input.value = '';
+      input.focus();
+    }
+  }
+  document.getElementById('go').addEventListener('click', submit);
+  input.addEventListener('keydown', e=>{ if(e.key==='Enter') submit(); });
+  input.focus();
+})();
+</script>
+</body>
+</html>
