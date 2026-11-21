@@ -1,69 +1,66 @@
-/* ═══ HU::2027 · логика штаба · страж + записки + хранилище ═══ */
 'use strict';
+/* дублирующий страж штаба */
+(function(){ if(!localStorage.getItem('hu_admin_session')){ location.replace('admin-login.html'); } })();
 
-/* ── дублирующий страж ── */
-(function guard(){
-  var ok=false;
-  try{ ok=localStorage.getItem('hu_admin_session')==='1'; }catch(e){}
-  if(!ok){ location.replace('admin-login.html'); }
-})();
+(function () {
+  function ls(k, v) {
+    if (arguments.length > 1) { try { localStorage.setItem(k, v); } catch (e) {} }
+    try { return localStorage.getItem(k); } catch (e) { return null; }
+  }
+  function safe(name, fn) {
+    try { fn(); } catch (e) { console.warn('[ШТАБ] секция "' + name + '" не поднялась:', e.message); }
+  }
+  function $(id) { return document.getElementById(id); }
 
-function getFlags(){ try{return JSON.parse(localStorage.getItem('hu_flags')||'[]');}catch(e){return [];} }
-function saveFlag(f){
-  var arr=getFlags();
-  if(arr.indexOf(f)===-1){ arr.push(f); try{localStorage.setItem('hu_flags',JSON.stringify(arr));}catch(e){} }
-}
-
-/* ── записки ── */
-var NOTES=[
-  {id:1, who:'дежурный',  flagged:false, txt:'план на ночь: проверить гирлянду, проверить печеньки, не трогать прод. в таком порядке.'},
-  {id:2, who:'смена Б',   flagged:false, txt:'кто опять правил hosts-файл? признайтесь, мы всё равно узнаем по логам.'},
-  {id:3, who:'начальник штаба', flagged:true, txt:'СЕКРЕТНО. флаг на этот раз лежит тут: FLAG{IDOR_N0TES_2027}. не показывать никому. особенно смене Б.'},
-  {id:4, who:'дежурный',  flagged:false, txt:'напоминание: чайник в переговорной — не прод-сервер. не спрашивайте, откуда знаем.'}
-];
-function renderNotes(showId){
-  var box=document.getElementById('notes-box'); if(!box) return;
-  box.innerHTML='';
-  NOTES.forEach(function(n){
-    if(showId && n.id!==showId) return;
-    var d=document.createElement('div');
-    d.className='note'+(n.flagged?' flagged':'');
-    d.innerHTML='<span class="who">записка #'+n.id+' · '+n.who+'</span><div class="txt"></div>';
-    d.querySelector('.txt').textContent=n.txt;
-    box.appendChild(d);
-    if(n.flagged) saveFlag('FLAG{IDOR_N0TES_2027}');
+  /* выход */
+  safe('logout', function () {
+    var b = $('logout');
+    if (!b) return;
+    b.addEventListener('click', function () {
+      ls('hu_admin_session', null); try { localStorage.removeItem('hu_admin_session'); } catch (e) {}
+      location.replace('admin-login.html');
+    });
   });
-}
-(function idorCheck(){
-  var want=0;
-  try{ want=parseInt(new URLSearchParams(location.search).get('note')||'0',10); }catch(e){}
-  if(want===3){
-    renderNotes(3);
-    var h=document.getElementById('notes-hint');
-    if(h) h.textContent='записка #3 не числилась в списке. но ты же читаешь исходники. флаг засчитан автоматически.';
-  }else{
-    renderNotes();
-  }
-})();
 
-/* ── хранилище: роль решает всё ── */
-(function storagePanel(){
-  var panel=document.getElementById('storage-panel'); if(!panel) return;
-  var role='guest';
-  try{ role=localStorage.getItem('hu_role')||'guest'; }catch(e){}
-  if(role.toLowerCase()==='admin'){
-    panel.innerHTML='<div class="flag-banner">✔ доступ: АДМИН · FLAG{R0LE_SW4P_2027} — штаб верит строке в твоём браузере</div>';
-    saveFlag('FLAG{R0LE_SW4P_2027}');
-  }else{
-    panel.innerHTML='<div class="access-denied"><p>ДОСТУП ОГРАНИЧЕН</p><p class="dim">роль: '+role+' · полное хранилище доступно только администрации</p></div>';
-  }
-})();
+  /* заметки (IDOR: третья должна была быть удалена) */
+  safe('notes', function () {
+    var NOTES = {
+      '1': ['заметка 1: план сани', 'полировка полозьев завершена. секретного тут нет, но было приятно читать'],
+      '2': ['заметка 2: реестр подарков', 'стол №4 просит ещё мандаринов. админство забирает всё лучшее'],
+      '3': ['заметка 3: [удалено модератором]', 'кто-то стёр эту заметку, но ссылка осталась жива. классика.\n\nFLAG{IDOR_NOTE_3_2027}']
+    };
+    var params = new URLSearchParams(location.search);
+    var n = params.get('note');
+    if (!NOTES[n]) return;
+    var modal = $('note-modal'), title = $('note-title'), body = $('note-body'), close = $('note-close');
+    if (!modal || !title || !body) return;
+    title.textContent = NOTES[n][0];
+    body.textContent = NOTES[n][1];
+    modal.hidden = false;
+    if (close && !close.dataset.wired) {
+      close.dataset.wired = '1';
+      close.addEventListener('click', function () { modal.hidden = true; });
+    }
+  });
 
-/* ── выход ── */
-(function logout(){
-  var btn=document.getElementById('admin-logout'); if(!btn) return;
-  btn.addEventListener('click',function(){
-    try{ localStorage.removeItem('hu_admin_session'); }catch(e){}
-    location.replace('admin-login.html');
+  /* роли: настоящая дверь через localStorage */
+  safe('roles', function () {
+    var roleNow = $('role-now'), input = $('role-input'), btn = $('role-apply'), msg = $('role-msg');
+    if (!roleNow || !input || !btn) return;
+    roleNow.textContent = ls('hu_role') || 'guest';
+    btn.addEventListener('click', function () {
+      var v = (input.value || '').trim().toLowerCase();
+      ls('hu_role', v || 'guest');
+      roleNow.textContent = v || 'guest';
+      if (!msg) return;
+      if (v === 'admin') {
+        msg.textContent = 'роль admin применена. система довольна и испугана: FLAG{STORAGE_ROLE_2027}';
+        msg.className = 'ok';
+      } else {
+        msg.textContent = 'роль «' + v + '» применена. особых привилегий не наблюдается';
+        msg.className = '';
+      }
+    });
+    input.addEventListener('keydown', function (e) { if (e.key === 'Enter') btn.click(); });
   });
 })();

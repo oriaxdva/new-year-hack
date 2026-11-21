@@ -1,314 +1,309 @@
-/* HU::2027 — движок канала. Единый файл логики. */
 'use strict';
+/* HU::2027 — движок канала */
+(function () {
+  var CODE = 'HAPPYNEWHACK';
 
-/* ---------- Константы ---------- */
-var ACCESS_CODE = 'HAPPYNEWHACK';
-var LS_ACCESS = 'hu_access';
-var LS_FLAGS = 'hu_flags';
-var LS_SECRET = 'hu_secret_flag';
+  var FLAGS = [
+    ['FLAG{WELCOME_2027}', 'флаг №1 — телеграмма штаба в исходном коде этой страницы'],
+    ['FLAG{CONSOLE_2027}', 'флаг №2 — прячется в консоли браузера: console.hack()'],
+    ['FLAG{LIVE_BROADCAST_2027}', 'флаг №3 — кто-то из эфира проговорится. лови момент'],
+    ['FLAG{ADMIN_PANEL_H4CKED}', 'флаг №4 — панель администратора. дверь внизу страницы'],
+    ['FLAG{IDOR_NOTE_3_2027}', 'флаг №5 — заметка №3 в штабе. ты не должен был её видеть'],
+    ['FLAG{STORAGE_ROLE_2027}', 'флаг №6 — подмени роль в браузерном хранилище штаба']
+  ];
 
-var FLAGS = [
-  { id: 'WELCOME_2027',        title: 'ПРИВЕТСТВИЕ',      where: 'Самое начало. Иногда самое важное прячется в исходниках страницы.' },
-  { id: 'CONSOLE_2027',        title: 'КОНСОЛЬ',          where: 'В браузере есть место, куда принято заглядывать разработчикам.' },
-  { id: 'LIVE_BROADCAST_2027', title: 'ПРЯМОЙ ЭФИР',      where: 'Слушай эфир внимательно. Однажды он проговорится.' },
-  { id: 'ADMIN_PANEL_H4CKED',  title: 'ШТАБ',             where: 'У штаба есть вход. Не основной.' },
-  { id: 'IDOR_NOTE_3_2027',    title: 'ЗАПИСКА №3',       where: 'Штаб потерял одну заметку. Или заметка потеряла штаб.' },
-  { id: 'STORAGE_ROLE_2027',   title: 'РОЛЬ',             where: 'Штаб верит только тому, что видит. К счастью для некоторых, он смотрит не туда.' }
-];
-
-/* ---------- Хранилище ---------- */
-function getFlags() {
-  try { return JSON.parse(localStorage.getItem(LS_FLAGS) || '{}'); }
-  catch (e) { return {}; }
-}
-function isFlagFound(fid) { return !!getFlags()[fid]; }
-function isSecretFound() { return localStorage.getItem(LS_SECRET) === '1'; }
-function foundCount() {
-  return FLAGS.filter(function (f) { return isFlagFound(f.id); }).length + (isSecretFound() ? 1 : 0);
-}
-
-/* ---------- Скрытые строки для трансляции ---------- */
-var BROADCAST = [
-  'HU::2027 — добро пожаловать. Контроль частоты завершён.',
-  'сигнал чистый. впрочем, он всегда такой, пока ты не начинаешь слушать слишком внимательно.',
-  'FLAG{LIVE_BROADCAST_2027} — пропущенный кадр. кто-то в эфире рассеян.',
-  'мандарины в сейфе закончились. это не кодовое сообщение. это горе.',
-  'штаб сообщает: прод уцелел. впервые за год.',
-  'сводка: было тихо. стало тише.',
-  'если ты читаешь это — ты уже внутри. оставайся.',
-  'санта передал: вести себя хорошо. или хотя бы заметно.'
-];
-var SECRET_LINES = [
-  '★ секретный флаг — сдан. не спрашивай, что это было.',
-  '★ реестр флагов не сходится. так и задумано.',
-  '★ кто-то сдал то, чего не существует. уважение.'
-];
-
-/* ---------- Сообщения на стене (только атмосфера) ---------- */
-var WALL = [
-  { who: 'phantom_404', text: 'штаб потерял одну заметку. или заметка потеряла штаб. в любом случае она не там, где думают админы.' },
-  { who: 'unknown',     text: 'штаб верит только тому, что видит. к счастью для некоторых, он смотрит не туда.' },
-  { who: 'mira',        text: 'кто-нибудь ещё слышит, как гирлянда моргает в такт эфиру? или это только я?' },
-  { who: 'tim',         text: 'нашёл носок с оленями под столом. второй так и не нашёлся. подозреваю штаб.' },
-  { who: 'phantom_404', text: 'остальное — вопрос громкости. запомните эту фразу.' },
-  { who: 'mira',        text: 'мандарины на клавиатуре. печатаю сквозь кожуру. ждите новости.' },
-  { who: 'tim',         text: 'год почти вскрыт. кое-кто уже держит нож.' },
-  { who: 'unknown',     text: 'говорят, в консоли водится старый друг. оставьте ему мандаринку.' }
-];
-var WALL_LIVE = [
-  'мандарин укатился под серверную стойку. строго слово — под стойку.',
-  'кто-то снова поставил в терминале «rm -rf /». это шутка. наверное.',
-  'носок с оленями замечен у вентиляции. он смотрит.',
-  'сейф хранит не только флаги. хранит и огрызки.',
-  'штабное табло показывает 0/6. кто-то только что вошёл. привет.'
-];
-
-/* ---------- DOM ---------- */
-function $(id) { return document.getElementById(id); }
-function esc(s) {
-  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-
-/* ---------- Экран доступа ---------- */
-function showAccess() {
-  var sc = $('access-screen');
-  if (!sc) return;
-  sc.style.display = 'flex';
-  document.body.classList.add('locked');
-  var inp = $('access-input');
-  var btn = $('access-btn');
-  var err = $('access-error');
-  if (err) err.textContent = '';
-  function tryEnter() {
-    var v = (inp && inp.value || '').trim().toUpperCase();
-    if (v === ACCESS_CODE) {
-      localStorage.setItem(LS_ACCESS, '1');
-      hideAccess();
-    } else if (err) {
-      err.textContent = '✘ доступ запрещён. код знает ведущий. и, возможно, санта';
-    }
+  function $(id) { return document.getElementById(id); }
+  function ls(k, v) {
+    if (arguments.length > 1) { try { localStorage.setItem(k, v); } catch (e) {} }
+    try { return localStorage.getItem(k); } catch (e) { return null; }
   }
-  if (btn) btn.addEventListener('click', tryEnter);
-  if (inp) inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') tryEnter(); });
-}
-function hideAccess() {
-  var sc = $('access-screen');
-  if (sc) sc.style.display = 'none';
-  document.body.classList.remove('locked');
-}
+  function safe(name, fn) {
+    try { fn(); } catch (e) { console.warn('[HU] секция "' + name + '" не поднялась:', e.message); }
+  }
 
-/* ---------- Рендер списка заданий ---------- */
-function renderTasks() {
-  var list = $('tasks-list');
-  if (!list) return;
-  var html = '';
-  FLAGS.forEach(function (f, i) {
-    var done = isFlagFound(f.id);
-    html += '<div class="task' + (done ? ' done' : '') + '">'
-      + '<div class="task-title">' + (i + 1) + '. ' + esc(f.title) + (done ? ' — сдан ✔' : '') + '</div>'
-      + '<div class="task-where">' + esc(f.where) + '</div>'
-      + '</div>';
+  /* ---------- хранилище прохождения ---------- */
+  var found = {};
+  try { found = JSON.parse(ls('hu_flags') || '{}') || {}; } catch (e) { found = {}; }
+  function save() { ls('hu_flags', JSON.stringify(found)); }
+  function foundCount() {
+    var n = 0; FLAGS.forEach(function (f) { if (found[f[0]]) n++; }); return n;
+  }
+  var secretFound = ls('hu_secret_flag') === '1';
+
+  /* ---------- экран доступа ---------- */
+  safe('access', function () {
+    var screen = $('access-screen'), input = $('access-input'),
+        btn = $('access-btn'), err = $('access-error');
+    if (!screen) return;
+    if (ls('hu_access') === '1') { screen.hidden = true; document.body.classList.remove('locked'); }
+    function tryEnter() {
+      if ((input.value || '').trim().toUpperCase() === CODE) {
+        ls('hu_access', '1');
+        screen.hidden = true;
+        document.body.classList.remove('locked');
+      } else {
+        if (err) err.textContent = '\u2718 доступ запрещ\u0451н. код знает ведущий. и, возможно, санта';
+      }
+    }
+    if (btn) btn.addEventListener('click', tryEnter);
+    if (input) input.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') tryEnter();
+    });
   });
-  if (isSecretFound()) {
-    html += '<div class="task secret">★ секретный флаг — не числился ни в одном реестре — сдан ✔</div>';
-  }
-  list.innerHTML = html;
-  var c = $('flags-counter');
-  if (c) c.textContent = foundCount() + '/' + FLAGS.length;
-  renderFinale();
-}
 
-/* ---------- Финал ---------- */
-function renderFinale() {
-  var fin = $('finale');
-  if (!fin) return;
-  if (foundCount() >= FLAGS.length && !fin.dataset.shown) {
-    fin.dataset.shown = '1';
-    fin.style.display = 'block';
-    confetti();
+  /* ---------- тосты ---------- */
+  function toast(msg, cls) {
+    var box = $('flag-msg');
+    if (!box) return;
+    box.className = cls || '';
+    box.textContent = msg;
   }
-  var btn = $('finale-close');
-  if (btn && !btn.dataset.bound) {
-    btn.dataset.bound = '1';
-    btn.addEventListener('click', function () { fin.style.display = 'none'; });
-  }
-}
 
-/* ---------- Конфетти ---------- */
-function confetti() {
-  var box = $('confetti');
-  if (!box) return;
-  var chars = ['🎄', '❄', '🍊', '✦'];
-  for (var i = 0; i < 60; i++) {
-    var s = document.createElement('span');
-    s.textContent = chars[Math.floor(Math.random() * chars.length)];
-    s.style.left = Math.random() * 100 + '%';
-    s.style.animationDuration = (2.5 + Math.random() * 3) + 's';
-    s.style.animationDelay = (Math.random() * 2) + 's';
-    s.style.fontSize = (14 + Math.random() * 16) + 'px';
-    box.appendChild(s);
+  /* ---------- счётчик ---------- */
+  function renderCounter() {
+    var c = $('flags-counter');
+    if (!c) return;
+    var base = 'флаги: ' + foundCount() + '/6';
+    if (secretFound) base = base.replace('/6', '/6 \u2605');
+    c.textContent = base;
   }
-  setTimeout(function () { box.innerHTML = ''; }, 9000);
-}
 
-/* ---------- Сдача флага на странице ЗАДАНИЕ ---------- */
-function bindFlagSubmit() {
-  var inp = $('flag-input');
-  var btn = $('flag-submit');
-  var msg = $('flag-msg');
-  if (!inp || !btn) return;
-  function submit() {
-    var raw = (inp.value || '').trim();
-    if (!raw) return;
-    var v = raw.toUpperCase().replace(/\s+/g, '');
-    var matched = FLAGS.some(function (f) { return v === ('FLAG{' + f.id + '}').toUpperCase(); });
-    if (matched) {
-      var id = FLAGS.filter(function (f) { return v === ('FLAG{' + f.id + '}').toUpperCase(); })[0].id;
-      var st = getFlags();
-      if (!st[id]) { st[id] = 1; localStorage.setItem(LS_FLAGS, JSON.stringify(st)); }
-      if (msg) msg.className = 'ok';
-      if (msg) msg.textContent = '✔ флаг принят: ' + id;
-      inp.value = '';
-    } else if (!isSecretFound()) {
-      localStorage.setItem(LS_SECRET, '1');
-      if (msg) msg.className = 'secret-ok';
-      if (msg) msg.textContent = '✔ принято. система не смогла это классифицировать — и записала как секретный флаг';
-      inp.value = '';
-    } else {
-      if (msg) msg.className = 'err';
-      if (msg) msg.textContent = '✘ неизвестный флаг';
+  /* ---------- список заданий ---------- */
+  safe('tasks-list', function () {
+    var list = $('tasks-list');
+    if (!list) return;
+    list.innerHTML = '';
+    FLAGS.forEach(function (f) {
+      var li = document.createElement('li');
+      li.textContent = found[f[0]] ? f[0] + ' — ' + f[1] : '\u0444\u043b\u0430\u0433 \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d: ' + f[1];
+      li.className = found[f[0]] ? 'done' : 'locked';
+      list.appendChild(li);
+    });
+    if (secretFound) {
+      var li = document.createElement('li');
+      li.className = 'secret-row';
+      li.textContent = '\u0441\u0435\u043a\u0440\u0435\u0442\u043d\u044b\u0439 \u0444\u043b\u0430\u0433 — \u043d\u0435 \u0447\u0438\u0441\u043b\u0438\u043b\u0441\u044f \u043d\u0438 \u0432 \u043e\u0434\u043d\u043e\u043c \u0440\u0435\u0435\u0441\u0442\u0440\u0435';
+      list.appendChild(li);
     }
-    renderTasks();
-  }
-  btn.addEventListener('click', submit);
-  inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') submit(); });
-}
+  });
 
-/* ---------- Эфир ---------- */
-function startBroadcast() {
-  var feed = $('broadcast-feed');
-  if (!feed) return;
-  var idx = 0;
-  function push() {
-    var line = document.createElement('div');
-    line.className = 'bc-line';
-    var text = BROADCAST[idx % BROADCAST.length];
-    line.textContent = text;
-    feed.appendChild(line);
-    while (feed.children.length > 12) feed.removeChild(feed.firstChild);
-    feed.scrollTop = feed.scrollHeight;
-    idx++;
-  }
-  push();
-  setInterval(push, 8000);
-}
+  /* ---------- сдача флагов ---------- */
+  safe('flag-submit', function () {
+    var input = $('flag-input'), btn = $('flag-submit');
+    if (!input || !btn) return;
+    function submit() {
+      var v = (input.value || '').trim().toUpperCase();
+      if (!v) { toast('введи флаг', 'err'); return; }
+      var hit = FLAGS.filter(function (f) { return f[0] === v; })[0];
+      if (hit) {
+        if (found[hit[0]]) { toast('\u044d\u0442\u043e\u0442 \u0444\u043b\u0430\u0433 \u0443\u0436\u0435 \u0441\u0434\u0430\u043d. \u0448\u0442\u0430\u0431 \u0446\u0435\u043d\u0438\u0442 \u043f\u0430\u043c\u044f\u0442\u044c, \u043d\u043e \u043d\u0435 \u0434\u0443\u0431\u043b\u0438\u043a\u0430\u0442\u044b', 'ok'); return; }
+        found[hit[0]] = true; save();
+        toast('\u2714 \u043f\u0440\u0438\u043d\u044f\u0442\u043e: ' + hit[0], 'ok');
+        renderCounter(); renderTasksSafe(); checkFinale();
+        input.value = '';
+        return;
+      }
+      if (!secretFound) {
+        secretFound = true;
+        ls('hu_secret_flag', '1');
+        toast('\u2714 \u043f\u0440\u0438\u043d\u044f\u0442\u043e. \u0441\u0438\u0441\u0442\u0435\u043c\u0430 \u043d\u0435 \u0441\u043c\u043e\u0433\u043b\u0430 \u044d\u0442\u043e \u043a\u043b\u0430\u0441\u0441\u0438\u0444\u0438\u0446\u0438\u0440\u043e\u0432\u0430\u0442\u044c — \u0438 \u0437\u0430\u043f\u0438\u0441\u0430\u043b\u0430 \u043a\u0430\u043a \u0441\u0435\u043a\u0440\u0435\u0442\u043d\u044b\u0439 \u0444\u043b\u0430\u0433', 'secret');
+        renderCounter(); renderTasksSafe();
+        input.value = '';
+        return;
+      }
+      toast('\u2718 \u041d\u0435\u0438\u0437\u0432\u0435\u0441\u0442\u043d\u044b\u0439 \u0444\u043b\u0430\u0433', 'err');
+    }
+    btn.addEventListener('click', submit);
+    input.addEventListener('keydown', function (e) { if (e.key === 'Enter') submit(); });
+  });
 
-/* ---------- Стена ---------- */
-function renderWall() {
-  var box = $('wall-posts');
-  if (!box) return;
-  box.innerHTML = WALL.map(function (w) {
-    return '<div class="wall-post"><span class="wall-who">' + esc(w.who) + '</span> ' + esc(w.text) + '</div>';
-  }).join('');
-  setInterval(function () {
-    var live = document.createElement('div');
-    live.className = 'wall-live';
-    live.textContent = WALL_LIVE[Math.floor(Math.random() * WALL_LIVE.length)];
-    box.appendChild(live);
-    setTimeout(function () { live.remove(); }, 12000);
-  }, 45000);
-}
+  function renderTasksSafe() { safe('tasks-list-rerender', function () {
+    var list = $('tasks-list');
+    if (!list) return;
+    list.innerHTML = '';
+    FLAGS.forEach(function (f) {
+      var li = document.createElement('li');
+      li.textContent = found[f[0]] ? f[0] + ' — ' + f[1] : '\u0444\u043b\u0430\u0433 \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d: ' + f[1];
+      li.className = found[f[0]] ? 'done' : 'locked';
+      list.appendChild(li);
+    });
+    if (secretFound) {
+      var li = document.createElement('li');
+      li.className = 'secret-row';
+      li.textContent = '\u0441\u0435\u043a\u0440\u0435\u0442\u043d\u044b\u0439 \u0444\u043b\u0430\u0433 — \u043d\u0435 \u0447\u0438\u0441\u043b\u0438\u043b\u0441\u044f \u043d\u0438 \u0432 \u043e\u0434\u043d\u043e\u043c \u0440\u0435\u0435\u0441\u0442\u0440\u0435';
+      list.appendChild(li);
+    }
+  }); }
 
-/* ---------- Терминал ---------- */
-function bindTerminal() {
-  var inp = $('term-input');
-  var out = $('term-output');
-  if (!inp || !out) return;
-  function print(s) {
-    var d = document.createElement('div');
-    d.textContent = s;
-    out.appendChild(d);
-    out.scrollTop = out.scrollHeight;
-  }
-  inp.addEventListener('keydown', function (e) {
-    if (e.key !== 'Enter') return;
-    var cmd = (inp.value || '').trim();
-    inp.value = '';
-    if (!cmd) return;
-    print('HU> ' + cmd);
-    var c = cmd.toLowerCase().split(/\s+/);
-    switch (c[0]) {
-      case 'help':
-        print('доступно: help, whoami, whoami --force-admin, flags, wall chat, xmas, clear');
-        break;
-      case 'whoami':
-        if (c[1] === '--force-admin') {
-          print('...ладно. кто-то попросил вслух. role=admin (только в твоей голове и только в этом окне)');
-        } else {
-          print('role=guest. терминал верит строке, а не человеку.');
-        }
-        break;
-      case 'flags':
-        print('сдано флагов: ' + foundCount() + ' / ' + FLAGS.length + (isSecretFound() ? ' (+1 не из реестра)' : ''));
-        if (isSecretFound()) print(SECRET_LINES[0]);
-        break;
-      case 'wall':
-        if (c[1] === 'chat') {
-          print('подслушано на стене:');
-          print('  mira: «...гирлянда моргает в такт эфиру»');
-          print('  tim: «носок с оленями смотрит»');
-          print('  phantom_404: «остальное — вопрос громкости»');
-        } else {
-          print('wall что? попробуй: wall chat');
-        }
-        break;
-      case 'xmas':
-        print('🍊 держи мандаринку. без флага внутри. проверял.');
-        break;
-      case 'clear':
+  /* ---------- пасхалка в консоли ---------- */
+  safe('console.hack', function () {
+    window.console.hack = function () {
+      if (found['FLAG{CONSOLE_2027}']) return '\u0443\u0436\u0435 \u0432\u0437\u043b\u043e\u043c\u0430\u043d\u043e. \u0444\u043b\u0430\u0433 \u0443 \u0442\u0435\u0431\u044f.';
+      found['FLAG{CONSOLE_2027}'] = true; save();
+      renderCounter(); renderTasksSafe(); checkFinale();
+      return '\u0434\u043e\u0431\u0440\u043e \u043f\u043e\u0436\u0430\u043b\u043e\u0432\u0430\u0442\u044c \u0432 \u0437\u0430\u043a\u0443\u043b\u0438\u0441\u044c\u0435: FLAG{CONSOLE_2027}';
+    };
+    console.log('HU::2027 — \u043f\u043e\u043f\u0440\u043e\u0431\u0443\u0439 console.hack()');
+  });
+
+  /* ---------- прямой эфир ---------- */
+  safe('broadcast', function () {
+    var feed = $('broadcast-feed');
+    if (!feed) return;
+    var lines = [
+      ['ведущий', 'в эфире у нас штатный порядок, санта на связи, тепло и спокойно'],
+      ['диспетчер', 'не выключай канал. не выключай. НЕ ВЫКЛЮЧАЙ КАН'],
+      ['санта', 'самолёт не мой. но олени почему-то запряжены'],
+      ['дедлайн', 'бой прогремит ровно в полночь. или в 23:59. или уже'],
+      ['ведущий', 'внимание, повторяю код резервного канала: FLAG{LIVE_BROADCAST_2027}'],
+      ['санта', 'подарки в этом году подержу у себя. климат бережём'],
+      ['диспетчер', 'по улице идёт подозрительный дед мороз с планшетом'],
+      ['ведущий', 'вы ещё здесь? а след уже ускакал']
+    ];
+    var i = 0;
+    function push() {
+      var pair = lines[i % lines.length]; i++;
+      var d = document.createElement('div');
+      d.className = 'feed-line' + (pair[0] === 'ведущий' && pair[1].indexOf('FLAG{') === 0 ? ' hot' : (pair[1].indexOf('FLAG{') >= 0 ? ' hot' : ''));
+      d.textContent = '[' + pair[0] + '] ' + pair[1];
+      feed.appendChild(d);
+      feed.scrollTop = feed.scrollHeight;
+      if (pair[1].indexOf('FLAG{LIVE_BROADCAST_2027}') >= 0 && !found['FLAG{LIVE_BROADCAST_2027}']) {
+        found['FLAG{LIVE_BROADCAST_2027}'] = true; save();
+        renderCounter(); renderTasksSafe(); checkFinale();
+      }
+      while (feed.children.length > 40) feed.removeChild(feed.firstChild);
+    }
+    push(); push();
+    window.setInterval(push, 8000);
+  });
+
+  /* ---------- стена ---------- */
+  safe('wall', function () {
+    var box = $('wall-posts');
+    if (!box) return;
+    var staticPosts = [
+      ['гость 404', 'у нас дома сломался флагшток. это к чему?'],
+      ['дед мороз (не настоящий)', 'продаю сани, б/у, следы взлома'],
+      ['снежок', 'кто украл мой шарф, верните, он тёплый']
+    ];
+    staticPosts.forEach(function (p) {
+      var d = document.createElement('div'); d.className = 'post';
+      var w = document.createElement('div'); w.className = 'who'; w.textContent = p[0];
+      var t = document.createElement('div'); t.textContent = p[1];
+      d.appendChild(w); d.appendChild(t); box.appendChild(d);
+    });
+    var live = [
+      ['гость с того берега', 'я видел, как во дворе камера моргнула в такт гирлянде'],
+      ['аноним', 'пароль от чего-то там — hackmas2027. не помню от чего'],
+      ['внук деда мороза', 'деду нужен доступ в админку. кто поможет?'],
+      [' кот', 'мяу. я всё вижу']
+    ];
+    var j = 0;
+    window.setInterval(function () {
+      var p = live[j % live.length]; j++;
+      var d = document.createElement('div'); d.className = 'post live';
+      var w = document.createElement('div'); w.className = 'who'; w.textContent = p[0];
+      var t = document.createElement('div'); t.textContent = p[1];
+      d.appendChild(w); d.appendChild(t);
+      box.prepend(d);
+      window.setTimeout(function () { if (d.parentNode) d.parentNode.removeChild(d); }, 12000);
+    }, 45000);
+  });
+
+  /* ---------- терминал ---------- */
+  safe('terminal', function () {
+    var out = $('term-output'), input = $('term-input');
+    if (!out || !input) return;
+    function print(s, cls) {
+      var d = document.createElement('div');
+      if (cls) d.className = cls;
+      d.textContent = s;
+      out.appendChild(d);
+      out.scrollTop = out.scrollHeight;
+    }
+    print('HU terminal v2027. набери help', '');
+    function run(raw) {
+      var parts = (raw || '').trim().split(/\s+/);
+      var cmd = (parts[0] || '').toLowerCase();
+      if (!cmd) return;
+      print('> ' + raw, 'term-cmd');
+      if (cmd === 'help') {
+        print('команды: help, whoami, flags, wall chat, xmas, clear');
+        print('сдача флагов — только через страницу ЗАДАНИЕ, submit не работает');
+      } else if (cmd === 'whoami') {
+        print(parts[1] === '--force-admin'
+          ? 'роль: admin (форс). но настоящий админ всё равно сделает это через localStorage'
+          : 'роль: guest. тихий гость с клавиатурой');
+      } else if (cmd === 'flags') {
+        var foundList = FLAGS.filter(function (f) { return found[f[0]]; });
+        print('\u0441\u0434\u0430\u043d\u043e \u0444\u043b\u0430\u0433\u043e\u0432: ' + foundCount() + ' / 6' + (secretFound ? ' (+1 \u043d\u0435 \u0438\u0437 \u0440\u0435\u0435\u0441\u0442\u0440\u0430)' : ''));
+        foundList.forEach(function (f) { print(f[0]); });
+        if (secretFound) print('\u2605 \u0441\u0435\u043a\u0440\u0435\u0442\u043d\u044b\u0439 \u0444\u043b\u0430\u0433 — \u0441\u0434\u0430\u043d. \u043d\u0435 \u0441\u043f\u0440\u0430\u0448\u0438\u0432\u0430\u0439, \u0447\u0442\u043e \u044d\u0442\u043e \u0431\u044b\u043b\u043e', 'secret-line');
+      } else if (cmd === 'wall' && parts[1] === 'chat') {
+        print('стена открыта в основной ленте. чат закрыт: админ сказал «тихо»');
+      } else if (cmd === 'xmas') {
+        print('\u0441 \u043d\u0430\u0441\u0442\u0443\u043f\u0430\u044e\u0449\u0438\u043c! \ud83c\udf8a \ud83c\udf85 \ud83c\udf4a');
+      } else if (cmd === 'clear') {
         out.innerHTML = '';
-        break;
-      case 'submit':
-        print('сдача флагов — только на странице ЗАДАНИЕ. здесь не принимаю.');
-        break;
-      default:
-        print('неизвестная команда. help — если потерялся.');
+      } else if (cmd === 'submit') {
+        print('submit \u0437\u0434\u0435\u0441\u044c \u043d\u0435 \u0440\u0430\u0431\u043e\u0442\u0430\u0435\u0442. \u0444\u043b\u0430\u0433\u0438 \u0441\u0434\u0430\u044e\u0442\u0441\u044f \u0442\u043e\u043b\u044c\u043a\u043e \u043d\u0430 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0435 \u0417\u0410\u0414\u0410\u041d\u0418\u0415');
+      } else {
+        print('неизвестная команда: ' + cmd + '. попробуй help');
+      }
     }
+    input.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { run(input.value); input.value = ''; }
+    });
   });
-}
 
-/* ---------- Консольная пасхалка ---------- */
-function bindConsoleEgg() {
-  var fired = false;
-  console.hack = function () {
-    if (fired) return 'повторно консоль не выдаёт. это единичность.';
-    fired = true;
-    var st = getFlags();
-    if (!st['CONSOLE_2027']) { st['CONSOLE_2027'] = 1; localStorage.setItem(LS_FLAGS, JSON.stringify(st)); }
-    renderTasks();
-    return 'FLAG{CONSOLE_2027} — да, прямо здесь. молодец, что заглянул.';
+  /* ---------- финал ---------- */
+  function checkFinale() {
+    if (foundCount() < 6) return;
+    var fin = $('finale');
+    if (!fin) return;
+    var sec = $('finale-secret');
+    if (sec) {
+      sec.textContent = secretFound
+        ? 'бонус: ты нашёл то, чего не было в реестре. ★ секретный флаг — седьмой.'
+        : 'в реестре числилось шесть. и ровно шесть сдано. а может, есть ещё?';
+    }
+    fin.hidden = false;
+    safe('confetti', function () {
+      var box = $('confetti');
+      if (!box) return;
+      var emojis = ['\ud83c\udf84', '\u2744\ufe0f', '\ud83c\udf4a'];
+      for (var i = 0; i < 60; i++) {
+        var s = document.createElement('span');
+        s.className = 'conf';
+        s.textContent = emojis[i % emojis.length];
+        s.style.left = (Math.random() * 100) + '%';
+        s.style.animationDuration = (2.5 + Math.random() * 3) + 's';
+        s.style.animationDelay = (Math.random() * 2) + 's';
+        s.style.fontSize = (14 + Math.random() * 14) + 'px';
+        box.appendChild(s);
+      }
+    });
+    var close = $('finale-close');
+    if (close && !close.dataset.wired) {
+      close.dataset.wired = '1';
+      close.addEventListener('click', function () { fin.hidden = true; });
+    }
+  }
+
+  /* ---------- запуск ---------- */
+  renderCounter();
+  renderTasksSafe();
+  checkFinale();
+
+  /* ---------- сброс для тестов ---------- */
+  window.HU = {
+    reset: function () {
+      ['hu_access', 'hu_flags', 'hu_secret_flag', 'hu_admin_session', 'hu_role', 'hu_backup_pin', 'hu_finale_seen']
+        .forEach(function (k) { ls(k, null); try { localStorage.removeItem(k); } catch (e) {} });
+      location.reload();
+    }
   };
-  console.log('%c HU::2027 — попробуй console.hack() ', 'background:#042; color:#5f5; padding:2px 6px;');
-}
 
-/* ---------- Запуск ---------- */
-function boot() {
-  var seen = [];
-  ['access-screen', 'access-input', 'access-btn', 'tasks-list', 'flags-counter', 'flag-input', 'flag-submit', 'flag-msg', 'broadcast-feed', 'wall-posts', 'term-input', 'term-output', 'finale', 'finale-close', 'confetti'].forEach(function (id) {
-    if (!$(id)) seen.push(id);
-  });
-  if (seen.length) console.warn('HU: не найдены блоки: ' + seen.join(', '));
-
-  if (localStorage.getItem(LS_ACCESS) === '1') hideAccess(); else showAccess();
-  renderTasks();
-  bindFlagSubmit();
-  bindTerminal();
-  bindConsoleEgg();
-  startBroadcast();
-  renderWall();
-}
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', boot);
-} else {
-  boot();
-}
+  console.log('движок готов: HU::2027');
+})();

@@ -2,118 +2,83 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>HU::2027 · Black Team</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HU::2027 — перехват новогоднего канала</title>
 <link rel="stylesheet" href="crt.css">
-<!-- FLAG{HTML_C0MMENT_2027} — молодец, что читаешь исходники. так и записывай -->
+<!--
+  HU::2027 // внутренняя телеграмма штаба
+  FLAG{WELCOME_2027}
+  привет, связной. раз ты читаешь исходники — ты уже нашёл первый флаг.
+  дальше смотри в консоль, в эфир и в дверь внизу страницы.
+-->
 </head>
-<body>
-<div class="snow-layer" id="snow"></div>
-<div id="confetti"></div>
+<body class="locked">
 
 <div id="access-screen">
-  <div class="access-wrap">
-    <div class="sign">HU::2027</div>
-    <div class="access-sub">закрытый канал · нужен код доступа</div>
-    <div class="access-box">
-      <input id="access-input" type="text" placeholder="код" autocomplete="off">
-      <button id="access-btn" class="btn-primary">ВОЙТИ</button>
-    </div>
-    <div class="access-err" id="access-err"></div>
+  <div class="access-box">
+    <div class="access-title">HU::2027</div>
+    <div class="access-sub">канал перехвачен. доступ — по коду</div>
+    <input id="access-input" type="password" placeholder="КОД ДОСТУПА" autocomplete="off">
+    <button id="access-btn" type="button">ВОЙТИ</button>
+    <div id="access-error" role="alert"></div>
   </div>
 </div>
 
-<div class="crt-frame">
-  <div class="scanlines"></div><div class="tv-glass"></div>
-  <header class="crt-header">
-    <div class="header-top">
-      <div class="logo">HU::<span class="logo-accent">2027</span></div>
-      <div class="header-right">
-        <span class="clock" id="clock">00:00:00</span>
-        <button class="header-btn" id="audio-toggle">AUDIO: OFF</button>
-      </div>
+<header id="topbar">
+  <span class="logo">HU::2027</span>
+  <span id="flags-counter">флаги: 0/6</span>
+</header>
+
+<main id="main">
+  <section id="briefing">
+    <h2>БРИФИНГ</h2>
+    <p>Новогодняя трансляция 2027 года кем-то перехвачена. Штаб собрал шесть следов —
+       каждый спрятан на этом канале или рядом с ним. Твоя задача: собрать все шесть,
+       прежде чем бой прогремит под бой курантов.</p>
+    <p class="dim">Сдача флагов — только через поле на странице ЗАДАНИЯ. Терминал сдачи не принимает.</p>
+  </section>
+
+  <section id="tasks">
+    <h2>ЗАДАНИЯ</h2>
+    <ol id="tasks-list"></ol>
+    <div class="flag-form">
+      <input id="flag-input" placeholder="FLAG{...}" autocomplete="off">
+      <button id="flag-submit" type="button">СДАТЬ ФЛАГ</button>
     </div>
-    <nav class="crt-nav" id="crt-nav">
-      <button data-section="briefing" class="active">БРИФИНГ</button>
-      <button data-section="broadcast">ЭФИР</button>
-      <button data-section="tasks">ЗАДАНИЯ</button>
-      <button data-section="wall">СТЕНА</button>
-      <button data-section="terminal">ТЕРМИНАЛ</button>
-    </nav>
-  </header>
-  <div class="garland" id="garland"></div>
+    <div id="flag-msg" role="status"></div>
+  </section>
 
-  <main class="content">
+  <section id="broadcast">
+    <h2>ПРЯМОЙ ЭФИР</h2>
+    <div id="broadcast-feed"></div>
+  </section>
 
-    <section id="briefing" class="crt-section active">
-      <h2 class="crt-title">БРИФИНГ</h2>
-      <p class="crt-text">Ты — свежий агент Black Team. Прошлый год ты «уронил прод» и оставил после себя сорок писем «уведомление о недоставке» от Санты. Начальство решило дать тебе второй шанс — тихий, ночной и полный флагов.</p>
-      <p class="crt-text"><b>Задача:</b> собрать <span class="amber">6 флагов</span>. Один спрятан прямо в исходниках этой страницы, остальные — в консоли, эфире и местах без замков.</p>
-      <p class="crt-text"><b>Правила:</b> флаги выглядят как <span class="amber">FLAG{...}</span>. Сдача — только здесь, на странице ЗАДАНИЯ. Подсказки бывают на стене, но слухам верь на свой страх.</p>
-      <p class="crt-text">Соберёшь все шесть — канал уйдёт в эфир, а год официально считается вскрытым.</p>
-      <div class="tree-row">🎄 🎄 🎄</div>
-      <p class="crt-text dim">Начинай. Год не будет ждать — он уже идёт.</p>
-    </section>
+  <section id="wall">
+    <h2>СТЕНА</h2>
+    <div id="wall-posts"></div>
+  </section>
 
-    <section id="broadcast" class="crt-section">
-      <h2 class="crt-title">ЭФИР</h2>
-      <div class="transmission-status">ПЕРЕДАЧА: ГОТОВА К ЗАПУСКУ <span class="rec-dot"></span></div>
-      <div class="broadcast-screen"><div class="broadcast-text" id="broadcast-text"></div></div>
-      <div class="btn-row">
-        <button id="start-broadcast" class="btn-primary">НАЧАТЬ ТРАНСЛЯЦИЮ</button>
-        <button id="stop-broadcast" class="btn-ghost hidden">СТОП</button>
-      </div>
-      <div id="broadcast-flag" class="flag-banner hidden"></div>
-    </section>
+  <section id="terminal">
+    <h2>ТЕРМИНАЛ</h2>
+    <div id="term-output"></div>
+    <input id="term-input" placeholder="команда..." autocomplete="off">
+  </section>
+</main>
 
-    <section id="tasks" class="crt-section">
-      <h2 class="crt-title">ЗАДАНИЯ</h2>
-      <div class="counter">СДАНО ФЛАГОВ: <b id="flag-counter">0</b> / 6</div>
-      <div class="submit-box">
-        <input id="flag-input" type="text" placeholder="FLAG{...}" autocomplete="off">
-        <button id="flag-submit" class="btn-primary">СДАТЬ</button>
-      </div>
-      <div class="feedback" id="flag-feedback"></div>
-      <ul class="flag-list" id="flag-list"></ul>
-    </section>
+<footer id="footer">
+  <span>HU::2027 · канал освещает штаб зимней операции</span>
+  <a id="admin-door" href="admin.html">служебный вход</a>
+</footer>
 
-    <section id="wall" class="crt-section">
-      <h2 class="crt-title">СТЕНА</h2>
-      <div class="wall" id="wall-posts"></div>
-      <div class="submit-box">
-        <input id="wall-input" type="text" placeholder="ник: сообщение" autocomplete="off">
-        <button id="wall-post" class="btn-primary">ОТПРАВИТЬ</button>
-      </div>
-    </section>
-
-    <section id="terminal" class="crt-section">
-      <h2 class="crt-title">ТЕРМИНАЛ</h2>
-      <div class="term-out" id="term-out"></div>
-      <div class="submit-box">
-        <span class="term-prompt">black@hu:~$</span>
-        <input id="term-in" type="text" autocomplete="off">
-      </div>
-    </section>
-
-  </main>
-
-  <footer class="crt-footer">
-    <div class="tree-row">🎄 🎄 🎄</div>
-    <div class="dim small">HU::2027 · канал Black Team · эфир разблокирован один раз в год</div>
-  </footer>
-</div>
-
-<div id="finale" class="hidden">
+<div id="finale" hidden>
   <div class="finale-box">
-    <div class="finale-title">★ С НОВЫМ 2027-м, BLACK TEAM ★</div>
-    <p>Ты хороший боец. Без вас этот год был бы просто набором логов.</p>
-    <p class="dim small">Все шесть флагов сданы. Канал официально закрыт. Мандарины — на всех.</p>
-    <button id="finale-close" class="btn-ghost">ЗАКРЫТЬ</button>
+    <h2>КАНАЛ ВЗЛОМАН. ПОЛНОСТЬЮ</h2>
+    <p>Шесть из шести. Штаб снимает шляпу (и надевает её обратно — холодно).</p>
+    <p id="finale-secret"></p>
+    <button id="finale-close" type="button">ЗАКРЫТЬ</button>
   </div>
 </div>
+<div id="confetti"></div>
 
 <script src="app.js"></script>
 </body>

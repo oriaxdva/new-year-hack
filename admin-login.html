@@ -2,65 +2,48 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Вход в штаб · HU::2027</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="crt.css">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ШТАБ — вход</title>
 <link rel="stylesheet" href="admin.css">
-<!-- пароль от штаба: hackmas2027 (не говорите смене Б) -->
+<!--
+  служебная памятка дежурного штаба
+  пароль входа: hackmas2027
+  не потеряй. снова.
+-->
 </head>
 <body>
-<div class="snow-layer" id="snow"></div>
-<div class="crt-frame">
-  <div class="scanlines"></div><div class="tv-glass"></div>
-  <div class="hazard-tape"></div>
-  <div class="secret-label">ШТАБ BLACK TEAM · ДОПУСК ПО ПАРОЛЮ</div>
-  <div class="content">
-    <div class="login-box">
-      <div class="logo" style="text-align:center;margin-bottom:10px">HU::<span class="logo-accent">ШТАБ</span></div>
-      <p class="crt-text dim" style="text-align:center;margin-bottom:16px">служебный вход. посторонним — мандарины и выход.</p>
-      <div class="submit-box">
-        <input id="admin-pass" type="password" placeholder="пароль штаба" autocomplete="off">
-        <button id="admin-enter" class="btn-primary">ВОЙТИ</button>
-      </div>
-      <div class="feedback" id="admin-err"></div>
-      <div id="admin-success" class="hidden">
-        <div class="flag-banner">✔ FLAG{ADMIN_PANEL_H4CKED} — штаб открыт</div>
-        <div class="btn-row"><a class="btn-primary" href="admin.html" style="text-decoration:none;text-align:center">ПЕРЕЙТИ В ШТАБ</a></div>
-      </div>
-    </div>
+<div class="login-box">
+  <div class="login-title">ШТАБ :: ВХОД</div>
+  <input id="admin-pass" type="password" placeholder="ПАРОЛЬ" autocomplete="off">
+  <button id="admin-enter" type="button">ВОЙТИ</button>
+  <div id="admin-login-msg" role="alert"></div>
+  <div id="admin-flag-box" hidden>
+    <div class="flag-line">FLAG{ADMIN_PANEL_H4CKED}</div>
+    <p>доступ получен. дверь в штаб открыта</p>
+    <a class="enter-btn" href="admin.html">ПЕРЕЙТИ В ШТАБ</a>
   </div>
-  <footer class="crt-footer">
-    <div class="tree-row">🎄 🎄 🎄</div>
-    <div class="dim small">доступ logging включён. смена Б в курсе, что ты читаешь исходники</div>
-  </footer>
+  <a class="back-link" href="index.html">&larr; назад на канал</a>
 </div>
 <script>
+'use strict';
 (function(){
-  function fail(msg){
-    var e=document.getElementById('admin-err');
-    e.textContent=msg; e.style.color='#e06a5a';
-  }
-  function tryPass(){
-    var v=(document.getElementById('admin-pass').value||'').trim().toLowerCase();
-    if(v==='hackmas2027'){
-      document.getElementById('admin-err').textContent='';
-      try{ localStorage.setItem('hu_admin_session','1'); }catch(e){}
-      document.getElementById('admin-success').classList.remove('hidden');
-      var arr=[];
-      try{ arr=JSON.parse(localStorage.getItem('hu_flags')||'[]'); }catch(e){}
-      if(arr.indexOf('FLAG{ADMIN_PANEL_H4CKED}')===-1){ arr.push('FLAG{ADMIN_PANEL_H4CKED}'); }
-      try{ localStorage.setItem('hu_flags',JSON.stringify(arr)); }catch(e){}
-    }else if(v){
-      fail('✘ неверный пароль. подсказки нет — есть исходники');
-    }else{
-      fail('✘ пустой пароль — это не тактика, это надежда');
+  var PASS = 'hackmas2027';
+  var $ = function(id){ return document.getElementById(id); };
+  function ls(k,v){ if(arguments.length>1){try{localStorage.setItem(k,v);}catch(e){}} try{return localStorage.getItem(k);}catch(e){return null;} }
+  function enter(){
+    var v = ($('admin-pass').value||'').trim();
+    var msg = $('admin-login-msg');
+    if (v === PASS){
+      ls('hu_admin_session','1');
+      ls('hu_backup_pin','DUFKLYHbFRGHb5350'); /* ROT-3 от ARCHIVE_CODE_2027 */
+      msg.textContent = '';
+      $('admin-flag-box').hidden = false;
+    } else {
+      msg.textContent = '\u2718 неверный пароль. дежурный хмурится';
     }
   }
-  document.getElementById('admin-enter').addEventListener('click',tryPass);
-  document.getElementById('admin-pass').addEventListener('keydown',function(e){ if(e.key==='Enter') tryPass(); });
+  $('admin-enter').addEventListener('click', enter);
+  $('admin-pass').addEventListener('keydown', function(e){ if(e.key==='Enter') enter(); });
 })();
 </script>
 </body>

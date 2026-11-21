@@ -1,41 +1,34 @@
-# HU::2027 · Black Team · карта флагов
+# HU::2027 — Новый год под контролем взлома
 
-Внутренняя карта. Игрокам не показывать (но они всё равно прочитают — им можно).
+Новогодний веб-квест. Игрок перехватывает канал штаба и собирает флаги.
 
-## Код доступа на сайт
-- `HAPPYNEWHACK` — окно входа на чёрном фоне. Хранится в localStorage (`hu_access`).
-  Сброс: `localStorage.removeItem('hu_access')` + перезагрузка.
+## Карта флагов (для ведущего)
 
-## Флаги (6)
-
-| # | Флаг | Где лежит |
+| № | Флаг | Где лежит |
 |---|------|-----------|
-| 1 | `FLAG{HTML_C0MMENT_2027}` | комментарий в исходнике index.html |
-| 2 | `FLAG{C0NS0LE_HUNT_2027}` | консоль браузера (появляется через 2 сек) |
-| 3 | `FLAG{2027_HAPPY_HACKERS}` | досмотреть трансляцию в разделе ЭФИР до конца |
-| 4 | `FLAG{ADMIN_PANEL_H4CKED}` | пароль штаба на admin-login.html (в комментарии исходника) |
-| 5 | `FLAG{IDOR_N0TES_2027}` | открыть admin.html?note=3 — записка, которой нет в списке |
-| 6 | `FLAG{R0LE_SW4P_2027}` | в консоли: localStorage.setItem('hu_role','admin'), затем обновить штаб |
+| 1 | `FLAG{WELCOME_2027}` | комментарий в исходнике `index.html` |
+| 2 | `FLAG{CONSOLE_2027}` | консоль браузера: `console.hack()` |
+| 3 | `FLAG{LIVE_BROADCAST_2027}` | всплывает в прямом эфире (ловить момент) |
+| 4 | `FLAG{ADMIN_PANEL_H4CKED}` | после входа в штаб (`admin-login.html`, пароль в комментарии этой же страницы) |
+| 5 | `FLAG{IDOR_NOTE_3_2027}` | штаб, заметка `admin.html?note=3` (IDOR) |
+| 6 | `FLAG{STORAGE_ROLE_2027}` | штаб: в localStorage задать `hu_role=admin`, поле «роль» |
+| ★ | секретный | любая билибирда в поле сдачи на странице ЗАДАНИЯ — принимается один раз, нигде не анонсируется |
 
-## Пароли
-- Пароль штаба: `hackmas2027` (спрятан в комментарии admin-login.html)
-- Сдача флагов — только на странице ЗАДАНИЯ на главной.
+## Ключи localStorage
 
-## Финал
-При 6/6 открывается баннер «С Новым 2027-м, Black Team» с конфетти и кнопкой ЗАКРЫТЬ.
-Сброс закрытия: `localStorage.removeItem('hu_finale_closed')`.
+- `hu_access` — доступ к каналу
+- `hu_flags` — найденные флаги (JSON)
+- `hu_secret_flag` — отметка секретного флага
+- `hu_admin_session` — сессия штаба
+- `hu_role` — роль в штабе
+- `hu_backup_pin` — ROT-3 от ARCHIVE_CODE_2027
 
-## Команды быстрого теста
+## Сброс для теста
+
 ```js
-// все флаги сразу (проверка финала):
-localStorage.setItem('hu_flags', JSON.stringify(['FLAG{HTML_C0MMENT_2027}','FLAG{C0NS0LE_HUNT_2027}','FLAG{2027_HAPPY_HACKERS}','FLAG{ADMIN_PANEL_H4CKED}','FLAG{IDOR_N0TES_2027}','FLAG{R0LE_SW4P_2027}']));
-localStorage.removeItem('hu_finale_closed'); location.reload();
-
-// полный сброс квеста:
 localStorage.clear(); location.reload();
 ```
 
-## Состав файлов
-- index.html / crt.css / app.js — главная
-- admin-login.html / admin.html / admin-app.js / admin.css — штаб (страж: без сессии `hu_admin_session` страницы отдают на вход)
-- robots.txt — намёки
+## Пароль штаба
+
+`hackmas2027` (также в комментарии на `admin-login.html`).

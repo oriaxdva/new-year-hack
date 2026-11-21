@@ -2,48 +2,43 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Штаб · HU::2027</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="crt.css">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ШТАБ — панель</title>
 <link rel="stylesheet" href="admin.css">
 <script>
-/* ── страж штаба: без сессии страницы не существует ── */
-(function(){
-  var ok=false;
-  try{ ok=localStorage.getItem('hu_admin_session')==='1'; }catch(e){}
-  if(!ok){ location.replace('admin-login.html'); }
-})();
+/* страж: без сессии страница даже не отрисовывается */
+(function(){ if(!localStorage.getItem('hu_admin_session')){ location.replace('admin-login.html'); } })();
 </script>
+<style>html{visibility:hidden}</style>
 </head>
 <body>
-<div class="snow-layer" id="snow"></div>
-<div class="crt-frame">
-  <div class="scanlines"></div><div class="tv-glass"></div>
-  <div class="hazard-tape"></div>
-  <div class="secret-label">ШТАБ BLACK TEAM · ЗАКРЫТЫЙ КОНТУР <span class="rec-dot"></span></div>
-  <div class="content">
-    <section id="notes-sec">
-      <h2 class="crt-title">ЗАПИСКИ</h2>
-      <p class="crt-text dim small">служебные записки дежурных смен. читать можно. не все.</p>
-      <div id="notes-box"></div>
-      <p class="crt-text dim small" id="notes-hint">если записка не открылась — возможно, у неё просто другой номер. где-то.</p>
-    </section>
-    <section id="storage-sec" style="margin-top:26px">
-      <h2 class="crt-title">ХРАНИЛИЩЕ</h2>
-      <div id="storage-panel"></div>
-    </section>
+<header id="admin-topbar">
+  <span class="logo">ШТАБ :: 2027</span>
+  <button id="logout" type="button">ВЫЙТИ</button>
+</header>
+<main>
+  <section id="notes">
+    <h2>СЛУЖЕБНЫЕ ЗАМЕТКИ</h2>
+    <ol id="notes-list">
+      <li><a href="admin.html?note=1">заметка 1: план сани</a></li>
+      <li><a href="admin.html?note=2">заметка 2: реестр подарков</a></li>
+      <li><a href="admin.html?note=3">заметка 3: [удалено модератором]</a></li>
+    </ol>
+  </section>
+  <section id="roles">
+    <h2>УПРАВЛЕНИЕ РОЛЯМИ</h2>
+    <p>ваша роль: <span id="role-now">guest</span></p>
+    <input id="role-input" placeholder="новая роль" autocomplete="off">
+    <button id="role-apply" type="button">ПРИМЕНИТЬ</button>
+    <div id="role-msg" role="status"></div>
+  </section>
+</main>
+<div id="note-modal" hidden>
+  <div class="note-box">
+    <h3 id="note-title"></h3>
+    <p id="note-body"></p>
+    <button id="note-close" type="button">ЗАКРЫТЬ</button>
   </div>
-  <div class="btn-row" style="padding:0 22px 6px">
-    <button id="admin-logout" class="btn-ghost">ВЫЙТИ ИЗ ШТАБА</button>
-    <a class="btn-ghost" href="index.html" style="text-decoration:none;text-align:center">НА ГЛАВНУЮ</a>
-  </div>
-  <footer class="crt-footer">
-    <div class="tree-row">🎄 🎄 🎄</div>
-    <div class="dim small">штаб BLACK TEAM · всё, что здесь происходит, остаётся в этом браузере</div>
-  </footer>
 </div>
 <script src="admin-app.js"></script>
 </body>
