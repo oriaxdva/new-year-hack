@@ -1,6 +1,29 @@
-
 /* ═══ HU::2027 · Black Team · новогодний движок ═══ */
 'use strict';
+
+/* ── экран входа ── */
+(function accessGate(){
+  var scr=document.getElementById('access-screen'); if(!scr) return;
+  var saved=null;
+  try{saved=localStorage.getItem('hu_access');}catch(e){}
+  if(saved==='HAPPYNEWHACK'){scr.classList.add('hidden');return;}
+  var inp=document.getElementById('access-code');
+  var msg=document.getElementById('access-msg');
+  function enter(){
+    var v=(inp.value||'').trim().toUpperCase();
+    if(v==='HAPPYNEWHACK'){
+      try{localStorage.setItem('hu_access','HAPPYNEWHACK');}catch(e){}
+      scr.classList.add('hidden');
+      click(0.05);
+    }else{
+      msg.textContent='✘ доступ запрещён. код знает ведущий. и, возможно, санта';
+      inp.value=''; inp.focus();
+    }
+  }
+  document.getElementById('access-enter').addEventListener('click',enter);
+  inp.addEventListener('keydown',function(e){if(e.key==='Enter')enter();});
+  setTimeout(function(){inp.focus();},50);
+})();
 
 /* ── снег ── */
 (function snow(){
@@ -46,7 +69,8 @@ function click(vol){
     o.start(); o.stop(actx.currentTime+0.03);
   }catch(e){}
 }
-document.getElementById('audio-toggle').addEventListener('click',function(){
+var at=document.getElementById('audio-toggle');
+if(at) at.addEventListener('click',function(){
   audioOn=!audioOn;
   this.textContent='AUDIO: '+(audioOn?'ON':'OFF');
   if(audioOn) click(0.04);
@@ -60,7 +84,8 @@ setInterval(function(){
 },1000);
 
 /* ── разделы ── */
-document.getElementById('crt-nav').addEventListener('click',function(e){
+var nav=document.getElementById('crt-nav');
+if(nav) nav.addEventListener('click',function(e){
   var btn=e.target.closest('button[data-section]'); if(!btn) return;
   document.querySelectorAll('#crt-nav button').forEach(function(b){b.classList.remove('active');});
   document.querySelectorAll('.crt-section').forEach(function(s){s.classList.remove('active');});
@@ -78,21 +103,20 @@ document.getElementById('crt-nav').addEventListener('click',function(e){
 
 /* ── флаги ── */
 var FLAGS=[
-  {flag:'FLAG{HTML_C0MMENT_2027}', hint:'комментарии в исходниках'},
-  {flag:'FLAG{C0NS0LE_HUNT_2027}', hint:'консоль браузера'},
-  {flag:'FLAG{2027_HAPPY_HACKERS}', hint:'финал трансляции'},
-  {flag:'FLAG{ADMIN_PANEL_H4CKED}', hint:'вход в админку'},
-  {flag:'FLAG{IDOR_N0TES_2027}', hint:'чужие заметки'},
-  {flag:'FLAG{R0LE_SW4P_2027}', hint:'роль в localStorage'},
-  {flag:'FLAG{FORCE_ADMIN_2027}', hint:'спросить громче всех'},
-  {flag:'FLAG{ARCHIVE_CODE_2027}', hint:'сейф в штабе'}
+  {flag:'FLAG{HTML_C0MMENT_2027}',hint:'комментарий в исходнике главной'},
+  {flag:'FLAG{C0NS0LE_HUNT_2027}',hint:'консоль браузера'},
+  {flag:'FLAG{2027_HAPPY_HACKERS}',hint:'финал трансляции'},
+  {flag:'FLAG{ADMIN_PANEL_H4CKED}',hint:'вход в штаб'},
+  {flag:'FLAG{IDOR_N0TES_2027}',hint:'чужие заметки'},
+  {flag:'FLAG{R0LE_SW4P_2027}',hint:'роль в localStorage'},
+  {flag:'FLAG{TERMIN4L_CHE4T_2027}',hint:'терминал, если попросить громче'},
+  {flag:'FLAG{ARCHIVE_CODE_2027}',hint:'сейф с резервным кодом'}
 ];
 function getFlags(){ try{return JSON.parse(localStorage.getItem('hu_flags')||'[]');}catch(e){return [];} }
 function saveFlag(f){
   var arr=getFlags();
   if(arr.indexOf(f)===-1){ arr.push(f); try{localStorage.setItem('hu_flags',JSON.stringify(arr));}catch(e){} }
   renderFlags();
-  checkFinale();
 }
 function renderFlags(){
   var found=getFlags();
@@ -115,18 +139,48 @@ function trySubmit(raw){
   var match=FLAGS.find(function(x){return x.flag===v;});
   if(match){
     saveFlag(match.flag);
-    if(fb){ fb.textContent='✔ ФЛАГ ПРИНЯТ: '+match.flag; fb.style.color='var(--green)'; }
+    if(fb){ fb.textContent='✔ ФЛАГ ПРИНЯТ: '+match.flag; }
     click(0.05);
     return true;
   }else{
-    if(fb){ fb.textContent='✘ Неизвестный флаг. Ищи внимательнее.'; fb.style.color='var(--red)'; }
+    if(fb){ fb.textContent='✘ Неизвестный флаг. Ищи внимательнее.'; }
     return false;
   }
 }
-document.getElementById('flag-submit').addEventListener('click',function(){trySubmit(document.getElementById('flag-input').value);});
-document.getElementById('flag-input').addEventListener('keydown',function(e){if(e.key==='Enter')trySubmit(this.value);});
-renderFlags();
-checkFinale();
+
+var fs=document.getElementById('flag-submit');
+if(fs) fs.addEventListener('click',function(){trySubmit(document.getElementById('flag-input').value);});
+var fi=document.getElementById('flag-input');
+if(fi) fi.addEventListener('keydown',function(e){if(e.key==='Enter')trySubmit(this.value);});
+
+/* ── финал и конфетти ── */
+function finaleClosed(){try{return localStorage.getItem('hu_finale_closed')==='1';}catch(e){return false;}}
+function confetti(){
+  var box=document.getElementById('confetti'); if(!box) return;
+  var glyphs=['🎄','❄','🍊','✦'];
+  for(var i=0;i<40;i++){
+    var s=document.createElement('span');
+    s.textContent=glyphs[Math.floor(Math.random()*glyphs.length)];
+    s.style.left=Math.random()*100+'%';
+    s.style.animationDuration=(4+Math.random()*5)+'s';
+    s.style.animationDelay=(Math.random()*3)+'s';
+    s.style.fontSize=(14+Math.random()*16)+'px';
+    box.appendChild(s);
+    (function(n){setTimeout(function(){n.remove();},(9+Math.random()*4)*1000);})(s);
+  }
+}
+function checkFinale(){
+  var fin=document.getElementById('finale'); if(!fin) return;
+  if(getFlags().length>=FLAGS.length && !finaleClosed()){
+    fin.classList.remove('hidden');
+    confetti();
+  }
+}
+var fc=document.getElementById('finale-close');
+if(fc) fc.addEventListener('click',function(){
+  document.getElementById('finale').classList.add('hidden');
+  try{localStorage.setItem('hu_finale_closed','1');}catch(e){}
+});
 
 /* ── трансляция ── */
 var BROADCAST=[
@@ -142,9 +196,9 @@ function typeBroadcast(){
   if(typing) return;
   typing=true; stopFlag=false;
   var box=document.getElementById('broadcast-text');
-  var fbBtn=document.getElementById('stop-broadcast');
+  var stopBtn=document.getElementById('stop-broadcast');
   document.getElementById('start-broadcast').classList.add('hidden');
-  fbBtn.classList.remove('hidden');
+  stopBtn.classList.remove('hidden');
   box.innerHTML='';
   var li=0;
   function nextLine(){
@@ -165,7 +219,7 @@ function typeBroadcast(){
   }
   function finish(){
     clearTimeout(typeTimer); typing=false;
-    fbBtn.classList.add('hidden');
+    stopBtn.classList.add('hidden');
     document.getElementById('start-broadcast').classList.remove('hidden');
     if(stopFlag) return;
     var banner=document.getElementById('broadcast-flag');
@@ -176,8 +230,10 @@ function typeBroadcast(){
   }
   nextLine();
 }
-document.getElementById('start-broadcast').addEventListener('click',typeBroadcast);
-document.getElementById('stop-broadcast').addEventListener('click',function(){
+var sb=document.getElementById('start-broadcast');
+if(sb) sb.addEventListener('click',typeBroadcast);
+var sbs=document.getElementById('stop-broadcast');
+if(sbs) sbs.addEventListener('click',function(){
   stopFlag=true; clearTimeout(typeTimer); typing=false;
   this.classList.add('hidden');
   document.getElementById('start-broadcast').classList.remove('hidden');
@@ -185,14 +241,15 @@ document.getElementById('stop-broadcast').addEventListener('click',function(){
 
 /* ── стена сообщений ── */
 var WALL=[
-  {who:'n0ctis',when:'23:41',txt:'кто не успел за флагами — успевайте, год закрывается. подсказка: одна строчка в консоли иногда решает всё.'},
+  {who:'n0ctis',when:'23:41',txt:'кто не успел за флагами — успевайте, год закрывается. одна строчка в консоли иногда решает всё.'},
   {who:'phantom_404',when:'23:47',txt:'админские заметки нумеруются с единицы. но иногда у заметки бывает id, о котором админ забыл.'},
   {who:'santa.exe',when:'23:52',txt:'🎁 вакансия: презентации подарков. требования: посмотреть robots.txt и не спрашивать лишнего.'},
-  {who:'unknown',when:'00:03',txt:'говорят, штаб решает, кто админ, по тому, что написано в localStorage. ключ — hu_role. верит он строке в твоём браузере.'},
+  {who:'unknown',when:'00:03',txt:'штаб решает, кто админ, по тому, что написано в localStorage. ключ — hu_role. верит он строке в твоём браузере.'},
   {who:'snow_drift',when:'00:07',txt:'мандариновые логи зашифрованы кожурой. официальная позиция службы безопасности.'}
 ];
 function renderWall(){
-  var box=document.getElementById('wall-posts'); box.innerHTML='';
+  var box=document.getElementById('wall-posts'); if(!box) return;
+  box.innerHTML='';
   WALL.forEach(function(p){
     var d=document.createElement('div');
     d.className='post';
@@ -202,7 +259,8 @@ function renderWall(){
   });
 }
 renderWall();
-document.getElementById('wall-post').addEventListener('click',function(){
+var wp=document.getElementById('wall-post');
+if(wp) wp.addEventListener('click',function(){
   var inp=document.getElementById('wall-input'), v=inp.value.trim();
   if(!v) return;
   var sep=v.indexOf(':'), who, txt;
@@ -211,50 +269,78 @@ document.getElementById('wall-post').addEventListener('click',function(){
   var d=new Date(),z=function(n){return String(n).padStart(2,'0');};
   WALL.push({who:who,when:z(d.getHours())+':'+z(d.getMinutes()),txt:txt});
   renderWall(); inp.value='';
-  document.querySelectorAll('.wall .post').forEach(function(p){});
-  document.querySelectorAll('.wall .post')[WALL.length-1].scrollIntoView({behavior:'smooth',block:'nearest'});
 });
+
+/* ── живые сообщения: человеческие, без подсказок ── */
+var LIVE=[
+  {who:'n0ctis',txt:'с наступающим, команда! пусть в новом году багов будет меньше, а флагов — больше.'},
+  {who:'phantom_404',txt:'мандарины над клавиатурой — это, кажется, уже традиция.'},
+  {who:'snow_drift',txt:'в серверной кто-то сушил носки на стойке. оставьте, мне нравятся.'},
+  {who:'ghost_in_log',txt:'лог дня: сегодня гирлянда падала реже, чем прод.'},
+  {who:'unknown',txt:'если найдёте мои наушники — они не в сейфе. точно.'},
+  {who:'black_ops_7',txt:'с Новым годом, Black Team! гирлянду не выключать — это приказ.'}
+];
+setInterval(function(){
+  var box=document.getElementById('wall-posts'); if(!box) return;
+  var m=LIVE[Math.floor(Math.random()*LIVE.length)];
+  var d=new Date(),z=function(n){return String(n).padStart(2,'0');};
+  var el=document.createElement('div');
+  el.className='post live-post';
+  el.innerHTML='<span class="when">'+z(d.getHours())+':'+z(d.getMinutes())+'</span><span class="who">'+m.who+'</span><div class="txt"></div>';
+  el.querySelector('.txt').textContent=m.txt;
+  box.prepend(el);
+  setTimeout(function(){ if(el.parentNode) el.remove(); },12000);
+},45000);
 
 /* ── терминал ── */
 var termOut=document.getElementById('term-out');
 function tPrint(text,cls){
+  if(!termOut) return;
   var d=document.createElement('div');
   if(cls) d.className=cls;
   d.textContent=text; termOut.appendChild(d);
   termOut.scrollTop=termOut.scrollHeight;
 }
-tPrint('HU terminal v2.7 · подключение установлено','dim');
-tPrint('введите help для списка команд','dim');
-document.getElementById('term-in').addEventListener('keydown',function(e){
+if(termOut){
+  tPrint('HU terminal v2.7 · подключение установлено','dim');
+  tPrint('введите help для списка команд','dim');
+}
+var liveChat=function(){
+  for(var i=0;i<3;i++){
+    var m=LIVE[Math.floor(Math.random()*LIVE.length)];
+    tPrint('['+m.who+'] '+m.txt,'dim');
+  }
+};
+var ti=document.getElementById('term-in');
+if(ti) ti.addEventListener('keydown',function(e){
   if(e.key!=='Enter') return;
   var cmd=this.value.trim(); this.value='';
   if(!cmd) return;
   tPrint('black@hu:~$ '+cmd);
   var parts=cmd.split(/\s+/), c=parts[0].toLowerCase();
   if(c==='help'){
-    tPrint('команды: help, whoami, flags, newyear, xmas, wall chat, clear');
+    tPrint('команды: help, whoami, flags, newyear, wall chat, xmas, submit FLAG{...}, clear');
+  }else if(cmd.toLowerCase()==='whoami --force-admin'){
+    tPrint('ладно. ты спрашивал громче всех остальных.','amber');
+    tPrint('FLAG{TERMIN4L_CHE4T_2027}','amber');
+    saveFlag('FLAG{TERMIN4L_CHE4T_2027}');
+    click(0.06);
   }else if(c==='whoami'){
-    if(parts[1]==='--force-admin'){
-      tPrint('...ладно. ты спрашивал громче всех остальных.','term-prompt');
-      tPrint('FLAG{FORCE_ADMIN_2027} — сдаётся в разделе ЗАДАНИЯ');
-    }else{
-      tPrint('role=guest · агент Black Team · настроение: праздничное');
-    }
+    tPrint('агент Black Team · role=guest · настроение: праздничное');
+    tPrint('подсказка: если попросить громче, можно узнать больше','dim');
   }else if(c==='flags'){
     var found=getFlags();
     tPrint('сдано флагов: '+found.length+' / 8');
     FLAGS.forEach(function(x){ tPrint((found.indexOf(x.flag)>-1?'✔ ':'□ ')+x.hint); });
   }else if(c==='newyear'){
     tPrint('🎄 счётчик до нового года переполнен — потому что он уже наступил. почти.');
+  }else if(cmd.toLowerCase()==='wall chat'){
+    liveChat();
+  }else if(cmd.toLowerCase()==='xmas'){
+    tPrint('🍊 мандаринка упала в консоль. только не говори Санте');
   }else if(c==='submit'){
-    tPrint('сдача флагов — только на странице ЗАДАНИЯ. иди, там всё готово.','dim');
-  }else if(c==='xmas'){
-    tPrint('🍊 мандаринка выдана. официальная праздничная валюта.');
-  }else if(c==='wall'&&parts[1]==='chat'){
-    for(var wi=0;wi<3;wi++){
-      var lp=LIVING[Math.floor(Math.random()*LIVING.length)];
-      tPrint(lp.who+': '+lp.txt);
-    }
+    trySubmit(parts.slice(1).join(' '));
+    tPrint('результат смотри на странице ЗАДАНИЯ','dim');
   }else if(c==='clear'){
     termOut.innerHTML='';
   }else{
@@ -268,90 +354,8 @@ setTimeout(function(){
   console.log('%cнастоящие хакеры читают исходники. а самые настоящие ещё и консоль открывают.','color:#7ee08c');
   console.log('%cFLAG{C0NS0LE_HUNT_2027}','color:#e8b84a;font-size:18px;font-weight:bold');
 },2000);
-
-/* ── приветствие ── */
 console.log('%c🎄 HU::2027 · Black Team · с наступающим!','color:#7ee08c;font-size:14px');
 
-/* ═══ дотяжка: доступ, финал, живая стена ═══ */
-
-/* ── доступ: непрозрачный оверлей входа ── */
-(function access(){
-  var ov=document.getElementById('access-overlay'); if(!ov) return;
-  var CODE='HAPPYNEWHACK';
-  var opened=false;
-  try{ opened=localStorage.getItem('hu_access')===CODE; }catch(err){}
-  function open(){
-    ov.classList.add('hidden');
-    document.body.classList.remove('locked');
-  }
-  if(opened) open();
-  function attempt(){
-    var inp=document.getElementById('access-input');
-    var err=document.getElementById('access-error');
-    var v=(inp.value||'').trim().toUpperCase();
-    if(v===CODE){
-      try{ localStorage.setItem('hu_access',CODE); }catch(err){}
-      open();
-    }else{
-      err.textContent='✘ неверно. код знает ведущий. и, возможно, санта';
-    }
-  }
-  document.getElementById('access-btn').addEventListener('click',attempt);
-  document.getElementById('access-input').addEventListener('keydown',function(e){ if(e.key==='Enter') attempt(); });
-})();
-
-/* ── финал: баннер с кнопкой и конфетти ── */
-function checkFinale(){
-  var f=document.getElementById('finale'); if(!f) return;
-  var closed=false;
-  try{ closed=localStorage.getItem('hu_finale_closed')==='1'; }catch(err){}
-  if(getFlags().length>=FLAGS.length && !closed){
-    f.classList.remove('hidden');
-    confetti();
-  }
-}
-(function finaleClose(){
-  var btn=document.getElementById('finale-close'); if(!btn) return;
-  btn.addEventListener('click',function(){
-    document.getElementById('finale').classList.add('hidden');
-    try{ localStorage.setItem('hu_finale_closed','1'); }catch(err){}
-  });
-})();
-function confetti(){
-  var glyphs=['🎄','❄','🍊','✦'];
-  for(var i=0;i<60;i++){
-    (function(){
-      var s=document.createElement('span');
-      s.className='confetti-piece';
-      s.textContent=glyphs[Math.floor(Math.random()*glyphs.length)];
-      s.style.left=(Math.random()*100)+'vw';
-      s.style.fontSize=(14+Math.random()*16)+'px';
-      s.style.animationDuration=(3+Math.random()*4)+'s';
-      s.style.animationDelay=(Math.random()*1.5)+'s';
-      document.body.appendChild(s);
-      setTimeout(function(){ s.remove(); },8000);
-    })();
-  }
-}
-
-/* ── живая стена: человеческие сообщения без подсказок ── */
-var LIVING=[
-  {who:'n0ctis',txt:'с наступающим, команда! пусть в новом году багов будет меньше, а флагов — больше.'},
-  {who:'phantom_404',txt:'только что сдал флаг. руки трясутся, но я это сделал.'},
-  {who:'unknown',txt:'кто выключил гирлянду? верните свет, тут и так сервер гудит.'},
-  {who:'black_ops_7',txt:'мандарины над клавиатурой — официальный рабочий перекус этого года.'},
-  {who:'ghost_in_log',txt:'серверным носкам тепло. обычным — холодно. вывод делайте сами.'},
-  {who:'snow_drift',txt:'серверы шепчут: хорошего года. или это вентиляторы. не важно.'}
-];
-setInterval(function(){
-  var box=document.getElementById('wall-posts'); if(!box) return;
-  var p=LIVING[Math.floor(Math.random()*LIVING.length)];
-  var d=new Date(),z=function(n){return String(n).padStart(2,'0');};
-  var el=document.createElement('div');
-  el.className='post living-post';
-  el.innerHTML='<span class="when">'+z(d.getHours())+':'+z(d.getMinutes())+'</span><span class="who">'+p.who+'</span><div class="txt"></div>';
-  el.querySelector('.txt').textContent=p.txt;
-  box.insertBefore(el,box.firstChild);
-  setTimeout(function(){ el.classList.add('fading'); },10800);
-  setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); },12200);
-},45000);
+/* ── старт ── */
+renderFlags();
+checkFinale();

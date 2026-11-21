@@ -1,108 +1,115 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HU::2027 · Black Team · Внутренняя сеть</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HU::2027 · Black Team</title>
 <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="crt.css">
 </head>
-<body class="locked">
+<body>
+
 <div class="snow-layer" id="snow"></div>
 
-<!-- FLAG{HTML_C0MMENT_2027} · привет, любопытный. код входа знает ведущий -->
-
 <div class="crt-frame">
+  <div class="scanlines"></div>
+  <div class="tv-glass"></div>
+
   <header class="crt-header">
     <div class="header-top">
-      <div class="logo">HU::<span class="logo-accent">2027</span> · Black Team</div>
+      <div class="logo">HU::2027 <span class="logo-accent">· BLACK TEAM</span></div>
       <div class="header-right">
         <span class="clock" id="clock">--:--:--</span>
         <button class="header-btn" id="audio-toggle">AUDIO: OFF</button>
       </div>
     </div>
     <nav class="crt-nav" id="crt-nav">
-      <button data-section="sec-brief" class="active">БРИФИНГ</button>
-      <button data-section="sec-broadcast">ОБРАЩЕНИЕ</button>
-      <button data-section="sec-tasks">ЗАДАНИЯ</button>
-      <button data-section="sec-wall">СТЕНА</button>
-      <button data-section="sec-term">ТЕРМИНАЛ</button>
+      <button data-section="briefing" class="active">БРИФИНГ</button>
+      <button data-section="transmission">ОБРАЩЕНИЕ</button>
+      <button data-section="tasks">ЗАДАНИЯ</button>
+      <button data-section="wall">СТЕНА</button>
+      <button data-section="terminal">ТЕРМИНАЛ</button>
     </nav>
-    <div class="garland" id="garland"></div>
   </header>
 
+  <div class="garland" id="garland"></div>
+
   <main class="content">
-    <section class="crt-section active" id="sec-brief">
-      <h1 class="crt-title">БРИФИНГ</h1>
-      <p class="crt-text">Агент, сеть закрыта на праздники. Восемь флагов рассыпаны по системе: исходники, консоль, терминал, штаб.</p>
-      <p class="crt-text dim small">Собери все восемь до боя курантов — сервер хочет поздравить тебя лично.</p>
-      <div class="tree-row">🎄 🎄 🎄</div>
-      <p class="dim small">штаб: <a href="admin-login.html" class="amber">admin-login.html</a> · допуски в robots.txt</p>
+
+    <section class="crt-section active" id="briefing">
+      <div class="crt-title">БРИФИНГ</div>
+      <p class="crt-text">Серверная затихла, снег идёт за стеклом, а в системе спрятано <b>8 флагов</b>.</p>
+      <p class="crt-text dim">Найди их все и сдай в разделе ЗАДАНИЯ. Подсказки — в исходниках, консоли, на стене и в штабе.</p>
+      <div class="tree-row">🎄 🍊 🎄 🍊 🎄</div>
     </section>
 
-    <section class="crt-section" id="sec-broadcast">
-      <h1 class="crt-title">ОБРАЩЕНИЕ</h1>
-      <div class="transmission-status">СТАТУС: ЗАШИФРОВАНО · ГОЛОС ПРЕЗИДЕНТА ХАКЕРОВ</div>
-      <div class="broadcast-screen"><div class="broadcast-text" id="broadcast-text"></div></div>
+    <section class="crt-section" id="transmission">
+      <div class="crt-title">ОБРАЩЕНИЕ</div>
+      <div class="transmission-status">ЭФИР · ПЕРЕХВАТ КАНАЛА · <span class="amber">ожидание запуска</span></div>
+      <div class="broadcast-screen">
+        <div class="broadcast-text" id="broadcast-text"></div>
+      </div>
       <div class="btn-row">
-        <button class="btn-primary" id="start-broadcast">▶ ВОСПРОИЗВЕСТИ</button>
+        <button class="btn-primary" id="start-broadcast">▶ ЗАПУСТИТЬ ОБРАЩЕНИЕ</button>
         <button class="btn-ghost hidden" id="stop-broadcast">■ СТОП</button>
       </div>
       <div class="flag-banner hidden" id="broadcast-flag"></div>
     </section>
 
-    <section class="crt-section" id="sec-tasks">
-      <h1 class="crt-title">ЗАДАНИЯ</h1>
-      <div class="counter">ФЛАГИ: <b id="flag-counter">0</b>/8</div>
+    <section class="crt-section" id="tasks">
+      <div class="crt-title">ЗАДАНИЯ</div>
+      <div class="counter">СДАНО: <span class="amber" id="flag-counter">0</span>/8</div>
       <div class="submit-box">
-        <input id="flag-input" placeholder="FLAG{...}" autocomplete="off">
+        <input id="flag-input" placeholder="FLAG{...}" autocomplete="off" spellcheck="false">
         <button class="btn-primary" id="flag-submit">СДАТЬ</button>
       </div>
       <div class="feedback" id="flag-feedback"></div>
       <ul class="flag-list" id="flag-list"></ul>
     </section>
 
-    <section class="crt-section" id="sec-wall">
-      <h1 class="crt-title">СТЕНА</h1>
+    <section class="crt-section" id="wall">
+      <div class="crt-title">СТЕНА</div>
       <div class="wall" id="wall-posts"></div>
       <div class="submit-box">
-        <input id="wall-input" placeholder="ник: сообщение">
+        <input id="wall-input" placeholder="ник: сообщение" autocomplete="off">
         <button class="btn-ghost" id="wall-post">НАПИСАТЬ</button>
       </div>
     </section>
 
-    <section class="crt-section" id="sec-term">
-      <h1 class="crt-title">ТЕРМИНАЛ</h1>
+    <section class="crt-section" id="terminal">
+      <div class="crt-title">ТЕРМИНАЛ</div>
       <div class="term-out" id="term-out"></div>
       <div class="submit-box">
         <span class="term-prompt">black@hu:~$</span>
-        <input id="term-in" autocomplete="off">
+        <input id="term-in" autocomplete="off" spellcheck="false">
       </div>
     </section>
+
   </main>
 
-  <footer class="crt-footer">
-    <div class="small dim">HU::2027 · серверная закрыта на праздники · санта на линии</div>
-  </footer>
+  <footer class="crt-footer">🎄 Серверная 2027 · работает в штатном режиме · мандарины на месте 🍊</footer>
 </div>
 
-<div class="access-overlay" id="access-overlay">
-  <div class="access-box">
-    <div class="access-title">ДОСТУП К СЕТИ</div>
-    <div class="dim small">внутренняя сеть HU::2027. введите код доступа.</div>
-    <input id="access-input" maxlength="12" autocomplete="off">
-    <button class="btn-primary" id="access-btn">ВОЙТИ</button>
-    <div class="access-error" id="access-error"></div>
+<div id="confetti"></div>
+
+<div id="finale" class="hidden">
+  <div class="finale-box">
+    <div class="big">С НОВЫМ ГОДОМ, BLACK TEAM!</div>
+    <p class="crt-text">Ты хороший боец. Без вас этот год был бы просто набором логов.</p>
+    <p class="dim small">8/8 флагов. Сервера закрыты, мандарины официально открыты.</p>
+    <button class="btn-primary" id="finale-close">ЗАКРЫТЬ</button>
   </div>
 </div>
 
-<div class="finale hidden" id="finale">
-  <div class="finale-box">
-    <div class="finale-tree">🎄 🍊 ❄ 🎄</div>
-    <div class="finale-title">С НОВЫМ ГОДОМ, BLACK TEAM!</div>
-    <div class="finale-text">Ты хороший боец.<br>Без вас этот год был бы просто набором логов.</div>
-    <button class="btn-primary" id="finale-close">ЗАКРЫТЬ</button>
+<!-- FLAG{HTML_C0MMENT_2027} · первый флаг прячется в исходнике. ctrl+u -->
+
+<div id="access-screen">
+  <div class="access-sign">
+    <div class="access-title">HU::2027</div>
+    <div class="access-sub dim small">защищённый канал · требуется код доступа</div>
+    <input id="access-code" autocomplete="off" spellcheck="false" maxlength="32">
+    <div id="access-msg"></div>
+    <button class="btn-primary" id="access-enter">ВОЙТИ</button>
   </div>
 </div>
 

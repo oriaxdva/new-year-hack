@@ -1,77 +1,53 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HU::2027 · Вход в штаб</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HU::2027 · вход в штаб</title>
 <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="crt.css">
 <link rel="stylesheet" href="admin.css">
 </head>
 <body>
-<!-- ┌─ СЛУЖЕБНАЯ ЗАПИСЬ · не для дежурных ─────────────
-     логин: santa_operator
-     пароль: SANTA_ROOT_2027
-     кто читает исходники — тот уже почти админ
-     └────────────────────────────────────────────────── -->
 <div class="snow-layer" id="snow"></div>
 <div class="crt-frame">
+  <div class="scanlines"></div>
+  <div class="tv-glass"></div>
   <div class="hazard-tape"></div>
-  <div class="secret-label">ШТАБ BLACK TEAM · ВХОД <span class="rec-dot"></span></div>
+  <div class="secret-label">ШТАБ BLACK TEAM · СОВЕРШЕННО СЕКРЕТНО <span class="rec-dot"></span></div>
   <main class="content">
+    <div class="crt-title">ВХОД В СИСТЕМУ</div>
     <div class="login-box">
-      <div class="crt-title" style="font-size:24px;margin-bottom:10px">ВХОД В ШТАБ</div>
-      <p class="crt-text dim small">доступ строго по регламенту. регламент лежит где-то рядом.</p>
-      <input id="adm-user" placeholder="логин" autocomplete="off">
-      <input id="adm-pass" type="password" placeholder="пароль" autocomplete="off">
-      <button class="btn-primary" id="adm-login">ВОЙТИ</button>
-      <div class="feedback" id="adm-error"></div>
+      <p class="crt-text dim">только для санты и очень настойчивых</p>
+      <input id="admin-pass" type="password" placeholder="пароль">
+      <div class="btn-row"><button class="btn-primary" id="admin-go">ВОЙТИ В СИСТЕМУ</button></div>
+      <div id="login-msg" class="feedback"></div>
     </div>
-    <div class="tree-row">🍊 🎄 🍊</div>
-    <p class="dim small">обратная ссылка: <a href="index.html" class="amber">на главную</a></p>
   </main>
-  <div class="hazard-tape"></div>
+  <footer class="crt-footer">🍊 серверная 2027 · мандариновый стандарт безопасности</footer>
 </div>
+<!-- пароль для входа: M4ND4R1N2027. тсс. -->
 <script>
 (function(){
-  function rot3(s){ return s.replace(/[a-z]/gi,function(c){ return String.fromCharCode(c.charCodeAt(0)+3); }); }
-  var PIN=rot3('ARCHIVE_CODE_2027');
-  try{ localStorage.setItem('backup_pin',PIN); }catch(e){}
-  function attempt(){
-    var u=document.getElementById('adm-user').value.trim().toLowerCase();
-    var p=document.getElementById('adm-pass').value.trim().toUpperCase();
-    var err=document.getElementById('adm-error');
-    if(u==='santa_operator' && p==='SANTA_ROOT_2027'){
-      try{ localStorage.setItem('hu_admin_logged','1'); }catch(e){}
-      var a=[]; try{ a=JSON.parse(localStorage.getItem('hu_flags')||'[]'); }catch(err){}
-      if(a.indexOf('FLAG{ADMIN_PANEL_H4CKED}')===-1){
-        a.push('FLAG{ADMIN_PANEL_H4CKED}');
-        try{ localStorage.setItem('hu_flags',JSON.stringify(a)); }catch(err){}
-      }
-      window.location.href='admin.html';
+  try{localStorage.setItem('backup_pin','DUFKLYHbFRGHb535:');}catch(e){}
+  var inp=document.getElementById('admin-pass');
+  function go(){
+    var v=(inp.value||'').trim().toUpperCase();
+    var msg=document.getElementById('login-msg');
+    if(v==='M4ND4R1N2027'){
+      var arr=[];try{arr=JSON.parse(localStorage.getItem('hu_flags')||'[]');}catch(e){}
+      if(arr.indexOf('FLAG{ADMIN_PANEL_H4CKED}')===-1)arr.push('FLAG{ADMIN_PANEL_H4CKED}');
+      try{localStorage.setItem('hu_flags',JSON.stringify(arr));}catch(e){}
+      msg.textContent='✔ доступ разрешён. переходим в штаб...';
+      setTimeout(function(){location.href='admin.html';},900);
     }else{
-      err.textContent='✘ доступ запрещён. подсказка? она прямо здесь. совсем рядом.';
+      msg.textContent='✘ неверно. обратитесь к администратору. или станьте им.';
+      inp.value='';
     }
   }
-  document.getElementById('adm-login').addEventListener('click',attempt);
-  ['adm-user','adm-pass'].forEach(function(id){
-    document.getElementById(id).addEventListener('keydown',function(e){ if(e.key==='Enter') attempt(); });
-  });
-  (function(){
-    var box=document.getElementById('snow'); if(!box) return;
-    var glyphs=['❄','❅','❆','✦'];
-    for(var i=0;i<40;i++){
-      var s=document.createElement('span');
-      s.textContent=glyphs[Math.floor(Math.random()*glyphs.length)];
-      s.style.left=Math.random()*100+'%';
-      s.style.fontSize=(10+Math.random()*12)+'px';
-      s.style.opacity=(0.2+Math.random()*0.4).toFixed(2);
-      s.style.animationDuration=(9+Math.random()*14)+'s';
-      s.style.animationDelay=(-Math.random()*20)+'s';
-      box.appendChild(s);
-    }
-  })();
+  document.getElementById('admin-go').addEventListener('click',go);
+  inp.addEventListener('keydown',function(e){if(e.key==='Enter')go();});
+  inp.focus();
 })();
 </script>
 </body>

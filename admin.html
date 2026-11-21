@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HU::2027 · Штаб</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HU::2027 · штаб</title>
 <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="crt.css">
 <link rel="stylesheet" href="admin.css">
@@ -12,135 +11,37 @@
 <body>
 <div class="snow-layer" id="snow"></div>
 <div class="crt-frame">
+  <div class="scanlines"></div>
+  <div class="tv-glass"></div>
   <div class="hazard-tape"></div>
-  <div class="secret-label">ШТАБ BLACK TEAM · ДОСТУП ПОДТВЕРЖДЁН <span class="rec-dot"></span></div>
+  <div class="secret-label">ШТАБ BLACK TEAM · СОВЕРШЕННО СЕКРЕТНО <span class="rec-dot"></span></div>
   <main class="content">
-    <div class="counter">ФЛАГИ НА ГЛАВНОЙ: <b id="admin-flag-counter">0</b>/8</div>
-
-    <section id="sec-notes">
-      <h1 class="crt-title" style="font-size:26px">ЗАМЕТКИ ДЕЖУРНОГО</h1>
+    <div class="crt-title">ШТАБ</div>
+    <nav class="crt-nav" id="admin-nav">
+      <button data-sec="notes" class="active">ЗАМЕТКИ</button>
+      <button data-sec="storage">ХРАНИЛИЩЕ</button>
+      <button data-sec="safe">СЕЙФ</button>
+    </nav>
+    <section class="crt-section active" id="sec-notes">
+      <p class="crt-text dim small">служебные заметки. нумерация с единицы.</p>
       <div id="notes-box"></div>
-      <p class="dim small">заметки нумеруются с единицы. открытые: <span class="amber">?note=1</span>, <span class="amber">?note=2</span>, <span class="amber">?note=4</span></p>
+      <p class="dim small">подсказка: admin.html?note=3</p>
     </section>
-
-    <section id="sec-storage">
-      <h1 class="crt-title" style="font-size:26px">ХРАНИЛИЩЕ</h1>
-      <div class="storage-box" id="storage-box"></div>
-      <p class="dim small">доступ проверяется честно. честно по меркам клиента.</p>
+    <section class="crt-section" id="sec-storage">
+      <div id="storage-content"></div>
     </section>
-
-    <section id="sec-safe">
-      <h1 class="crt-title" style="font-size:26px">СЕЙФ</h1>
+    <section class="crt-section" id="sec-safe">
+      <p class="crt-text dim">резервный код доступа. найти его — отдельная задача.</p>
       <div class="safe-box">
-        <p class="dim small">резервный код доступа. обычно хранится не тут.</p>
-        <input id="safe-input" placeholder="CODE" autocomplete="off">
-        <button class="btn-primary" id="safe-btn">ОТКРЫТЬ</button>
-        <div class="feedback" id="safe-feedback"></div>
+        <input id="safe-code" placeholder="введите код">
+        <div class="btn-row"><button class="btn-primary" id="safe-go">ОТКРЫТЬ</button></div>
+        <div id="safe-msg" class="feedback"></div>
+        <div id="safe-banner" class="flag-banner hidden"></div>
       </div>
     </section>
-
-    <p class="dim small">обратная ссылка: <a href="index.html" class="amber">на главную</a></p>
   </main>
-  <div class="hazard-tape"></div>
+  <footer class="crt-footer">🍊 штаб · 2027</footer>
 </div>
-<script>
-(function(){
-  function pushFlag(f){
-    var a=[]; try{ a=JSON.parse(localStorage.getItem('hu_flags')||'[]'); }catch(e){}
-    if(a.indexOf(f)===-1){ a.push(f); try{ localStorage.setItem('hu_flags',JSON.stringify(a)); }catch(e){} }
-  }
-  function counter(){
-    var n=0; try{ n=JSON.parse(localStorage.getItem('hu_flags')||'[]').length; }catch(e){}
-    var c=document.getElementById('admin-flag-counter'); if(c) c.textContent=n;
-  }
-  counter();
-
-  /* ── заметки (IDOR) ── */
-  var NOTES={
-    1:{who:'duty_bot',when:'22:04',txt:'проверил гирлянду. работает. проверил печеньки. съел. отчёт закрыт.'},
-    2:{who:'duty_bot',when:'22:31',txt:'кто-то опять спрашивал про robots.txt. передал, что там всё как всегда: честно и бесполезно.'},
-    3:{who:'chief',when:'22:58',txt:'личное. нашёл бумажку с флагом FLAG{IDOR_N0TES_2027} — понял, что заметку №3 легко открыть, если поменять номер в адресе. попросил навигацию этого не заметить. навигация согласилась.'},
-    4:{who:'duty_bot',when:'23:12',txt:'сейф открыт-закрыт трижды за ночь. кто-то тренируется.'}
-  };
-  var box=document.getElementById('notes-box');
-  var m=location.search.match(/note=(\d+)/);
-  function noteEl(n,flagged){
-    var d=document.createElement('div');
-    d.className='note'+(flagged?' flagged':'');
-    d.innerHTML='<span class="who">'+n.who+' · '+n.when+'</span><div class="txt"></div>';
-    d.querySelector('.txt').textContent=n.txt;
-    return d;
-  }
-  if(m && NOTES[m[1]]){
-    box.appendChild(noteEl(NOTES[m[1]], m[1]==='3'));
-    if(m[1]==='3'){
-      var b=document.createElement('div');
-      b.className='flag-banner';
-      b.textContent='★ заметка без допуска открыта — она никому не рассказывала ★';
-      box.appendChild(b);
-      pushFlag('FLAG{IDOR_N0TES_2027}');
-      counter();
-    }
-  }else{
-    [1,2,4].forEach(function(i){ box.appendChild(noteEl(NOTES[i], false)); });
-  }
-
-  /* ── хранилище (роль из localStorage) ── */
-  var sb=document.getElementById('storage-box');
-  var role=null;
-  try{ role=localStorage.getItem('hu_role'); }catch(e){}
-  if(role==='admin'){
-    sb.innerHTML='<p class="amber" style="font-size:22px">✔ ДОСТУП РАЗРЕШЁН</p><p>админ: приветствуем. серверу всё равно, откуда ты взял роль — он читает её отсюда же.</p>';
-    var fb=document.createElement('div');
-    fb.className='flag-banner';
-    fb.textContent='★ FLAG{R0LE_SW4P_2027} — роль сменена успешно ★';
-    sb.appendChild(fb);
-    pushFlag('FLAG{R0LE_SW4P_2027}');
-    counter();
-  }else{
-    sb.innerHTML='<div class="access-denied"><p>ДОСТУП ОТКЛОНЁН</p><p>role: '+(role||'guest')+'</p><p class="small dim">админом тебя никто не назначал. но кто-то же может назначить? возьми и назначь сам — сервер верит бумажке в твоём браузере.</p></div>';
-  }
-
-  /* ── сейф ── */
-  function attemptSafe(){
-    var inp=document.getElementById('safe-input');
-    var fb=document.getElementById('safe-feedback');
-    var v=(inp.value||'').trim().toUpperCase();
-    if(v==='ARCHIVE_CODE_2027'){
-      fb.textContent='✔ СЕЙФ ОТКРЫТ: FLAG{ARCHIVE_CODE_2027}';
-      fb.style.color='#e8c47a';
-      pushFlag('FLAG{ARCHIVE_CODE_2027}');
-      counter();
-    }else{
-      fb.textContent='✘ не тот код. он где-то рядом, но в другой кодировке.';
-      fb.style.color='#e08a7a';
-    }
-  }
-  document.getElementById('safe-btn').addEventListener('click',attemptSafe);
-  document.getElementById('safe-input').addEventListener('keydown',function(e){ if(e.key==='Enter') attemptSafe(); });
-
-  /* ── без входа в штаб — на страницу входа ── */
-  (function(){
-    var ok=false; try{ ok=localStorage.getItem('hu_admin_logged')==='1'; }catch(e){}
-    if(!ok) window.location.href='admin-login.html';
-  })();
-
-  /* ── снег ── */
-  (function(){
-    var b=document.getElementById('snow'); if(!b) return;
-    var glyphs=['❄','❅','❆','✦'];
-    for(var i=0;i<40;i++){
-      var s=document.createElement('span');
-      s.textContent=glyphs[Math.floor(Math.random()*glyphs.length)];
-      s.style.left=Math.random()*100+'%';
-      s.style.fontSize=(10+Math.random()*12)+'px';
-      s.style.opacity=(0.2+Math.random()*0.4).toFixed(2);
-      s.style.animationDuration=(9+Math.random()*14)+'s';
-      s.style.animationDelay=(-Math.random()*20)+'s';
-      b.appendChild(s);
-    }
-  })();
-})();
-</script>
+<script src="admin-app.js"></script>
 </body>
 </html>
