@@ -1,80 +1,75 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Штаб // вход</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ШТАБ :: ВХОД</title>
 <link rel="stylesheet" href="admin.css">
 </head>
 <body>
-<!-- Пароль для входа в штаб: M4ND4R1N2027 -->
-<!-- да, вот так просто. дежурный, который это читает, уже молодец. -->
+<!-- Пароль для входа: M4ND4R1N2027 — хранить в комментариях надёжно, говорил кто-то. -->
 <div id="snow"></div>
-<div class="garland"></div>
+<div class="garland" id="garland"></div>
 
 <main class="panel">
-  <h1>ШТАБ // ВХОД</h1>
-  <p class="muted">Доступ только для своих. Санта не в счёт — Санте можно всё.</p>
-  <form id="f">
-    <input id="pw" type="password" placeholder="пароль" autocomplete="off">
-    <button class="primary">ВОЙТИ В СИСТЕМУ</button>
-  </form>
-  <p id="err" class="err" hidden>Неверно. Настоящие пароли лежат на виду — в исходнике.</p>
-  <a class="back" href="index.html">← на главную</a>
+  <h2>ШТАБ BLACK TEAM</h2>
+  <p>Требуется пароль. Резервные коды хранятся в сейфе.</p>
+  <p class="hint">Сейф не запирается. Совсем.</p>
+  <div class="submit-row">
+    <input id="pass" type="password" placeholder="пароль..." autocomplete="off">
+    <button id="login-btn">ВОЙТИ В СИСТЕМУ</button>
+  </div>
+  <div id="msg"></div>
+  <p class="back"><a href="index.html">&lt; назад в серверную</a></p>
 </main>
 
 <script>
+"use strict";
+// сервер заботливо оставил резервный код в localStorage. закодирован ROT+3.
+localStorage.setItem("backup_pin", "DUFKLYH_FRGH_2027");
 
+function addFlag(code){
+  var f = [];
+  try { f = JSON.parse(localStorage.getItem("hu_flags")) || []; } catch(e){}
+  if(f.indexOf(code) === -1){ f.push(code); localStorage.setItem("hu_flags", JSON.stringify(f)); }
+}
+
+function login(){
+  var v = document.getElementById("pass").value.trim();
+  var msg = document.getElementById("msg");
+  if(v === "M4ND4R1N2027"){
+    addFlag("FLAG{ADMIN_PANEL_H4CKED}");
+    msg.textContent = "Флаг получен: FLAG{ADMIN_PANEL_H4CKED} — перенаправляю...";
+    setTimeout(function(){ location.href = "admin.html"; }, 1500);
+  } else {
+    msg.textContent = "Неверный пароль. Санта разочарован.";
+  }
+}
+document.getElementById("login-btn").addEventListener("click", login);
+document.getElementById("pass").addEventListener("keydown", function(e){ if(e.key === "Enter") login(); });
+
+// снег и гирлянда (янтарная версия)
 (function(){
-  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var snowBox = document.getElementById('snow');
-  if(snowBox && !reduce){
-    var N = window.innerWidth < 700 ? 22 : 36;
-    var glyphs = ['❄','❅','❆','*'];
-    for(var i = 0; i < N; i++){
-      var f = document.createElement('i');
-      f.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
-      f.style.left = (Math.random() * 100) + '%';
-      f.style.fontSize = (8 + Math.random() * 12) + 'px';
-      f.style.opacity = (.25 + Math.random() * .45).toFixed(2);
-      f.style.animationDuration = (9 + Math.random() * 14) + 's';
-      f.style.animationDelay = (-Math.random() * 20) + 's';
-      snowBox.appendChild(f);
-    }
+  var box = document.getElementById("snow");
+  for(var i = 0; i < 30; i++){
+    var s = document.createElement("span");
+    s.className = "flake"; s.textContent = "\u2744";
+    s.style.left = (Math.random()*100) + "%";
+    s.style.animationDuration = (8 + Math.random()*10) + "s";
+    s.style.animationDelay = (-Math.random()*15) + "s";
+    s.style.fontSize = (10 + Math.random()*14) + "px";
+    box.appendChild(s);
   }
-  var g = document.querySelector('.garland');
-  if(g){
-    var colors = ['#ffd166','#ff7a7a','#8bd3ff','#ffd166'];
-    for(var j = 0; j < 16; j++){
-      var b = document.createElement('i');
-      b.style.background = colors[j % 4];
-      b.style.color = colors[j % 4];
-      b.style.animationDelay = (Math.random() * 3).toFixed(2) + 's';
-      g.appendChild(b);
-    }
+  var g = document.getElementById("garland");
+  var cols = ["#ffd76e", "#ffb347", "#ffe8a3"];
+  for(var j = 0; j < 22; j++){
+    var b = document.createElement("i");
+    b.className = "bulb";
+    b.style.background = cols[j % 3];
+    b.style.color = cols[j % 3];
+    b.style.animationDelay = (j * 0.18) + "s";
+    g.appendChild(b);
   }
-})();
-
-
-(function(){
-  /* резервный код кладётся в сейф браузера, сдвинутый на 3 (ROT+3) */
-  if(!localStorage.getItem('backup_pin')){
-    localStorage.setItem('backup_pin', 'DUFKLYH_FRGH_2027');
-  }
-  document.getElementById('f').addEventListener('submit', function(e){
-    e.preventDefault();
-    var v = document.getElementById('pw').value.trim();
-    if(v === 'M4ND4R1N2027'){
-      var s = JSON.parse(localStorage.getItem('hu_flags') || '[]');
-      if(s.indexOf('FLAG{ADMIN_PANEL_H4CKED}') < 0){
-        s.push('FLAG{ADMIN_PANEL_H4CKED}');
-        localStorage.setItem('hu_flags', JSON.stringify(s));
-      }
-      location.href = 'admin.html';
-    } else {
-      document.getElementById('err').hidden = false;
-    }
-  });
 })();
 </script>
 </body>

@@ -1,54 +1,61 @@
-/* Штаб — мягкая янтарная тема */
 :root{
-  --bg:#181207; --bg2:#21190c; --panel:rgba(32,24,12,.9);
-  --text:#f3e3c0; --dim:#b8a37a; --amber:#ffcf6b;
-  --red:#ff9494; --green:#b7e4a0; --line:rgba(255,207,107,.22);
+  --bg:#1a1408;
+  --panel:#241b0c;
+  --panel2:#1d1509;
+  --ph:#f0dcb8;
+  --ph-dim:#b09a72;
+  --accent:#ffb347;
+  --line:#4d3a1c;
 }
-*{box-sizing:border-box}
-html,body{margin:0;padding:0}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
 body{
-  min-height:100vh;overflow-x:hidden;
-  background:
-    radial-gradient(1000px 520px at 50% -10%, rgba(160,120,50,.14), transparent 60%),
-    linear-gradient(180deg,var(--bg),var(--bg2));
-  color:var(--text);
-  font:15px/1.55 "JetBrains Mono","Cascadia Mono",Consolas,"Courier New",monospace;
+  background:radial-gradient(ellipse at 50% -10%, #2e2410 0%, var(--bg) 60%);
+  color:var(--ph);
+  font-family:"Courier New",Consolas,monospace;
+  overflow-x:hidden;position:relative;
 }
-body::after{content:"";position:fixed;inset:0;z-index:4;pointer-events:none;
-  background:repeating-linear-gradient(180deg,transparent 0 3px,rgba(0,0,0,.05) 3px 4px)}
-#snow{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden}
-#snow i{position:absolute;top:-40px;animation:fall linear infinite;color:#fdf3d9;
-  text-shadow:0 0 6px rgba(255,235,190,.3)}
-@keyframes fall{to{transform:translateY(112vh)}}
-.garland{position:fixed;top:0;left:0;right:0;z-index:7;display:flex;justify-content:center;
-  gap:24px;padding:10px 0 16px;pointer-events:none}
-.garland i{width:9px;height:13px;border-radius:45% 45% 60% 60%;opacity:.9;
-  box-shadow:0 0 9px 1px currentColor;animation:blink 2.8s ease-in-out infinite}
-@keyframes blink{0%,100%{opacity:.95}45%{opacity:.3}}
-main{padding:26px 14px 70px}
-.panel{max-width:720px;margin:0 auto;padding:22px 24px 26px;border:1px solid var(--line);
-  border-radius:12px;background:var(--panel);box-shadow:0 14px 44px rgba(0,0,0,.4)}
-h1{margin:0 0 10px;color:var(--amber);font-size:21px;letter-spacing:.5px}
-h2{margin:20px 0 8px;color:var(--amber);font-size:16px}
-p{margin:8px 0}
-.muted{color:var(--dim);font-size:13px}
-input[type=text],input[type=password]{flex:1;min-width:180px;font:inherit;color:var(--amber);
-  background:rgba(14,10,4,.7);border:1px solid var(--line);border-radius:5px;padding:8px 10px;outline:none}
-input:focus{border-color:var(--amber)}
-button.primary{font:inherit;color:#241a08;background:var(--amber);border:none;border-radius:5px;
-  padding:8px 14px;cursor:pointer;font-weight:700}
-button.primary:hover{filter:brightness(1.08)}
-form{display:flex;gap:8px;flex-wrap:wrap}
-.err{color:var(--red);font-weight:600}
-.ok{color:var(--green)}
-.flagline{color:var(--green);word-break:break-all}
-ul.notes{list-style:none;margin:8px 0;padding:0}
-ul.notes li{padding:6px 0;border-bottom:1px dashed rgba(255,207,107,.15)}
-a{color:var(--amber)}
-.back{font-size:13px}
-@media (max-width:640px){
-  .panel{padding:16px 14px 20px}
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:40;
+  background:repeating-linear-gradient(0deg, rgba(0,0,0,0.08) 0 1px, transparent 1px 3px);
 }
-@media (prefers-reduced-motion:reduce){
-  #snow i,.garland i{animation:none}
+#snow{position:fixed;inset:0;pointer-events:none;z-index:1;overflow:hidden}
+.flake{position:absolute;top:-40px;color:#e8dcc0;animation-name:fall;animation-timing-function:linear;animation-iteration-count:infinite}
+@keyframes fall{to{transform:translateY(110vh) rotate(360deg)}}
+.garland{display:flex;justify-content:center;gap:14px;padding:10px 0 0;position:relative;z-index:5}
+.bulb{width:10px;height:14px;border-radius:50% 50% 45% 45%;box-shadow:0 0 10px 2px currentColor;animation:blink 1.8s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:.45;filter:brightness(.7)}50%{opacity:1;filter:brightness(1.2)}}
+main{position:relative;z-index:5;display:flex;justify-content:center;padding:18px 12px 30px}
+.panel{
+  width:100%;max-width:680px;
+  background:rgba(36,27,12,.85);
+  border:1px solid var(--line);
+  box-shadow:0 0 30px rgba(0,0,0,.4);
+  padding:22px 26px;
 }
+h2{color:var(--accent);font-size:18px;letter-spacing:2px;margin-bottom:8px}
+h3{color:var(--accent);font-size:14px;letter-spacing:1px;margin:18px 0 8px}
+p{margin-bottom:10px;font-size:13px;line-height:1.5}
+.ticker{color:var(--ph-dim);font-size:11px;letter-spacing:1px;border-bottom:1px dashed var(--line);padding-bottom:8px}
+.box{background:var(--panel2);border:1px solid var(--line);padding:12px;font-size:13px;margin-bottom:8px}
+.box .who{color:var(--accent);font-weight:bold}
+.nav-notes{display:flex;gap:6px;margin-bottom:6px}
+.nav-notes button, .box button{
+  background:transparent;border:1px solid var(--accent);color:var(--accent);
+  font-family:inherit;font-size:12px;padding:5px 12px;cursor:pointer;
+}
+.nav-notes button:hover, .box button:hover{background:rgba(255,179,71,.12)}
+.submit-row{display:flex;gap:8px;margin-top:8px}
+.submit-row input{
+  flex:1;background:#141008;border:1px solid var(--line);color:var(--ph);
+  font-family:inherit;font-size:13px;padding:8px 10px;outline:none;
+}
+.submit-row input:focus{border-color:var(--accent)}
+#msg,#safe-msg{margin-top:8px;font-size:12px;color:var(--accent);min-height:16px}
+.hint{color:var(--ph-dim);font-size:11px;font-style:italic}
+.back{margin-top:18px}
+.back a{color:var(--ph-dim);text-decoration:none}
+.back a:hover{color:var(--accent)}
+::-webkit-scrollbar{width:8px}
+::-webkit-scrollbar-track{background:var(--panel2)}
+::-webkit-scrollbar-thumb{background:var(--line)}

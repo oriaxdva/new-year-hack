@@ -1,20 +1,54 @@
-# HU::2027 // BLACK TEAM — новогодний квест
+# Новогодний квест Black Team 2027 — карта флагов (только для тебя)
 
-Карта флагов (только для организатора, игрокам не показывать):
+## 8 флагов
 
-1. `FLAG{H1DDEN_SOURC3}` — комментарий в исходнике `index.html` (Ctrl+U).
-2. `FLAG{CONS0LE_NEWYEAR}` — приветствие в консоли браузера (F12) на главной.
-3. `FLAG{L1VE_BR0ADCAST}` — досмотреть эфир в разделе «ОБРАЩЕНИЕ» до конца (печатается сам).
-4. `FLAG{ADMIN_PANEL_H4CKED}` — `robots.txt` ведёт на `admin-login.html`; пароль `M4ND4R1N2027` лежит в комментарии исходника страницы входа. Сдаётся автоматически при входе.
-5. `FLAG{ID0R_N0TE_3}` — в штабе открыть `admin.html?note=3` (в списке видны только заметки 1 и 2; заметка #2 намекает, что #3 «удалена»).
-6. `FLAG{R0LE_SW4P_2027}` — в консоли: `localStorage.setItem('hu_role','admin')`, обновить `admin.html`. Хранилище само выдаст флаг.
-7. `FLAG{TERMIN4L_CHE4T_2027}` — терминал на главной: `whoami --force-admin`.
-8. `FLAG{ARC_H1VE_2027}` — в консоли: `localStorage.getItem('backup_pin').split('').map(c => String.fromCharCode(c.charCodeAt(0) - 3)).join('')` → получить `ARCHIVE_CODE_2027`, ввести его в штабе в разделе «Резервный код».
+| № | Флаг | Где лежит | Как получить |
+|---|------|-----------|--------------|
+| 1 | `FLAG{HTML_COMMENT_2027}` | index.html | Ctrl+U, комментарий после `<body>` |
+| 2 | `FLAG{CONSOLE_GREET_2027}` | app.js | Открыть консоль (F12) при загрузке главной |
+| 3 | `FLAG{BROADCAST_2027}` | app.js | Дослушать «Обращение» до конца |
+| 4 | `FLAG{ADMIN_PANEL_H4CKED}` | admin-login.html | Пароль `M4ND4R1N2027` из комментария |
+| 5 | `FLAG{IDOR_NOTE_3_2027}` | admin.html | `admin.html?note=3` — IDOR |
+| 6 | `FLAG{STORAGE_ROLE_2027}` | admin.html | `localStorage.setItem('hu_role','admin')` затем «Проверить доступ» |
+| 7 | `FLAG{FORCE_ADMIN_2027}` | app.js | Терминал: `whoami --force-admin` |
+| 8 | `FLAG{ARCHIVE_CODE_2027}` | admin.html | Код в `localStorage.backup_pin` (ROT+3), ввести в сейф |
 
-Проверка кодировки: `ARCHIVE_CODE_2027` в ROT+3 даёт `DUFKLYH_FRGH_2027` — это значение лежит в `backup_pin` после входа на страницу штаба.
+## Быстрый тест финала
 
-Финал: при 8/8 на главной открывается поздравление «С Новым годом, Black Team! Ты хороший боец. Без вас этот год был бы просто набором логов» и конфетти. Прогресс (`hu_flags`, `hu_finale`) хранится в localStorage; для полного перепрохождения очистить `hu_flags`, `hu_bc`, `hu_finale`, `hu_role`, `backup_pin`.
+```js
+localStorage.setItem('hu_flags', JSON.stringify([
+  'FLAG{HTML_COMMENT_2027}','FLAG{CONSOLE_GREET_2027}','FLAG{BROADCAST_2027}',
+  'FLAG{ADMIN_PANEL_H4CKED}','FLAG{IDOR_NOTE_3_2027}','FLAG{STORAGE_ROLE_2027}',
+  'FLAG{FORCE_ADMIN_2027}','FLAG{ARCHIVE_CODE_2027}'
+]));
+localStorage.removeItem('hu_finale_closed');
+location.reload();
+```
 
-Сдача флагов — только в разделе «ЗАДАНИЯ» на главной. Флаги, полученные в штабе, попадают в общий счётчик автоматически.
+Сброс прогресса:
+```js
+localStorage.removeItem('hu_flags');
+localStorage.removeItem('hu_finale_closed');
+localStorage.removeItem('hu_role');
+localStorage.removeItem('hu_section');
+location.reload();
+```
 
-Файлы: `index.html`, `crt.css`, `app.js`, `admin-login.html`, `admin.html`, `admin.css`, `robots.txt`.
+## Проверка ROT-3
+
+`ARCHIVE_CODE_2027` + ROT3 = `DUFKLYH_FRGH_2027` (ключ `backup_pin`).
+
+## Сдача флагов
+
+Только в разделе «ЗАДАНИЯ» на главной. Флаги из штаба прилетают в счётчик автоматически.
+
+## Живая стена
+
+Каждые 45 секунд всплывает случайное сообщение (без подсказок, только атмосфера),
+живёт 12 секунд. В терминале: `wall chat` — три подслушанных сообщения.
+
+## Финал
+
+При всех 8 флагах появляется поздравление с кнопкой ЗАКРЫТЬ.
+Кнопка ставит `hu_finale_closed=1` — баннер больше не мешает, прогресс сохраняется.
+При пустом прогрессе финал НЕ показывается: счётчик честно стартует с 0/8.

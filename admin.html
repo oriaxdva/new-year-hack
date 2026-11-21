@@ -1,133 +1,124 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Штаб</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ШТАБ :: ПАНЕЛЬ</title>
 <link rel="stylesheet" href="admin.css">
 </head>
 <body>
 <div id="snow"></div>
-<div class="garland"></div>
+<div class="garland" id="garland"></div>
 
 <main class="panel">
-  <h1>ШТАБ // ПАНЕЛЬ</h1>
-  <p class="muted">user: guest · роль: <span id="role">guest</span></p>
+  <h2>ПАНЕЛЬ ШТАБА</h2>
+  <p class="ticker">СОВЕРШЕННО СЕКРЕТНО · КОПИРОВАТЬ ЗАПРЕЩЕНО · ПОПРОБУЙ ВСЁ-ТАКИ</p>
 
-  <section>
-    <h2>Записки дежурных</h2>
-    <ul class="notes">
-      <li><a href="admin.html?note=1">Заметка #1 — порядок в серверной</a></li>
-      <li><a href="admin.html?note=2">Заметка #2 — смены на праздники</a></li>
-    </ul>
-    <div id="note-box" hidden>
-      <p><b id="note-title"></b></p>
-      <p id="note-text"></p>
-    </div>
-  </section>
+  <h3>ЗАМЕТКИ</h3>
+  <div id="note-view" class="box"></div>
+  <div class="nav-notes">
+    <button onclick="showNote(1)">id=1</button>
+    <button onclick="showNote(2)">id=2</button>
+    <button onclick="showNote(3)">id=3</button>
+    <button onclick="showNote(4)">id=4</button>
+  </div>
 
-  <section>
-    <h2>Хранилище</h2>
-    <div id="vault-denied" class="err">
-      ДОСТУП ЗАПРЕЩЁН.<br>
-      <span class="muted">Обратитесь к администратору. Или станьте им.</span>
-    </div>
-    <div id="vault-open" hidden>
-      <p>Флаг хранилища: <span class="flagline">FLAG{R0LE_SW4P_2027}</span></p>
-    </div>
-    <h2>Резервный код</h2>
-    <form id="safe">
-      <input id="code" type="text" placeholder="код" autocomplete="off">
-      <button class="primary">ОТКРЫТЬ</button>
-    </form>
-    <p id="safe-msg"></p>
-  </section>
+  <h3>ХРАНИЛИЩЕ</h3>
+  <div class="box">
+    <div id="store-view">проверка доступа...</div>
+    <button onclick="checkStore()">ПРОВЕРИТЬ ДОСТУП</button>
+  </div>
 
-  <a class="back" href="index.html">← на главную</a>
+  <h3>СЕЙФ</h3>
+  <div class="box">
+    <div class="submit-row">
+      <input id="safe-input" placeholder="резервный код..." autocomplete="off">
+      <button onclick="openSafe()">ОТКРЫТЬ</button>
+    </div>
+    <div id="safe-msg"></div>
+  </div>
+
+  <p class="back"><a href="index.html">&lt; назад в серверную</a></p>
 </main>
 
 <script>
+"use strict";
+function addFlag(code){
+  var f = [];
+  try { f = JSON.parse(localStorage.getItem("hu_flags")) || []; } catch(e){}
+  if(f.indexOf(code) === -1){
+    f.push(code);
+    localStorage.setItem("hu_flags", JSON.stringify(f));
+    console.log("[BLACK TEAM] Флаг принят: " + code);
+  }
+}
 
+// заметки: id=3 — служебная, доступна любому, кто умеет менять параметр
+var NOTES = {
+  1: ["n0ctis", "Планы на 27-е: обновить гирлянду, проверить бэкапы, не забыть мандарины."],
+  2: ["phantom_404", "Кто-то снова зашёл под guest. Роли же лежат у вас в браузере, ребята."],
+  3: ["SYSTEM", "СЛУЖЕБНАЯ ЗАПИСКА // Флаг №5: FLAG{IDOR_NOTE_3_2027} // Удалить не успели: «позже» длиной в год."],
+  4: ["black_ops_7", "Хранилище: доступ по роли. Роль меняется там же, где и всё остальное."]
+};
+function showNote(n){
+  var box = document.getElementById("note-view");
+  var note = NOTES[n];
+  if(!note){
+    box.innerHTML = "<span class=who>SYSTEM:</span> Заметка не найдена. Даже Санта не знает, куда она делась.";
+    return;
+  }
+  box.innerHTML = "<span class=who>" + note[0] + ":</span> " + note[1];
+  if(n === 3) addFlag("FLAG{IDOR_NOTE_3_2027}");
+}
+showNote(1);
+
+// хранилище: пустит только admin
+function checkStore(){
+  var v = document.getElementById("store-view");
+  var role = localStorage.getItem("hu_role") || "guest";
+  if(role === "admin"){
+    v.innerHTML = "доступ: <b>admin</b>. Здравствуй, начальник.<br>Флаг: <b>FLAG{STORAGE_ROLE_2027}</b>";
+    addFlag("FLAG{STORAGE_ROLE_2027}");
+  } else {
+    v.innerHTML = "доступ: <b>" + role + "</b>. Обратитесь к администратору. Или станьте им.";
+  }
+}
+checkStore();
+
+// сейф: резервный код из localStorage, закодирован ROT+3
+function openSafe(){
+  var v = (document.getElementById("safe-input").value || "").trim();
+  var msg = document.getElementById("safe-msg");
+  if(v === "ARCHIVE_CODE_2027"){
+    msg.textContent = "Сейф открыт. Флаг: FLAG{ARCHIVE_CODE_2027}";
+    addFlag("FLAG{ARCHIVE_CODE_2027}");
+  } else {
+    msg.textContent = "Не подходит. Подсказка: код уже у тебя в браузере, просто сдвинут.";
+  }
+}
+
+// снег и гирлянда
 (function(){
-  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var snowBox = document.getElementById('snow');
-  if(snowBox && !reduce){
-    var N = window.innerWidth < 700 ? 22 : 36;
-    var glyphs = ['❄','❅','❆','*'];
-    for(var i = 0; i < N; i++){
-      var f = document.createElement('i');
-      f.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
-      f.style.left = (Math.random() * 100) + '%';
-      f.style.fontSize = (8 + Math.random() * 12) + 'px';
-      f.style.opacity = (.25 + Math.random() * .45).toFixed(2);
-      f.style.animationDuration = (9 + Math.random() * 14) + 's';
-      f.style.animationDelay = (-Math.random() * 20) + 's';
-      snowBox.appendChild(f);
-    }
+  var box = document.getElementById("snow");
+  for(var i = 0; i < 30; i++){
+    var s = document.createElement("span");
+    s.className = "flake"; s.textContent = "\u2744";
+    s.style.left = (Math.random()*100) + "%";
+    s.style.animationDuration = (8 + Math.random()*10) + "s";
+    s.style.animationDelay = (-Math.random()*15) + "s";
+    s.style.fontSize = (10 + Math.random()*14) + "px";
+    box.appendChild(s);
   }
-  var g = document.querySelector('.garland');
-  if(g){
-    var colors = ['#ffd166','#ff7a7a','#8bd3ff','#ffd166'];
-    for(var j = 0; j < 16; j++){
-      var b = document.createElement('i');
-      b.style.background = colors[j % 4];
-      b.style.color = colors[j % 4];
-      b.style.animationDelay = (Math.random() * 3).toFixed(2) + 's';
-      g.appendChild(b);
-    }
+  var g = document.getElementById("garland");
+  var cols = ["#ffd76e", "#ffb347", "#ffe8a3"];
+  for(var j = 0; j < 22; j++){
+    var b = document.createElement("i");
+    b.className = "bulb";
+    b.style.background = cols[j % 3];
+    b.style.color = cols[j % 3];
+    b.style.animationDelay = (j * 0.18) + "s";
+    g.appendChild(b);
   }
-})();
-
-
-(function(){
-  if(!localStorage.getItem('backup_pin')){
-    localStorage.setItem('backup_pin', 'DUFKLYH_FRGH_2027');
-  }
-  var flags = JSON.parse(localStorage.getItem('hu_flags') || '[]');
-  function addFlag(f){
-    if(flags.indexOf(f) < 0){
-      flags.push(f);
-      localStorage.setItem('hu_flags', JSON.stringify(flags));
-    }
-  }
-
-  var notes = {
-    '1': ['Заметка #1 — порядок в серверной',
-          'Гирлянду не трогать. Она морально поддерживает стойки.'],
-    '2': ['Заметка #2 — смены на праздники',
-          '31-го дежурят все. Мандарины хранили в сейфе — «хранили», заметьте, в прошедшем.'],
-    '3': ['Заметка #3 — служебная',
-          'Доступ: только админ. Ладно, раз уж ты здесь: FLAG{ID0R_N0TE_3}']
-  };
-  var note = new URLSearchParams(location.search).get('note');
-  var box = document.getElementById('note-box');
-  if(note && notes[note]){
-    box.hidden = false;
-    document.getElementById('note-title').textContent = notes[note][0];
-    document.getElementById('note-text').textContent = notes[note][1];
-    if(note === '3') addFlag('FLAG{ID0R_N0TE_3}');
-  }
-
-  if(localStorage.getItem('hu_role') === 'admin'){
-    document.getElementById('role').textContent = 'admin';
-    document.getElementById('vault-denied').hidden = true;
-    document.getElementById('vault-open').hidden = false;
-    addFlag('FLAG{R0LE_SW4P_2027}');
-  }
-
-  document.getElementById('safe').addEventListener('submit', function(e){
-    e.preventDefault();
-    var v = document.getElementById('code').value.trim();
-    var m = document.getElementById('safe-msg');
-    if(v === 'ARCHIVE_CODE_2027'){
-      addFlag('FLAG{ARC_H1VE_2027}');
-      m.textContent = 'Сейф открылся. Флаг: FLAG{ARC_H1VE_2027}';
-      m.className = 'ok';
-    } else {
-      m.textContent = 'Код не подошёл. Сейф обиделся, но недолго.';
-      m.className = 'err';
-    }
-  });
 })();
 </script>
 </body>
