@@ -1,0 +1,42 @@
+/* ═══ BLACK OPS · стили декои, терминала и панели ═══ */
+body{margin:0;background:#fff}
+/* ── декоя 404 (видно всем, у кого нет приглашения) ── */
+.bo-decoy{font-family:Helvetica,Arial,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:40px;text-align:center;color:#24292f}
+.bo-decoy h1{font-size:28px;font-weight:600;margin:0}
+.bo-decoy p{color:#57606a;font-size:15px;margin:0}
+/* ── оболочка терминала/панели ── */
+.bo-shell{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(ellipse at 50% 0%,#0e1a10 0%,#0a120c 70%)}
+.bo-frame{position:relative;width:100%;max-width:720px;border:1px solid rgba(126,224,140,.3);border-radius:10px;background:rgba(8,16,10,.95);box-shadow:0 0 40px rgba(60,120,70,.15),inset 0 0 60px rgba(0,0,0,.5);padding:22px;overflow:hidden}
+.bo-wide{max-width:960px}
+.bo-scan{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.15) 0 1px,transparent 1px 4px);opacity:.5;z-index:2}
+.bo-title{font-family:'VT323',monospace;font-size:24px;letter-spacing:2px;color:#7ee08c;text-shadow:0 0 6px rgba(126,224,140,.4);margin-bottom:14px;position:relative;z-index:3}
+.bo-out{font-family:monospace;font-size:15px;color:#5cbf6e;min-height:84px;max-height:180px;overflow:auto;margin-bottom:12px;position:relative;z-index:3}
+.bo-line{margin:2px 0;white-space:pre-wrap}
+.bo-err{color:#e06a5a}
+.bo-ok{color:#7ee08c}
+.bo-dim{color:#3f7a4c}
+.bo-inputrow{display:flex;gap:8px;align-items:center;position:relative;z-index:3}
+.bo-prompt{font-family:monospace;color:#7ee08c}
+.bo-input{flex:1;background:rgba(0,0,0,.5);border:1px solid rgba(126,224,140,.35);color:#7ee08c;font-family:monospace;font-size:16px;padding:7px 10px;border-radius:4px;outline:none}
+.bo-input:focus{border-color:#7ee08c;box-shadow:0 0 8px rgba(126,224,140,.3)}
+.bo-btn{background:none;border:1px solid rgba(126,224,140,.4);color:#7ee08c;font-family:'VT323',monospace;font-size:17px;letter-spacing:1px;padding:5px 16px;cursor:pointer;border-radius:4px}
+.bo-btn:hover{background:rgba(126,224,140,.12)}
+.bo-danger{border-color:rgba(224,106,90,.5);color:#e06a5a}
+.bo-danger:hover{background:rgba(224,106,90,.12)}
+.bo-hint{color:#3f7a4c;font-family:monospace;font-size:13px;margin-top:12px;position:relative;z-index:3}
+.bo-glitch{animation:boglitch .45s steps(2) 1}
+@keyframes boglitch{0%{transform:translateX(0)}25%{transform:translateX(-3px)}50%{transform:translateX(3px)}75%{transform:translateX(-2px)}100%{transform:translateX(0)}}
+/* ── панель ── */
+.bo-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.bo-clock{font-family:monospace;color:#3f7a4c;position:relative;z-index:3}
+.bo-stats{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0;position:relative;z-index:3}
+.bo-card{flex:1;min-width:120px;border:1px solid rgba(126,224,140,.25);border-radius:6px;padding:10px;text-align:center;background:rgba(0,0,0,.3)}
+.bo-num{font-family:monospace;font-size:22px;color:#7ee08c;text-shadow:0 0 6px rgba(126,224,140,.35);word-break:break-all}
+.bo-cap{color:#3f7a4c;font-family:monospace;font-size:13px;margin-top:3px}
+.bo-sub{font-family:monospace;letter-spacing:2px;color:#5cbf6e;font-size:15px;margin:16px 0 8px;position:relative;z-index:3}
+.bo-table{width:100%;border-collapse:collapse;font-family:monospace;font-size:13px;position:relative;z-index:3}
+.bo-table th{color:#3f7a4c;text-align:left;font-weight:normal;letter-spacing:1px;border-bottom:1px solid rgba(126,224,140,.25);padding:4px 6px}
+.bo-table td{color:#5cbf6e;border-bottom:1px solid rgba(126,224,140,.08);padding:4px 6px;word-break:break-all}
+.bo-btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;position:relative;z-index:3}
+@media (max-width:600px){.bo-frame{padding:14px}.bo-num{font-size:18px}}
+@media (prefers-reduced-motion: reduce){.bo-glitch{animation:none}}

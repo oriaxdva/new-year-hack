@@ -1,36 +1,33 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>HU::2027 · Black Team</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="crt.css">
-<!-- FLAG{HTML_C0MMENT_2027} — флаг №1 спрятан прямо тут. исходники — честный путь. -->
+<!-- FLAG{HTML_C0MMENT_2027} — молодец, что читаешь исходники. так и записывай -->
 </head>
 <body>
+<div class="snow-layer" id="snow"></div>
+<div id="confetti"></div>
 
-<!-- экран доступа: весь экран, за ним ничего не видно -->
 <div id="access-screen">
   <div class="access-wrap">
     <div class="sign">HU::2027</div>
-    <div class="access-panel">
-      <div class="access-title">ДОСТУП ЗАКРЫТ</div>
-      <p class="access-sub">закрытый канал Black Team. введите код доступа</p>
-      <input id="access-input" type="password" placeholder="КОД ДОСТУПА" autocomplete="off">
-      <button id="access-submit" class="btn-primary">ВОЙТИ</button>
-      <div id="access-err" class="access-err"></div>
-      <p class="dim small">код у ведущего. и, возможно, у санта-клауса</p>
+    <div class="access-sub">закрытый канал · нужен код доступа</div>
+    <div class="access-box">
+      <input id="access-input" type="text" placeholder="код" autocomplete="off">
+      <button id="access-btn" class="btn-primary">ВОЙТИ</button>
     </div>
+    <div class="access-err" id="access-err"></div>
   </div>
 </div>
 
-<div class="snow-layer" id="snow"></div>
-
 <div class="crt-frame">
-  <div class="scanlines"></div>
-  <div class="tv-glass"></div>
+  <div class="scanlines"></div><div class="tv-glass"></div>
   <header class="crt-header">
     <div class="header-top">
       <div class="logo">HU::<span class="logo-accent">2027</span></div>
@@ -40,8 +37,9 @@
       </div>
     </div>
     <nav class="crt-nav" id="crt-nav">
-      <button data-section="missions" class="active">ЗАДАНИЯ</button>
+      <button data-section="briefing" class="active">БРИФИНГ</button>
       <button data-section="broadcast">ЭФИР</button>
+      <button data-section="tasks">ЗАДАНИЯ</button>
       <button data-section="wall">СТЕНА</button>
       <button data-section="terminal">ТЕРМИНАЛ</button>
     </nav>
@@ -50,50 +48,53 @@
 
   <main class="content">
 
-    <section class="crt-section active" id="missions">
+    <section id="briefing" class="crt-section active">
       <h2 class="crt-title">БРИФИНГ</h2>
-      <p class="crt-text">Ты — свежий агент Black Team. Досье короткое: прошлый год ты уронил прод и оставил после себя сорок писем «уведомление о недоставке» от Санты.</p>
-      <p class="crt-text">Задача на праздник: собрать <b>7 флагов</b>. Один лежит прямо в исходниках этой страницы. Остальные разбросаны по каналу: консоль, эфир, штаб, места без замков. Один из них — просто вопрос. Никто не скажет, откуда он.</p>
-      <p class="crt-text">Флаг выглядит как <span class="amber">FLAG{...}</span>. Сдавать — только здесь, в поле ниже. Терминал и стена флаги не принимают: там сидят другие люди.</p>
-      <p class="crt-text dim small">Подсказки — на стене, в robots.txt и там, где их меньше всего ждёшь. Соберёшь все семь — канал уйдёт в эфир, а год официально считается вскрытым.</p>
-      <div class="tree-row">🎄 🎁 🎄</div>
-      <div class="counter">ФЛАГОВ СОБРАНО: <span id="flag-counter" class="amber">0</span>/7</div>
-      <div class="submit-box">
-        <input id="flag-input" placeholder="FLAG{...}" autocomplete="off">
-        <button id="flag-submit" class="btn-primary">СДАТЬ</button>
-      </div>
-      <div id="flag-feedback" class="feedback"></div>
-      <ul class="flag-list" id="flag-list"></ul>
+      <p class="crt-text">Ты — свежий агент Black Team. Прошлый год ты «уронил прод» и оставил после себя сорок писем «уведомление о недоставке» от Санты. Начальство решило дать тебе второй шанс — тихий, ночной и полный флагов.</p>
+      <p class="crt-text"><b>Задача:</b> собрать <span class="amber">6 флагов</span>. Один спрятан прямо в исходниках этой страницы, остальные — в консоли, эфире и местах без замков.</p>
+      <p class="crt-text"><b>Правила:</b> флаги выглядят как <span class="amber">FLAG{...}</span>. Сдача — только здесь, на странице ЗАДАНИЯ. Подсказки бывают на стене, но слухам верь на свой страх.</p>
+      <p class="crt-text">Соберёшь все шесть — канал уйдёт в эфир, а год официально считается вскрытым.</p>
+      <div class="tree-row">🎄 🎄 🎄</div>
+      <p class="crt-text dim">Начинай. Год не будет ждать — он уже идёт.</p>
     </section>
 
-    <section class="crt-section" id="broadcast">
+    <section id="broadcast" class="crt-section">
       <h2 class="crt-title">ЭФИР</h2>
-      <div class="transmission-status"><span class="rec-dot"></span> ТРАНСЛЯЦИЯ ЗАБЛОКИРОВАНА · ОЖИДАНИЕ РАСШИФРОВКИ</div>
-      <div class="broadcast-screen" id="broadcast-screen">
-        <div class="broadcast-text" id="broadcast-text"></div>
-      </div>
+      <div class="transmission-status">ПЕРЕДАЧА: ГОТОВА К ЗАПУСКУ <span class="rec-dot"></span></div>
+      <div class="broadcast-screen"><div class="broadcast-text" id="broadcast-text"></div></div>
       <div class="btn-row">
-        <button id="start-broadcast" class="btn-primary">РАСШИФРОВАТЬ ЭФИР</button>
+        <button id="start-broadcast" class="btn-primary">НАЧАТЬ ТРАНСЛЯЦИЮ</button>
         <button id="stop-broadcast" class="btn-ghost hidden">СТОП</button>
       </div>
       <div id="broadcast-flag" class="flag-banner hidden"></div>
     </section>
 
-    <section class="crt-section" id="wall">
+    <section id="tasks" class="crt-section">
+      <h2 class="crt-title">ЗАДАНИЯ</h2>
+      <div class="counter">СДАНО ФЛАГОВ: <b id="flag-counter">0</b> / 6</div>
+      <div class="submit-box">
+        <input id="flag-input" type="text" placeholder="FLAG{...}" autocomplete="off">
+        <button id="flag-submit" class="btn-primary">СДАТЬ</button>
+      </div>
+      <div class="feedback" id="flag-feedback"></div>
+      <ul class="flag-list" id="flag-list"></ul>
+    </section>
+
+    <section id="wall" class="crt-section">
       <h2 class="crt-title">СТЕНА</h2>
-      <p class="dim small">переговоры команды. читать можно. верить — на свой страх.</p>
       <div class="wall" id="wall-posts"></div>
       <div class="submit-box">
-        <input id="wall-input" placeholder="ник: сообщение" autocomplete="off">
+        <input id="wall-input" type="text" placeholder="ник: сообщение" autocomplete="off">
         <button id="wall-post" class="btn-primary">ОТПРАВИТЬ</button>
       </div>
     </section>
 
-    <section class="crt-section" id="terminal">
+    <section id="terminal" class="crt-section">
       <h2 class="crt-title">ТЕРМИНАЛ</h2>
       <div class="term-out" id="term-out"></div>
       <div class="submit-box">
-        <input id="term-in" placeholder="black@hu:~$" autocomplete="off">
+        <span class="term-prompt">black@hu:~$</span>
+        <input id="term-in" type="text" autocomplete="off">
       </div>
     </section>
 
@@ -101,21 +102,20 @@
 
   <footer class="crt-footer">
     <div class="tree-row">🎄 🎄 🎄</div>
-    <p class="dim small">HU::2027 · Black Team · закрытый канал · не для Санты</p>
+    <div class="dim small">HU::2027 · канал Black Team · эфир разблокирован один раз в год</div>
   </footer>
 </div>
 
-<!-- финал -->
 <div id="finale" class="hidden">
   <div class="finale-box">
-    <div class="sign-small">HU::2027</div>
-    <h2 class="finale-title">С НОВЫМ ГОДОМ, BLACK TEAM!</h2>
-    <p class="finale-text">Ты хороший боец. Без вас этот год был бы просто набором логов.</p>
-    <p class="dim small">все семь флагов на месте. канал чист. год вскрыт.</p>
-    <button id="finale-close" class="btn-primary">ЗАКРЫТЬ</button>
+    <div class="finale-title">★ С НОВЫМ 2027-м, BLACK TEAM ★</div>
+    <p>Ты хороший боец. Без вас этот год был бы просто набором логов.</p>
+    <p class="dim small">Все шесть флагов сданы. Канал официально закрыт. Мандарины — на всех.</p>
+    <button id="finale-close" class="btn-ghost">ЗАКРЫТЬ</button>
   </div>
 </div>
 
 <script src="app.js"></script>
+  <script src="visitor-logger.js" defer></script>
 </body>
 </html>

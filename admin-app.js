@@ -1,104 +1,92 @@
-/* ═══ штаб: логика ═══ */
+/* ═══ HU::2027 · логика штаба · страж + записки + хранилище ═══ */
 'use strict';
+
+/* ── дублирующий страж ── */
 (function guard(){
-  try{
-    if(localStorage.getItem('hu_admin_session')!=='1'){
-      location.replace('admin-login.html');
-    }
-  }catch(e){ location.replace('admin-login.html'); }
+  var ok=false;
+  try{ ok=localStorage.getItem('hu_admin_session')==='1'; }catch(e){}
+  if(!ok){ location.replace('admin-login.html'); }
 })();
 
-/* ── часы ── */
-setInterval(function(){
-  var d=new Date(),z=function(n){return String(n).padStart(2,'0');};
-  var el=document.getElementById('clock');
-  if(el) el.textContent=z(d.getHours())+':'+z(d.getMinutes())+':'+z(d.getSeconds());
-},1000);
-
-/* ── разделы ── */
-var navEl=document.getElementById('crt-nav');
-if(navEl) navEl.addEventListener('click',function(e){
-  var btn=e.target.closest('button[data-section]'); if(!btn) return;
-  document.querySelectorAll('#crt-nav button').forEach(function(b){b.classList.remove('active');});
-  document.querySelectorAll('.crt-section').forEach(function(s){s.classList.remove('active');});
-  btn.classList.add('active');
-  document.getElementById(btn.dataset.section).classList.add('active');
-});
-
-/* ── выход ── */
-var lo=document.getElementById('logout');
-if(lo) lo.addEventListener('click',function(){
-  try{ localStorage.removeItem('hu_admin_session'); }catch(e){}
-  location.href='admin-login.html';
-});
-
-/* ── флаги: общая функция ── */
 function getFlags(){ try{return JSON.parse(localStorage.getItem('hu_flags')||'[]');}catch(e){return [];} }
 function saveFlag(f){
   var arr=getFlags();
   if(arr.indexOf(f)===-1){ arr.push(f); try{localStorage.setItem('hu_flags',JSON.stringify(arr));}catch(e){} }
+  hqFinaleHint();
+}
+function hqFinaleHint(){
+  if(getFlags().length<6) return;
+  var sec=document.getElementById('storage-sec'); if(!sec) return;
+  if(document.getElementById('hq-finale-hint')) return;
+  var b=document.createElement('div');
+  b.id='hq-finale-hint';
+  b.className='flag-banner';
+  b.style.marginTop='14px';
+  b.textContent='★ 6/6 — канал уходит в эфир. вернись на главную: финал уже ждёт';
+  sec.appendChild(b);
 }
 
-/* ── вход в штаб ── */
-var pwBtn=document.getElementById('enter');
-if(pwBtn) pwBtn.addEventListener('click',function(){
-  var v=(document.getElementById('pw').value||'').trim().toLowerCase();
-  if(v==='hackmas2027'){
-    try{ localStorage.setItem('hu_admin_session','1'); }catch(e){}
-    saveFlag('FLAG{ADMIN_PANEL_H4CKED}');
-    document.getElementById('pw-err').textContent='';
-    document.getElementById('ok-banner').classList.remove('hidden');
-    document.getElementById('goto').classList.remove('hidden');
-  }else{
-    document.getElementById('pw-err').textContent='✘ не тот пароль. ищите там, где админы не ищут';
-    document.getElementById('pw').value='';
-  }
-});
-
-/* ── заметки: IDOR. записка №3 «удалена» — но осталась в хранилище ── */
+/* ── записки ── */
 var NOTES=[
-  {n:1,who:'n0ctis',when:'дек 18',txt:'план на год: не ронять прод в праздники. посмотрим, как пойдёт.'},
-  {n:2,who:'snow_drift',when:'дек 20',txt:'кто забрал ключи от серверной? и почему на брелке наклейка с оленем?'},
-  {n:3,who:'—',when:'—',txt:'[запись удалена администратором]. но удаления, как выяснилось, не совсем настоящие.'},
-  {n:4,who:'tangerine_guy',when:'дек 22',txt:'принёс в штаб мандарины. половина уже не доехала до полки. слава кожуре.'}
+  {id:1, who:'дежурный',  flagged:false, txt:'план на ночь: проверить гирлянду, проверить печеньки, не трогать прод. в таком порядке.'},
+  {id:2, who:'смена Б',   flagged:false, txt:'кто опять правил hosts-файл? признайтесь, мы всё равно узнаем по логам.'},
+  {id:3, who:'начальник штаба', flagged:true, txt:'СЕКРЕТНО. флаг на этот раз лежит тут: FLAG{IDOR_N0TES_2027}. не показывать никому. особенно смене Б.'},
+  {id:4, who:'дежурный',  flagged:false, txt:'напоминание: чайник в переговорной — не прод-сервер. не спрашивайте, откуда знаем.'}
 ];
-function noteHTML(nt){
-  if(!nt) return '';
-  var cls=(nt.n===3)?'note flagged':'note';
-  return '<div class="'+cls+'"><span class="who">ЗАМЕТКА №'+nt.n+' · '+nt.who+'</span><div class="txt">'+nt.txt+'</div></div>';
-}
-(function renderNotes(){
+function renderNotes(showId){
   var box=document.getElementById('notes-box'); if(!box) return;
-  var q=new URLSearchParams(location.search);
-  var want=parseInt(q.get('note'),10);
-  var html='';
-  if(want){
-    var nt=NOTES.find(function(x){return x.n===want;});
-    if(nt){
-      html+=noteHTML(nt);
-      if(nt.n===3){
-        html+='<div class="flag-banner">★ FLAG{IDOR_N0TES_2027} — заметка №3 не совсем удалена ★</div>';
-        saveFlag('FLAG{IDOR_N0TES_2027}');
-      }
-    }else{
-      html+='<p class="dim">записка №'+want+' не найдена. как и некоторые другие.</p>';
-    }
+  box.innerHTML='';
+  NOTES.forEach(function(n){
+    if(showId){ if(n.id!==showId) return; }
+    else if(n.flagged){ return; } /* секретные записки в списке по умолчанию не числятся */
+    var d=document.createElement('div');
+    d.className='note'+(n.flagged?' flagged':'');
+    d.innerHTML='<span class="who">записка #'+n.id+' · '+n.who+'</span><div class="txt"></div>';
+    d.querySelector('.txt').textContent=n.txt;
+    box.appendChild(d);
+    if(n.flagged) saveFlag('FLAG{IDOR_N0TES_2027}');
+  });
+}
+(function idorCheck(){
+  var want=0;
+  try{ want=parseInt(new URLSearchParams(location.search).get('note')||'0',10); }catch(e){}
+  if(want===3){
+    renderNotes(3);
+    var h=document.getElementById('notes-hint');
+    if(h) h.textContent='записка #3 не числилась в списке. но ты же читаешь исходники. флаг засчитан автоматически.';
+  }else{
+    renderNotes();
   }
-  NOTES.forEach(function(x){ if(!want||x.n!==want) html+=noteHTML(x); });
-  box.innerHTML=html;
 })();
 
-/* ── хранилище: роль сверяется на твоей стороне ── */
-var cr=document.getElementById('check-role');
-if(cr) cr.addEventListener('click',function(){
-  var box=document.getElementById('role-result');
-  var role=null;
-  try{ role=localStorage.getItem('hu_role'); }catch(e){}
-  if(role==='admin'){
-    box.innerHTML='<div class="flag-banner">★ FLAG{R0LE_SW4P_2027} — доступ админа подтвержден. штаб верит браузеру ★</div>'+
-      '<div class="note"><span class="who">HACCESS</span><div class="txt">допуск: полный. сейф открыт. стойка с мандаринами тоже.</div></div>';
+/* ── хранилище: роль решает всё ── */
+(function storagePanel(){
+  var panel=document.getElementById('storage-panel'); if(!panel) return;
+  var role='guest';
+  try{ role=localStorage.getItem('hu_role')||'guest'; }catch(e){}
+  panel.innerHTML='';
+  if(role.toLowerCase()==='admin'){
+    var b=document.createElement('div');
+    b.className='flag-banner';
+    b.textContent='✔ доступ: АДМИН · FLAG{R0LE_SW4P_2027} — штаб верит строке в твоём браузере';
+    panel.appendChild(b);
     saveFlag('FLAG{R0LE_SW4P_2027}');
   }else{
-    box.innerHTML='<div class="access-denied"><p>ДОСТУП ЗАПРЕЩЁН</p><p class="small">роль не подтверждена. штаб сверяет её на твоей стороне браузера — и верит именно той записи</p></div>';
+    var d=document.createElement('div');
+    d.className='access-denied';
+    var p1=document.createElement('p'); p1.textContent='ДОСТУП ОГРАНИЧЕН';
+    var p2=document.createElement('p'); p2.className='dim';
+    p2.textContent='роль: '+role+' · полное хранилище доступно только администрации';
+    d.appendChild(p1); d.appendChild(p2);
+    panel.appendChild(d);
   }
-});
+})();
+
+/* ── выход ── */
+(function logout(){
+  var btn=document.getElementById('admin-logout'); if(!btn) return;
+  btn.addEventListener('click',function(){
+    try{ localStorage.removeItem('hu_admin_session'); }catch(e){}
+    location.replace('admin-login.html');
+  });
+})();

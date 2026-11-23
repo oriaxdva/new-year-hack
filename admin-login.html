@@ -1,41 +1,67 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>HU::2027 · Вход в штаб</title>
+<title>Вход в штаб · HU::2027</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="crt.css">
 <link rel="stylesheet" href="admin.css">
-<!-- пароль штаба: hackmas2027 — админы не понимают, что исходники тоже читают -->
+<!-- пароль от штаба: hackmas2027 (не говорите смене Б) -->
 </head>
 <body>
 <div class="snow-layer" id="snow"></div>
 <div class="crt-frame">
-  <div class="scanlines"></div>
-  <div class="tv-glass"></div>
-  <header class="crt-header">
-    <div class="logo">HU::<span class="logo-accent">2027</span> · ШТАБ</div>
-    <div class="garland" id="garland"></div>
-  </header>
-  <main class="content">
+  <div class="scanlines"></div><div class="tv-glass"></div>
+  <div class="hazard-tape"></div>
+  <div class="secret-label">ШТАБ BLACK TEAM · ДОПУСК ПО ПАРОЛЮ</div>
+  <div class="content">
     <div class="login-box">
-      <div class="crt-title">ВХОД В ШТАБ</div>
-      <p class="crt-text dim small">только для членов Black Team. посторонним — от ворот поворот</p>
+      <div class="logo" style="text-align:center;margin-bottom:10px">HU::<span class="logo-accent">ШТАБ</span></div>
+      <p class="crt-text dim" style="text-align:center;margin-bottom:16px">служебный вход. посторонним — мандарины и выход.</p>
       <div class="submit-box">
-        <input id="pw" type="password" placeholder="ПАРОЛЬ ШТАБА" autocomplete="off">
-        <button id="enter" class="btn-primary">ВОЙТИ</button>
+        <input id="admin-pass" type="password" placeholder="пароль штаба" autocomplete="off">
+        <button id="admin-enter" class="btn-primary">ВОЙТИ</button>
       </div>
-      <div id="pw-err" class="feedback"></div>
-      <div id="ok-banner" class="flag-banner hidden">★ FLAG{ADMIN_PANEL_H4CKED} — штаб выдал ключ с первого раза ★</div>
-      <a id="goto" class="btn-ghost hidden" href="admin.html">ПЕРЕЙТИ В ШТАБ →</a>
+      <div class="feedback" id="admin-err"></div>
+      <div id="admin-success" class="hidden">
+        <div class="flag-banner">✔ FLAG{ADMIN_PANEL_H4CKED} — штаб открыт</div>
+        <div class="btn-row"><a class="btn-primary" href="admin.html" style="text-decoration:none;text-align:center">ПЕРЕЙТИ В ШТАБ</a></div>
+      </div>
     </div>
-  </main>
+  </div>
   <footer class="crt-footer">
     <div class="tree-row">🎄 🎄 🎄</div>
-    <p class="dim small">HU::2027 · Black Team · штаб</p>
+    <div class="dim small">доступ logging включён. смена Б в курсе, что ты читаешь исходники</div>
   </footer>
 </div>
-<script src="admin-app.js"></script>
+<script>
+(function(){
+  function fail(msg){
+    var e=document.getElementById('admin-err');
+    e.textContent=msg; e.style.color='#e06a5a';
+  }
+  function tryPass(){
+    var v=(document.getElementById('admin-pass').value||'').trim().toLowerCase();
+    if(v==='hackmas2027'){
+      document.getElementById('admin-err').textContent='';
+      try{ localStorage.setItem('hu_admin_session','1'); }catch(e){}
+      document.getElementById('admin-success').classList.remove('hidden');
+      var arr=[];
+      try{ arr=JSON.parse(localStorage.getItem('hu_flags')||'[]'); }catch(e){}
+      if(arr.indexOf('FLAG{ADMIN_PANEL_H4CKED}')===-1){ arr.push('FLAG{ADMIN_PANEL_H4CKED}'); }
+      try{ localStorage.setItem('hu_flags',JSON.stringify(arr)); }catch(e){}
+    }else if(v){
+      fail('✘ неверный пароль. подсказки нет — есть исходники');
+    }else{
+      fail('✘ пустой пароль — это не тактика, это надежда');
+    }
+  }
+  document.getElementById('admin-enter').addEventListener('click',tryPass);
+  document.getElementById('admin-pass').addEventListener('keydown',function(e){ if(e.key==='Enter') tryPass(); });
+})();
+</script>
 </body>
 </html>
