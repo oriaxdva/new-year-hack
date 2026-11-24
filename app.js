@@ -1,61 +1,6 @@
 /* ═══ HU::2027 · Black Team · новогодний движок ═══ */
 'use strict';
 
-/* ── чёрный ход: хранится только хэш, сам код нигде не лежит ── */
-
-/* ── sha256 · компактная реализация (utf-8) ── */
-var __sha256=function(ascii){
-  function rightRotate(value,amount){return (value>>>amount)|(value<<(32-amount));}
-  var maxWord=Math.pow(2,32),i,j,result='';
-  var words=[],asciiBitLength=ascii.length*8;
-  var hash=__sha256.h=__sha256.h||[],k=__sha256.k=__sha256.k||[];
-  var primeCounter=k.length,isComposite={};
-  for(var candidate=2;primeCounter<64;candidate++){
-    if(!isComposite[candidate]){
-      for(i=0;i<313;i+=candidate){isComposite[i]=candidate;}
-      hash[primeCounter]=(Math.pow(candidate,.5)*maxWord)|0;
-      k[primeCounter++]=(Math.pow(candidate,1/3)*maxWord)|0;
-    }
-  }
-  ascii+='\x80';
-  while(ascii.length%64-56) ascii+='\x00';
-  for(i=0;i<ascii.length;i++){
-    j=ascii.charCodeAt(i);
-    if(j>>8) return '';
-    words[i>>2]|=j<<((3-i)%4)*8;
-  }
-  words[words.length]=(asciiBitLength/maxWord)|0;
-  words[words.length]=asciiBitLength;
-  for(j=0;j<words.length;){
-    var w=words.slice(j,j+=16);
-    var oldHash=hash;
-    hash=hash.slice(0,8);
-    for(i=0;i<64;i++){
-      var w15=w[i-15],w2=w[i-2];
-      var a=hash[0],e=hash[4];
-      var temp1=hash[7]
-        +(rightRotate(e,6)^rightRotate(e,11)^rightRotate(e,25))
-        +((e&hash[5])^((~e)&hash[6]))
-        +k[i]
-        +(w[i]=(i<16)?w[i]:(w[i-16]+(rightRotate(w15,7)^rightRotate(w15,18)^(w15>>>3))+w[i-7]+(rightRotate(w2,17)^rightRotate(w2,19)^(w2>>>10)))|0);
-      var temp2=(rightRotate(a,2)^rightRotate(a,13)^rightRotate(a,22))+((a&hash[1])^(a&hash[2])^(hash[1]&hash[2]));
-      hash=[(temp1+temp2)|0].concat(hash);
-      hash[4]=(hash[4]+temp1)|0;
-    }
-    for(i=0;i<8;i++){hash[i]=(hash[i]+oldHash[i])|0;}
-  }
-  for(i=0;i<8;i++){
-    for(j=3;j+1;j--){
-      var b=(hash[i]>>(j*8))&255;
-      result+=((b<16)?'0':'')+b.toString(16);
-    }
-  }
-  return result;
-};
-function sha256Of(s){return __sha256(unescape(encodeURIComponent(s)));}
-
-var DOOR_HASH='0b4a40359230328653303ebd2849c013f81307b1c894344deec2d611145804c8';
-
 /* ── экран доступа ── */
 (function access(){
   var screen=document.getElementById('access-screen');
@@ -73,15 +18,36 @@ var DOOR_HASH='0b4a40359230328653303ebd2849c013f81307b1c894344deec2d611145804c8'
     if(v==='HAPPYNEWHACK'){
       try{ localStorage.setItem('hu_access','1'); }catch(e){}
       err.textContent=''; hide();
-    }else if(sha256Of(v)===DOOR_HASH){
-      try{ sessionStorage.setItem('bo_invite',String(Date.now())); }catch(e){}
-      location.href='black-ops.html';
     }else{
       err.textContent='✘ доступ запрещён. код знает ведущий. и, возможно, санта';
     }
   }
   if(btn) btn.addEventListener('click',tryCode);
   if(inp) inp.addEventListener('keydown',function(e){ if(e.key==='Enter') tryCode(); });
+})();
+
+/* ── невидимая дверь BLACK OPS ── */
+(function boDoor(){
+  /* код хранится только как SHA-256, сам код в исходниках не существует */
+  var DOOR_HASH='0b4a40359230328653303ebd2849c013f81307b1c894344deec2d611145804c8';
+  var buf='';
+  function sha(t){
+    if(!window.crypto||!window.crypto.subtle) return null;
+    return crypto.subtle.digest('SHA-256',new TextEncoder().encode(t)).then(function(b){
+      return Array.prototype.map.call(new Uint8Array(b),function(x){return ('0'+x.toString(16)).slice(-2);}).join('');
+    });
+  }
+  document.addEventListener('keydown',function(e){
+    if(!e.key || e.key.length!==1 || e.ctrlKey || e.metaKey || e.altKey) return;
+    if(document.activeElement && document.activeElement.tagName==='INPUT' && document.activeElement.type!=='password') return;
+    buf=(buf+e.key).slice(-8);
+    sha(buf).then(function(h){
+      if(h===DOOR_HASH){
+        try{ sessionStorage.setItem('bo_pending',String(Date.now())); }catch(err){}
+        location.href='black-ops.html';
+      }
+    }).catch(function(){});
+  });
 })();
 
 /* ── снег ── */

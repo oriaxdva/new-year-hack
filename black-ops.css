@@ -1,42 +1,108 @@
-/* ═══ BLACK OPS · стили декои, терминала и панели ═══ */
-body{margin:0;background:#fff}
-/* ── декоя 404 (видно всем, у кого нет приглашения) ── */
-.bo-decoy{font-family:Helvetica,Arial,sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:40px;text-align:center;color:#24292f}
-.bo-decoy h1{font-size:28px;font-weight:600;margin:0}
-.bo-decoy p{color:#57606a;font-size:15px;margin:0}
-/* ── оболочка терминала/панели ── */
-.bo-shell{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:radial-gradient(ellipse at 50% 0%,#0e1a10 0%,#0a120c 70%)}
-.bo-frame{position:relative;width:100%;max-width:720px;border:1px solid rgba(126,224,140,.3);border-radius:10px;background:rgba(8,16,10,.95);box-shadow:0 0 40px rgba(60,120,70,.15),inset 0 0 60px rgba(0,0,0,.5);padding:22px;overflow:hidden}
-.bo-wide{max-width:960px}
-.bo-scan{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.15) 0 1px,transparent 1px 4px);opacity:.5;z-index:2}
-.bo-title{font-family:'VT323',monospace;font-size:24px;letter-spacing:2px;color:#7ee08c;text-shadow:0 0 6px rgba(126,224,140,.4);margin-bottom:14px;position:relative;z-index:3}
-.bo-out{font-family:monospace;font-size:15px;color:#5cbf6e;min-height:84px;max-height:180px;overflow:auto;margin-bottom:12px;position:relative;z-index:3}
-.bo-line{margin:2px 0;white-space:pre-wrap}
-.bo-err{color:#e06a5a}
-.bo-ok{color:#7ee08c}
-.bo-dim{color:#3f7a4c}
-.bo-inputrow{display:flex;gap:8px;align-items:center;position:relative;z-index:3}
-.bo-prompt{font-family:monospace;color:#7ee08c}
-.bo-input{flex:1;background:rgba(0,0,0,.5);border:1px solid rgba(126,224,140,.35);color:#7ee08c;font-family:monospace;font-size:16px;padding:7px 10px;border-radius:4px;outline:none}
-.bo-input:focus{border-color:#7ee08c;box-shadow:0 0 8px rgba(126,224,140,.3)}
-.bo-btn{background:none;border:1px solid rgba(126,224,140,.4);color:#7ee08c;font-family:'VT323',monospace;font-size:17px;letter-spacing:1px;padding:5px 16px;cursor:pointer;border-radius:4px}
-.bo-btn:hover{background:rgba(126,224,140,.12)}
-.bo-danger{border-color:rgba(224,106,90,.5);color:#e06a5a}
-.bo-danger:hover{background:rgba(224,106,90,.12)}
-.bo-hint{color:#3f7a4c;font-family:monospace;font-size:13px;margin-top:12px;position:relative;z-index:3}
-.bo-glitch{animation:boglitch .45s steps(2) 1}
-@keyframes boglitch{0%{transform:translateX(0)}25%{transform:translateX(-3px)}50%{transform:translateX(3px)}75%{transform:translateX(-2px)}100%{transform:translateX(0)}}
-/* ── панель ── */
-.bo-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
-.bo-clock{font-family:monospace;color:#3f7a4c;position:relative;z-index:3}
-.bo-stats{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0;position:relative;z-index:3}
-.bo-card{flex:1;min-width:120px;border:1px solid rgba(126,224,140,.25);border-radius:6px;padding:10px;text-align:center;background:rgba(0,0,0,.3)}
-.bo-num{font-family:monospace;font-size:22px;color:#7ee08c;text-shadow:0 0 6px rgba(126,224,140,.35);word-break:break-all}
-.bo-cap{color:#3f7a4c;font-family:monospace;font-size:13px;margin-top:3px}
-.bo-sub{font-family:monospace;letter-spacing:2px;color:#5cbf6e;font-size:15px;margin:16px 0 8px;position:relative;z-index:3}
-.bo-table{width:100%;border-collapse:collapse;font-family:monospace;font-size:13px;position:relative;z-index:3}
-.bo-table th{color:#3f7a4c;text-align:left;font-weight:normal;letter-spacing:1px;border-bottom:1px solid rgba(126,224,140,.25);padding:4px 6px}
-.bo-table td{color:#5cbf6e;border-bottom:1px solid rgba(126,224,140,.08);padding:4px 6px;word-break:break-all}
-.bo-btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;position:relative;z-index:3}
-@media (max-width:600px){.bo-frame{padding:14px}.bo-num{font-size:18px}}
-@media (prefers-reduced-motion: reduce){.bo-glitch{animation:none}}
+/* ═══ BLACK OPS · CRT-стили · копия темы квеста ═══ */
+/* декоя (404) остаётся белой — тема включается только после входа */
+body{margin:0}
+.decoy-404{font-family:system-ui,-apple-system,sans-serif;color:#24292f;text-align:center;padding:90px 20px}
+.decoy-404 h1{font-size:76px;margin:0 0 8px}
+.decoy-404 a{color:#0969da;text-decoration:none}
+
+/* ── CRT-тема ── */
+body.bo-crt{
+  background:radial-gradient(ellipse at 50% 0%, #0e1a10 0%, #0a120c 70%);
+  color:#7ee08c; font-family:'VT323',monospace; font-size:20px; line-height:1.5;
+  min-height:100vh;
+}
+/* ── снег ── */
+.snow-layer{position:fixed;inset:0;pointer-events:none;z-index:60;overflow:hidden}
+.snow-layer span{position:absolute;top:-24px;color:rgba(200,235,210,.5);animation:bo-fall linear infinite}
+@keyframes bo-fall{to{transform:translateY(110vh) rotate(40deg)}}
+/* ── рамка экрана ── */
+.crt-frame{
+  position:relative; max-width:1080px; margin:14px auto;
+  border:1px solid rgba(126,224,140,.25); border-radius:12px;
+  background:rgba(10,20,12,.92);
+  box-shadow:0 0 40px rgba(60,120,70,.12), inset 0 0 60px rgba(0,0,0,.5);
+  overflow:hidden;
+}
+.scanlines{position:absolute;inset:0;pointer-events:none;z-index:5;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.14) 0 1px,transparent 1px 4px);opacity:.5}
+.tv-glass{position:absolute;inset:0;pointer-events:none;z-index:6;
+  background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.45) 100%)}
+/* ── шапка ── */
+.crt-header{position:relative;z-index:10;padding:14px 18px 8px;border-bottom:1px solid rgba(126,224,140,.2)}
+.header-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}
+.logo{font-size:24px;letter-spacing:1px;text-shadow:0 0 6px rgba(126,224,140,.35)}
+.logo-accent{color:#e8b84a}
+.header-right{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.clock{color:#3f7a4c}
+.header-btn{background:none;border:1px solid rgba(126,224,140,.3);color:#3f7a4c;
+  font-family:inherit;font-size:15px;padding:2px 10px;cursor:pointer;border-radius:3px}
+.header-btn:hover{color:#e06a5a;border-color:#e06a5a}
+.crt-nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.crt-nav button{background:none;border:1px solid rgba(126,224,140,.3);color:#5cbf6e;
+  font-family:inherit;font-size:17px;padding:4px 14px;cursor:pointer;border-radius:3px;letter-spacing:1px}
+.crt-nav button:hover{border-color:#7ee08c;color:#7ee08c}
+.crt-nav button.active{background:rgba(126,224,140,.12);color:#7ee08c;border-color:#7ee08c;
+  box-shadow:0 0 6px rgba(126,224,140,.35)}
+/* ── гирлянда ── */
+.garland{position:relative;z-index:10;height:26px;display:flex;justify-content:space-around;
+  align-items:center;padding:0 8px;border-bottom:1px solid rgba(126,224,140,.12)}
+.garland::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:repeating-linear-gradient(90deg,rgba(120,90,50,.8) 0 8px,transparent 8px 12px)}
+.bulb{width:9px;height:14px;border-radius:50% 50% 45% 45%;position:relative;top:3px;
+  animation:bo-blink 2.4s ease-in-out infinite}
+.bulb::before{content:'';position:absolute;top:-4px;left:50%;width:2px;height:4px;
+  transform:translateX(-50%);background:#7a5a32}
+@keyframes bo-blink{0%,100%{opacity:1;box-shadow:0 0 8px currentColor}50%{opacity:.25;box-shadow:none}}
+/* ── контент ── */
+.crt-main{position:relative;z-index:10;padding:18px;min-height:320px}
+.crt-section{display:none}
+.crt-section.active{display:block}
+.crt-title{font-size:26px;letter-spacing:2px;text-shadow:0 0 6px rgba(126,224,140,.35);margin:0 0 8px}
+.crt-text{color:#5cbf6e;margin:0 0 10px}
+.dim{color:#3f7a4c}
+.small{font-size:15px;color:#3f7a4c;margin-top:8px}
+.crt-footer{position:relative;z-index:10;padding:10px 18px;border-top:1px solid rgba(126,224,140,.2);
+  color:#3f7a4c;font-size:16px;text-align:center}
+/* ── терминал ── */
+.terminal-box{max-width:560px;margin:30px auto;border:1px dashed rgba(126,224,140,.35);
+  border-radius:8px;padding:24px;background:rgba(0,0,0,.35)}
+.terminal-line{display:flex;gap:8px;align-items:center;margin-top:14px}
+.terminal-prompt{color:#e8b84a;white-space:nowrap}
+.terminal-line input{flex:1;min-width:0;background:rgba(0,0,0,.4);border:1px solid rgba(126,224,140,.4);
+  color:#7ee08c;font-family:inherit;font-size:20px;padding:6px 10px;border-radius:3px;outline:none}
+.terminal-line input:focus{border-color:#7ee08c;box-shadow:0 0 6px rgba(126,224,140,.3)}
+.terminal-err{margin-top:10px;color:#e06a5a;min-height:24px}
+/* ── статистика ── */
+.stats-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.stat-card{flex:1;min-width:130px;border:1px solid rgba(126,224,140,.3);border-radius:6px;
+  padding:10px;background:rgba(126,224,140,.05);text-align:center}
+.stat-num{font-size:24px;color:#e8b84a;text-shadow:0 0 6px rgba(232,184,74,.35)}
+.stat-label{font-size:14px;color:#3f7a4c;letter-spacing:1px}
+/* ── таблицы ── */
+.table-wrap{overflow-x:auto;border:1px solid rgba(126,224,140,.2);border-radius:6px}
+table.data-table{width:100%;border-collapse:collapse;font-size:15px;white-space:nowrap}
+table.data-table th{border-bottom:1px solid rgba(126,224,140,.4);padding:6px 10px;text-align:left;
+  color:#e8b84a;letter-spacing:1px;background:rgba(10,20,12,.95)}
+table.data-table td{border-bottom:1px solid rgba(126,224,140,.1);padding:5px 10px;color:#5cbf6e}
+table.data-table tr:hover td{background:rgba(126,224,140,.06)}
+/* ── баннеры и строки ── */
+.flag-banner{border:1px solid rgba(126,224,140,.5);border-radius:6px;padding:10px 14px;
+  background:rgba(126,224,140,.08);color:#7ee08c;margin-bottom:12px;text-align:center}
+.system-line{display:flex;justify-content:space-between;gap:10px;padding:6px 4px;
+  border-bottom:1px dashed rgba(126,224,140,.15);flex-wrap:wrap}
+.system-line b{color:#e8b84a;font-weight:normal}
+/* ── кнопки ── */
+.btn-primary{display:inline-block;border:1px solid #7ee08c;color:#7ee08c;background:rgba(126,224,140,.1);
+  font-family:inherit;font-size:17px;padding:6px 16px;cursor:pointer;border-radius:3px;letter-spacing:1px}
+.btn-primary:hover{background:rgba(126,224,140,.22);box-shadow:0 0 6px rgba(126,224,140,.3)}
+.btn-ghost{display:inline-block;border:1px solid #3f7a4c;color:#3f7a4c;background:none;
+  font-family:inherit;font-size:16px;padding:5px 14px;cursor:pointer;border-radius:3px}
+.btn-ghost:hover{color:#e06a5a;border-color:#e06a5a}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+/* ── тикер ── */
+.bo-ticker{position:relative;z-index:10;padding:6px 18px;border-top:1px solid rgba(126,224,140,.2);
+  color:#3f7a4c;font-size:15px;letter-spacing:1px;white-space:nowrap;overflow:hidden}
+/* ── глитч при отказе ── */
+@keyframes bo-glitch{0%,100%{transform:none;filter:none}20%{transform:translateX(-3px);filter:hue-rotate(60deg)}
+  40%{transform:translateX(3px)}60%{transform:translateX(-2px);filter:hue-rotate(60deg)}80%{transform:translateX(2px)}}
+body.bo-glitch .crt-frame{animation:bo-glitch .4s steps(2)}
