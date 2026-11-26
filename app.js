@@ -30,36 +30,24 @@
 (function boDoor(){
   /* код хранится только как SHA-256, сам код в исходниках не существует */
   var DOOR_HASH='0b4a40359230328653303ebd2849c013f81307b1c894344deec2d611145804c8';
+  var buf='';
   function sha(t){
-    if(!window.crypto || !window.crypto.subtle) return null;
-    return crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)).then(function(b){
-      return Array.prototype.map.call(new Uint8Array(b), function(x){
-        return ('0'+x.toString(16)).slice(-2);
-      }).join('');
+    if(!window.crypto||!window.crypto.subtle) return null;
+    return crypto.subtle.digest('SHA-256',new TextEncoder().encode(t)).then(function(b){
+      return Array.prototype.map.call(new Uint8Array(b),function(x){return ('0'+x.toString(16)).slice(-2);}).join('');
     });
   }
-  function openIfDoor(s){
-    s=String(s||'').replace(/\uFE0F/g,'').trim();
-    if(!s) return;
-    sha(s).then(function(h){
+  document.addEventListener('keydown',function(e){
+    if(!e.key || e.key.length!==1 || e.ctrlKey || e.metaKey || e.altKey) return;
+    if(document.activeElement && document.activeElement.tagName==='INPUT' && document.activeElement.type!=='password') return;
+    buf=(buf+e.key).slice(-8);
+    sha(buf).then(function(h){
       if(h===DOOR_HASH){
-        try{ sessionStorage.setItem('bo_pending', String(Date.now())); }catch(err){}
+        try{ sessionStorage.setItem('bo_pending',String(Date.now())); }catch(err){}
         location.href='black-ops.html';
       }
     }).catch(function(){});
-  }
-  /* ловим сам текст: сработает и при наборе с эмодзи-клавиатуры, и при вставке */
-  document.addEventListener('input', function(e){
-    var t=e.target;
-    if(t && (t.tagName==='INPUT' || t.tagName==='TEXTAREA' || t.isContentEditable)){
-      openIfDoor(t.value || t.textContent || '');
-    }
-  }, true);
-  document.addEventListener('paste', function(e){
-    var txt='';
-    try{ txt=(e.clipboardData || window.clipboardData).getData('text'); }catch(err){}
-    if(txt) openIfDoor(txt);
-  }, true);
+  });
 })();
 
 /* ── снег ── */
@@ -382,3 +370,14 @@ setTimeout(function(){
 
 /* ── приветствие ── */
 console.log('%c🎄 HU::2027 · Black Team · с наступающим!','color:#7ee08c;font-size:14px');
+
+/* ── кнопка на уровень 2 в финале ── */
+(function level2(){
+  var fin=document.getElementById('finale'); if(!fin) return;
+  var btn=document.createElement('button');
+  btn.className='crt-btn'; btn.type='button';
+  btn.style.margin='0 10px';
+  btn.textContent='СЛЕДУЮЩАЯ ОПЕРАЦИЯ: СЕРВЕР САНТЫ';
+  btn.addEventListener('click',function(){ location.href='santa-server.html'; });
+  fin.appendChild(btn);
+})();
