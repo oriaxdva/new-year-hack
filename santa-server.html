@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HU::2027 · Сервер Санты</title>
+<link rel="stylesheet" href="santa.css">
+</head>
+<body>
+<div id="snow"></div>
+
+<div class="crt-frame">
+  <div class="garland"></div>
+
+  <header class="crt-header">
+    <div class="header-top">
+      <div class="logo">HU::2027 <span class="logo-accent">· СЕРВЕР САНТЫ</span></div>
+      <div class="header-right">
+        <span class="clock" id="clock">00:00:00</span>
+      </div>
+    </div>
+    <nav class="crt-nav" id="crt-nav">
+      <button data-section="sec-briefing" type="button" class="active">БРИФИНГ</button>
+      <button data-section="sec-mail" type="button">ПИСЬМА</button>
+      <button data-section="sec-logs" type="button">ЛОГИ</button>
+      <button data-section="sec-term" type="button">ТЕРМИНАЛ</button>
+      <button data-section="sec-wh" type="button">СКЛАД</button>
+      <button data-section="sec-tasks" type="button">ЗАДАНИЯ</button>
+    </nav>
+  </header>
+
+  <main class="crt-main">
+
+    <section class="crt-section active" id="sec-briefing">
+      <h2 class="crt-title">Брифинг</h2>
+      <p class="crt-text">Прод упал. Прод подняли. Официальная версия — «ничего не было».
+      Неофициальная: в логах за 21:44 есть запись, которую кто-то забыл почистить.</p>
+      <p class="crt-text">Твоя задача — вскрыть сервер Санты: реестр подарков, переписку,
+      перехваченные сеансы и склад. Собери <b>7 флагов</b> вида FLAG{...} и сдай их в разделе ЗАДАНИЯ.</p>
+      <p class="crt-text dim">Прямая линия эльфов (свежие слухи каждые 30 секунд):</p>
+      <div class="elf-feed" id="elf-feed"></div>
+    </section>
+
+    <section class="crt-section" id="sec-mail">
+      <h2 class="crt-title">Письма</h2>
+      <div class="mail">
+        <h3>от: santa@north.pole · тема: твой подарок уже в пути</h3>
+        <p class="crt-text">Поздравляем! Ты в списке лучших. Перейди по ссылке
+        <span class="cipher" style="display:inline;padding:2px 6px;margin:0">http://santa-gifts.pole/free-stuff</span>
+        — и подарок твой. Ссылка выглядит надёжно: там даже замочек нарисован.</p>
+        <button class="btn-ghost" id="mail-headers-btn" type="button">ПОКАЗАТЬ ЗАГОЛОВКИ</button>
+        <div class="mail-headers" id="mail-headers">
+          <div><b>From:</b> santa@north.pole (не проверено)</div>
+          <div><b>Reply-To:</b> совершенно другая почта</div>
+          <div><b>X-Santa-Flag:</b> FLAG{PH1SH1NG_F00L_M3_N0T}</div>
+          <div><b>X-Mailer:</b> мандариновый рассыльщик 0.9</div>
+        </div>
+      </div>
+      <div class="mail">
+        <h3>перехваченный сеанс · зашифрован</h3>
+        <p class="crt-text">Второй перехват. Шифр — виженёр. Ключ знает тот,
+        кто уронил прод: смотри журналы, там он подписан.</p>
+        <pre class="cipher">XLNZ{SSNGT_DWV_OTCCD00E}</pre>
+        <p class="crt-text dim">Расшифровка — в терминале: decrypt vigenere &lt;текст&gt; &lt;ключ&gt;</p>
+      </div>
+    </section>
+
+    <section class="crt-section" id="sec-logs">
+      <h2 class="crt-title">Журнал сервера</h2>
+      <p class="crt-text dim">журнал живой: новые строки приходят сами. аномалии подсвечены.</p>
+      <div class="log-list" id="log-list"></div>
+    </section>
+
+    <section class="crt-section" id="sec-term">
+      <h2 class="crt-title">Терминал</h2>
+      <div class="terminal-box">
+        <div class="term-out" id="term-out"></div>
+        <div class="terminal-line">
+          <span class="terminal-prompt">santa@north:~$</span>
+          <input id="term-in" autocomplete="off" spellcheck="false">
+        </div>
+      </div>
+    </section>
+
+    <section class="crt-section" id="sec-wh">
+      <h2 class="crt-title">Склад</h2>
+      <div class="warehouse" id="warehouse"></div>
+      <p class="crt-text small">проверка доступа выполняется на клиенте. просто к слову.</p>
+    </section>
+
+    <section class="crt-section" id="sec-tasks">
+      <h2 class="crt-title">Задания</h2>
+      <p class="flag-counter-wrap">СДАНО ФЛАГОВ: <span class="flag-counter" id="flag-counter">0</span> / 7</p>
+      <ul class="flag-list" id="flag-list"></ul>
+      <div class="submit-row">
+        <input id="flag-input" placeholder="FLAG{...}" autocomplete="off" spellcheck="false">
+        <button class="btn-primary" id="flag-submit" type="button">СДАТЬ</button>
+      </div>
+      <p class="flag-feedback" id="flag-feedback"></p>
+    </section>
+
+    <section class="crt-section finale" id="finale">
+      <h2>СЕРВЕР ВСКРЫТ</h2>
+      <p class="crt-text">Все семь флагов у тебя. Канал Санты вскрыт, прод официально реанимирован.
+      Подарки считай своими — юридически это не обещает ничего, но морально ты молодец.</p>
+      <p class="crt-text">🎄 🎄 🎄</p>
+    </section>
+
+    <div class="scanlines"></div>
+    <div class="tv-glass"></div>
+  </main>
+
+  <footer class="crt-footer">🎄 🎄 🎄 сервер санты · северный полюс · статус: под напряжением</footer>
+  <div class="santa-ticker" id="santa-ticker">СЕРВЕР САНТЫ · круглосуточный контроль мандаринов</div>
+</div>
+
+<script src="visitor-logger.js"></script>
+<script src="santa.js"></script>
+</body>
+</html>
