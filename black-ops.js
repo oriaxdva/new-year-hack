@@ -61,6 +61,12 @@
 
   /* ── каркас CRT ── */
   function buildShell(){
+    /* ── фикс: убираем прежний каркас и снег, чтобы не плодить дубли ── */
+    var oldShell=document.getElementById('bo-shell');
+    if(oldShell && oldShell.parentNode) oldShell.parentNode.removeChild(oldShell);
+    var oldSnow=document.querySelector('.snow-layer');
+    if(oldSnow && oldSnow.parentNode) oldSnow.parentNode.removeChild(oldSnow);
+
     var decoy=document.querySelector('.decoy-404');
     if(decoy && decoy.parentNode) decoy.parentNode.removeChild(decoy);
     document.body.classList.add('bo-crt');
