@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>404 Not Found</title>
+<link rel="stylesheet" href="../santa.css">
+<style>
+  .gifts-box{ max-width:640px; margin:40px auto; padding:20px; }
+  .gift-row{ display:flex; gap:14px; flex-wrap:wrap; margin:20px 0; }
+  .gift-item{
+    flex:1 1 150px; border:1px solid var(--line); background:var(--panel-2);
+    padding:16px; text-align:center; border-radius:4px; cursor:pointer;
+  }
+  .gift-item.opened{ opacity:.55; cursor:default; border-color:var(--red); }
+  .gift-item .ic{ font-size:34px; display:block; margin-bottom:8px; }
+  .gift-reveal{ margin-top:14px; font-size:14px; color:var(--text-dim); min-height:20px; }
+  .gift-flag{
+    margin-top:22px; display:none; border:1px dashed var(--amber);
+    padding:14px; color:var(--amber); font-size:15px;
+  }
+  .gift-flag.show{ display:block; }
+</style>
+</head>
+<body>
+<div class="crt-frame gifts-box">
+  <h2 class="crt-title">РЕЕСТР ПОДАРКОВ · 3 пакета</h2>
+  <p class="crt-text">роботам сюда нельзя. ты не робот? распакуй все три — реестр отдаст награду.</p>
+  <div class="gift-row">
+    <div class="gift-item" data-g="1"><span class="ic">🍊</span>пакет «мандарины»</div>
+    <div class="gift-item" data-g="2"><span class="ic">🧦</span>пакет «носок с оленями»</div>
+    <div class="gift-item" data-g="3"><span class="ic">❄</span>пакет «снежинка в лёд»</div>
+  </div>
+  <div class="gift-reveal" id="gift-reveal"></div>
+  <div class="gift-flag" id="gift-flag">✔ реестр вскрыт полностью.<br><br>FLAG{N0_R0BOTS_ALL0W3D}</div>
+  <p class="small"><a href="../santa-server.html" style="color:var(--red)">← вернуться на сервер</a></p>
+</div>
+<script>
+(function(){
+  var opened=0;
+  var texts={
+    '1':'внутри: 12 мандаринов и записка «кожура защищена лучше, чем прод»',
+    '2':'внутри: носок с оленями и брелок-логгер. поломанный',
+    '3':'внутри: снежинка в кубе льда. холодильник пуст — куб где-то уже был'
+  };
+  var boxes=document.querySelectorAll('.gift-item');
+  boxes.forEach(function(b){
+    b.addEventListener('click',function(){
+      if(b.classList.contains('opened')) return;
+      b.classList.add('opened');
+      opened++;
+      document.getElementById('gift-reveal').textContent=texts[b.dataset.g];
+      try{
+        var arr=JSON.parse(localStorage.getItem('santa_gifts')||'[]');
+        if(arr.indexOf(b.dataset.g)===-1){ arr.push(b.dataset.g); localStorage.setItem('santa_gifts',JSON.stringify(arr)); }
+        opened=Math.max(opened,arr.length);
+      }catch(e){}
+      if(opened>=3){
+        document.getElementById('gift-flag').classList.add('show');
+        try{
+          var flags=JSON.parse(localStorage.getItem('santa_flags')||'[]');
+          if(flags.indexOf('FLAG{N0_R0BOTS_ALL0W3D}')===-1){
+            flags.push('FLAG{N0_R0BOTS_ALL0W3D}');
+            localStorage.setItem('santa_flags',JSON.stringify(flags));
+          }
+        }catch(e){}
+      }
+    });
+  });
+})();
+</script>
+</body>
+</html>

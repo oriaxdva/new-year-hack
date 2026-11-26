@@ -286,7 +286,7 @@
         v.tz||'—',
         v.lang||'—',
         v.plat||'—',
-        (v.flags!=null ? v.flags+'/6' : '—'),
+        (v.flags!=null ? v.flags+((v.page||'').indexOf('santa')>-1?'/7':'/6') : '—'),
         (v.access ? 'открыт' : 'закрыт'),
         v.section||'—',
         (v.dwell!=null ? fmtDur(v.dwell) : '—'),
