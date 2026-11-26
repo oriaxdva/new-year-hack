@@ -11,16 +11,34 @@
     {flag:'FLAG{C0NS0LE_SANTA_2027}',     hint:'консоль браузера'},
     {flag:'FLAG{CL13NT_S1DE_TRUST}',      hint:'склад и роль'}
   ];
-  function getFlags(){ try{return JSON.parse(localStorage.getItem('hu_flags')||'[]');}catch(e){return [];} }
+  var SKEY='santa_flags';
+  function getFlags(){ try{return JSON.parse(localStorage.getItem(SKEY)||'[]');}catch(e){return [];} }
   function saveFlag(f){
     var arr=getFlags();
-    if(arr.indexOf(f)===-1){ arr.push(f); try{localStorage.setItem('hu_flags',JSON.stringify(arr));}catch(e){} }
+    if(arr.indexOf(f)===-1){ arr.push(f); try{localStorage.setItem(SKEY,JSON.stringify(arr));}catch(e){} }
     renderFlags();
   }
-  function allDone(){ return getFlags().length>=FLAGS.length; }
+  /* миграция: флаги уровня 2 больше не живут в hu_flags уровня 1 */
+  (function migrate(){
+    var old=null;
+    try{ old=JSON.parse(localStorage.getItem('hu_flags')||'[]'); }catch(e){ old=[]; }
+    if(!Array.isArray(old)) old=[];
+    var mine=old.filter(function(f){ return FLAGS.some(function(x){ return x.flag===f; }); });
+    if(!mine.length) return;
+    var rest=old.filter(function(f){ return mine.indexOf(f)===-1; });
+    var now=getFlags();
+    mine.forEach(function(f){ if(now.indexOf(f)===-1) now.push(f); });
+    try{ localStorage.setItem(SKEY,JSON.stringify(now)); }catch(e){}
+    try{ localStorage.setItem('hu_flags',JSON.stringify(rest)); }catch(e){}
+  })();
+  function allDone(){
+    var found=getFlags();
+    return FLAGS.every(function(x){ return found.indexOf(x.flag)>-1; });
+  }
   function renderFlags(){
     var found=getFlags();
-    var c=document.getElementById('flag-counter'); if(c) c.textContent=found.length;
+    var cnt=FLAGS.filter(function(x){ return found.indexOf(x.flag)>-1; }).length;
+    var c=document.getElementById('flag-counter'); if(c) c.textContent=cnt;
     var list=document.getElementById('flag-list');
     if(list){
       list.innerHTML='';
@@ -40,9 +58,11 @@
     var match=FLAGS.find(function(x){return x.flag===v;});
     if(match){
       saveFlag(match.flag);
-      if(fb){ fb.textContent='✔ флаг принят: '+match.flag; fb.style.color='var(--red)'; }
+      var fi=document.getElementById('flag-input'); if(fi) fi.value='';
+      if(fb){ fb.textContent='✔ флаг принят: '+match.flag; fb.style.color='#7ee08c'; }
     }else if(fb){
       fb.textContent='✘ сервер санта отклонил ввод. это не флаг.';
+      fb.style.color='var(--red)';
     }
   }
   var finEl=document.getElementById('flag-submit');
@@ -205,12 +225,21 @@
     '⚠ ALERT: обнаружен несанкционированный снеговик',
     '⚠ ТРЕВОГА: эльфы требуют повышение · или хотя бы компот'
   ];
+  var alertOpen=false;
   function showAlert(){
+    if(alertOpen){ setTimeout(showAlert, 20000); return; }
+    alertOpen=true;
     var b=document.createElement('div');
     b.className='alert-banner';
     b.textContent=ALERTS[Math.floor(Math.random()*ALERTS.length)];
+    var hint=document.createElement('span');
+    hint.className='alert-hint';
+    hint.textContent=' · клик — скрыть';
+    b.appendChild(hint);
+    b.style.cursor='pointer';
+    b.addEventListener('click',function(){ if(b.parentNode) b.parentNode.removeChild(b); alertOpen=false; });
     document.body.appendChild(b);
-    setTimeout(function(){ if(b.parentNode) b.parentNode.removeChild(b); }, 4000);
+    setTimeout(function(){ if(b.parentNode) b.parentNode.removeChild(b); alertOpen=false; }, 10000);
     setTimeout(showAlert, 90000+Math.random()*60000);
   }
   setTimeout(showAlert, 15000);
@@ -263,6 +292,15 @@
     }
   }
   renderWarehouse();
+  (function watchRole(){
+    var lastRole=null;
+    try{ lastRole=localStorage.getItem('santa_role'); }catch(e){}
+    setInterval(function(){
+      var role=null;
+      try{ role=localStorage.getItem('santa_role'); }catch(e){}
+      if(role!==lastRole){ lastRole=role; renderWarehouse(); }
+    },1500);
+  })();
 
   /* ── заметка в консоли ── */
   console.log('%cдоступ к складу проверяется на клиенте. кто мешает вам стать админом?',
@@ -318,7 +356,7 @@
     }else if(cmd==='ls'){
       printLine('santa.log   intercepted.txt   gifts_registry.json');
     }else if(cmd==='whoami'){
-      printLine('guest (неadmin). удивительно, сколько прав у гостя.');
+      printLine('guest · не админ. удивительно, сколько прав у гостя.');
     }else if(cmd==='clear'){
       out.innerHTML='';
     }else if(cmd==='cat'){
@@ -334,8 +372,9 @@
         printLine('cat: '+ (f||'?') +': файл не найден','err');
       }
     }else if(cmd==='decrypt'){
-      var mode=(parts[1]||'').toLowerCase();
-      var body=v.slice(cmd.length+mode.length).trim();
+      var rest=v.slice(cmd.length).trim();
+      var mode=rest.split(/\s+/)[0].toLowerCase();
+      var body=rest.slice(mode.length).trim();
       if(mode==='rot13'){
         if(!body){ printLine('использование: decrypt rot13 <текст>','err'); return; }
         var r=rot13(body);
